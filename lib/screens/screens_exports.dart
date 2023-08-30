@@ -1,0 +1,9 @@
+export './splash_screen.dart';
+export 'auth_screen/login_screen.dart';
+export 'auth_screen/signup_screen.dart';
+export './home_screen/home_screen.dart';
+export 'chat_room/chat_rooms_list.dart';
+export './choose_your_intrest_screen/choose_intrest_screen.dart';
+export './profile_screen/profile_screen.dart';
+export './podcast_screen/podcast_screen.dart';
+export './quotes_screen/quotes_screen.dart';
