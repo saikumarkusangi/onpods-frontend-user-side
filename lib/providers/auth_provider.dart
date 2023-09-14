@@ -38,10 +38,8 @@ class AuthProvider with ChangeNotifier {
     _user = user;
     final prefs = await SharedPreferences.getInstance();
     prefs.setBool('isUserLoggedIn', true);
-    prefs.setString('user_id', user.user.id);
-    prefs.setString('user_name', user.user.userName);
-    prefs.setString('user_profile_pic', user.user.userProfilePic);
-    prefs.setString('user_downloads', user.user.userDownloads.join(','));
+    prefs.setString('user_id', user.data.id);
+    prefs.setString('user_name', user.data.username);
     notifyListeners();
   }
 

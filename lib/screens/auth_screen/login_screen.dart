@@ -21,12 +21,16 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final FocusNode _field1FocusNode = FocusNode();
+  final FocusNode _field2FocusNode = FocusNode();
 
   @override
   void dispose() {
-    super.dispose();
+    _field1FocusNode.dispose();
+    _field2FocusNode.dispose();
     _emailController.dispose();
     _passwordController.dispose();
+    super.dispose();
   }
 
   @override
@@ -48,7 +52,8 @@ class _LoginScreenState extends State<LoginScreen> {
     }
 
     return WidgetHUD(
-      hud: HUD(progressIndicator: const CircularProgressIndicator(
+      hud: HUD(
+          progressIndicator: const CircularProgressIndicator(
         color: Colors.blue,
       )),
       showHUD: authProvider.isLoading,
@@ -114,125 +119,75 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ],
               ),
-              Form(
-                key: _formKey,
-                child: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      CustomTextFormField(
-                        controller: _emailController,
-                        autofocus: false,
-                        radius: 10,
-                        hintText: "Email Address",
-                        vertical: 16,
-                        fillColor: textFieldColor,
-                        hintStyle: const TextStyle(color: Colors.grey),
-                        textStyle: const TextStyle(color: Colors.white),
-                        validator: (value) {
-                          if (value!.isEmpty) {
-                            return 'Please enter email';
-                          }
-                          if (!isEmailValid(value)) {
-                            return 'Please enter a valid email address';
-                          }
-                          return null;
-                        },
-                      ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      CustomTextFormField(
-                        controller: _passwordController,
-                        autofocus: false,
-                        radius: 10,
-                        hintText: "Password",
-                        obscureText: !passwordToggle.isPasswordVisible,
-                        vertical: 16,
-                        suffix: IconButton(
-                          color: Colors.white,
-                          icon: Icon(
-                            passwordToggle.isPasswordVisible
-                                ? Icons.visibility
-                                : Icons.visibility_off,
-                          ),
-                          onPressed: () {
-                            passwordToggle.togglePasswordVisibility();
+              SizedBox(
+                height: MediaQuery.of(context).size.shortestSide - 25,
+                child: Form(
+                  key: _formKey,
+                  child: Padding(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        CustomTextFormField(
+                          controller: _emailController,
+                          autofocus: false,
+                          focusNode: _field1FocusNode,
+                          radius: 10,
+                          hintText: "Email Address",
+                          vertical: 16,
+                          fillColor: textFieldColor,
+                          hintStyle: const TextStyle(color: Colors.grey),
+                          textStyle: const TextStyle(color: Colors.white),
+                          validator: (value) {
+                            if (value!.isEmpty) {
+                              return 'Please enter email';
+                            }
+                            if (!isEmailValid(value)) {
+                              return 'Please enter a valid email address';
+                            }
+                            return null;
                           },
                         ),
-                        fillColor: textFieldColor,
-                        hintStyle: const TextStyle(color: Colors.grey),
-                        textStyle: const TextStyle(color: Colors.white),
-                        validator: (value) {
-                          if (value!.isEmpty) {
-                            return 'Please enter password';
-                          }
-                          if (value.length < 6) {
-                            return 'Password must be at least 6 characters long';
-                          }
-                          return null;
-                        },
-                      ),
-                      const SizedBox(
-                        height: 20,
-                      ),
-                      CustomElevatedButton(
-                        onTap: submit,
-                        height: 42,
-                        text: 'Login',
-                        buttonTextStyle:
-                            const TextStyle(color: Colors.white, fontSize: 18),
-                        buttonStyle: ButtonStyle(
-                          shape: MaterialStateProperty.all(
-                            RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
+                        CustomTextFormField(
+                          controller: _passwordController,
+                          focusNode: _field2FocusNode,
+                          autofocus: false,
+                          radius: 10,
+                          hintText: "Password",
+                          obscureText: !passwordToggle.isPasswordVisible,
+                          vertical: 16,
+                          suffix: IconButton(
+                            color: Colors.white,
+                            icon: Icon(
+                              passwordToggle.isPasswordVisible
+                                  ? Icons.visibility
+                                  : Icons.visibility_off,
                             ),
-                          ),
-                          fixedSize: MaterialStateProperty.resolveWith<Size?>(
-                            (Set<MaterialState> states) {
-                              if (states.contains(MaterialState.disabled)) {
-                                return Size(
-                                    1.sw, 40); // Size for disabled state
-                              }
-                              return Size(
-                                  1.sw, 40); // Default size for enabled state
+                            onPressed: () {
+                              passwordToggle.togglePasswordVisibility();
                             },
                           ),
-                          backgroundColor:
-                              MaterialStateProperty.resolveWith<Color?>(
-                            (Set<MaterialState> states) {
-                              if (states.contains(MaterialState.disabled)) {
-                                return Colors.grey; // Color for disabled state
-                              }
-                              return Colors
-                                  .blue; // Default color for enabled state
-                            },
-                          ),
+                          fillColor: textFieldColor,
+                          hintStyle: const TextStyle(color: Colors.grey),
+                          textStyle: const TextStyle(color: Colors.white),
+                          validator: (value) {
+                            if (value!.isEmpty) {
+                              return 'Please enter password';
+                            }
+                            if (value.length < 6) {
+                              return 'Password must be at least 6 characters long';
+                            }
+                            return null;
+                          },
                         ),
-                      ),
-                      const SizedBox(
-                        height: 5,
-                      ),
-                      const Align(
-                          alignment: Alignment.centerRight,
-                          child: Text(
-                            'Forgot Password?',
-                            style: TextStyle(color: Colors.blue),
-                          )),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      const Text(
-                        '( OR )',
-                        style: TextStyle(color: Colors.white),
-                      ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      OutlinedButton(
-                          style: ButtonStyle(
+                        CustomElevatedButton(
+                          onTap: submit,
+                          height: 42,
+                          text: 'Login',
+                          buttonTextStyle: const TextStyle(
+                              color: Colors.white, fontSize: 18),
+                          buttonStyle: ButtonStyle(
                             shape: MaterialStateProperty.all(
                               RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(10),
@@ -256,47 +211,86 @@ class _LoginScreenState extends State<LoginScreen> {
                                       .grey; // Color for disabled state
                                 }
                                 return Colors
-                                    .white; // Default color for enabled state
+                                    .blue; // Default color for enabled state
                               },
                             ),
                           ),
-                          onPressed: () {},
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Image.asset(
-                                googleLogo,
-                                height: 20,
+                        ),
+                        const Align(
+                            alignment: Alignment.centerRight,
+                            child: Text(
+                              'Forgot Password?',
+                              style: TextStyle(color: Colors.blue),
+                            )),
+                        const Text(
+                          '( OR )',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        OutlinedButton(
+                            style: ButtonStyle(
+                              shape: MaterialStateProperty.all(
+                                RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
                               ),
-                              const SizedBox(
-                                width: 20,
+                              fixedSize:
+                                  MaterialStateProperty.resolveWith<Size?>(
+                                (Set<MaterialState> states) {
+                                  if (states.contains(MaterialState.disabled)) {
+                                    return Size(
+                                        1.sw, 40); // Size for disabled state
+                                  }
+                                  return Size(1.sw,
+                                      40); // Default size for enabled state
+                                },
                               ),
-                              const Text(
-                                'Login With Google',
-                                style: TextStyle(color: Colors.blue),
+                              backgroundColor:
+                                  MaterialStateProperty.resolveWith<Color?>(
+                                (Set<MaterialState> states) {
+                                  if (states.contains(MaterialState.disabled)) {
+                                    return Colors
+                                        .grey; // Color for disabled state
+                                  }
+                                  return Colors
+                                      .white; // Default color for enabled state
+                                },
                               ),
-                            ],
-                          )),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      RichText(
-                        text: TextSpan(
-                            text: 'Don’t have account?',
-                            style: const TextStyle(
-                                color: Colors.white, fontSize: 16),
-                            children: [
-                              TextSpan(
-                                  recognizer: TapGestureRecognizer()
-                                    ..onTap = () {
-                                      Get.to(const SignUpScreen(),
-                                          transition: Transition.rightToLeft);
-                                    },
-                                  text: ' Sign up',
-                                  style: const TextStyle(color: Colors.blue))
-                            ]),
-                      )
-                    ],
+                            ),
+                            onPressed: () {},
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Image.asset(
+                                  googleLogo,
+                                  height: 20,
+                                ),
+                                const SizedBox(
+                                  width: 20,
+                                ),
+                                const Text(
+                                  'Login With Google',
+                                  style: TextStyle(color: Colors.blue),
+                                ),
+                              ],
+                            )),
+                        RichText(
+                          text: TextSpan(
+                              text: 'Don’t have account?',
+                              style: const TextStyle(
+                                  color: Colors.white, fontSize: 16),
+                              children: [
+                                TextSpan(
+                                    recognizer: TapGestureRecognizer()
+                                      ..onTap = () {
+                                        Get.to(const SignUpScreen(),
+                                            transition: Transition.rightToLeft);
+                                      },
+                                    text: ' Sign up',
+                                    style: const TextStyle(color: Colors.blue))
+                              ]),
+                        )
+                      ],
+                    ),
                   ),
                 ),
               )

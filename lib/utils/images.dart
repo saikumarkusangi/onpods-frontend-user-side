@@ -1,5 +1,4 @@
 const imagebaseUrl = 'assets/images';
-
 const splashLogo = '$imagebaseUrl/Logo.png';
 const loginImage = '$imagebaseUrl/login_image.jpg';
 const googleLogo = '$imagebaseUrl/googleLogo.webp';
@@ -11,3 +10,20 @@ const profileIcon = "$imagebaseUrl/user_icon.png";
 const quoteIcon = "$imagebaseUrl/quote_icon.png";
 const appBarLogo = "$imagebaseUrl/appbarLogo.png";
 const liveGif = "$imagebaseUrl/live.gif";
+const imagePlaceHolder = "$imagebaseUrl/imageplaceholder.png";
+const loveIcon = "$imagebaseUrl/love_icon.svg";
+const bookmarkIcon = "$imagebaseUrl/bookmark_icon.png";
+const chatIcon = "$imagebaseUrl/chat_icon.png";
+const sendIcon = "$imagebaseUrl/send_icon.png";
+const internrtIcon = "$imagebaseUrl/globe.png";
+const paint = "$imagebaseUrl/paint-palette.png";
+const galleryIcon = "$imagebaseUrl/gallery.png";
+const camera = "$imagebaseUrl/camera.png";
+const backgoundImageSearchLogo = '$imagebaseUrl/background_search.svg';
+const lovedIcon = '$imagebaseUrl/loved_icon.svg';
+const recordAudio = '$imagebaseUrl/record_audio.svg';
+const audioUpload = '$imagebaseUrl/upload_audio.svg';
+const micImage = '$imagebaseUrl/mic.png';
+const cdImage = '$imagebaseUrl/cd.svg';
+const micStand = '$imagebaseUrl/mic_stand.png';
+const cdGif = '$imagebaseUrl/cd_gif.gif';

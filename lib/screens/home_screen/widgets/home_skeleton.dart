@@ -80,7 +80,7 @@ class RecommendationSkeleton extends StatelessWidget {
             physics: const NeverScrollableScrollPhysics(),
             itemBuilder: (context, index) {
               return Padding(
-                padding: const EdgeInsets.only(right: 10),
+                padding: const EdgeInsets.only(left: 15),
                 child: _container,
               );
             }),
@@ -164,7 +164,7 @@ class QuotesSkeleton extends StatelessWidget {
             physics: const NeverScrollableScrollPhysics(),
             itemBuilder: (context, index) {
               return Padding(
-                padding: const EdgeInsets.only(right: 10),
+                padding: const EdgeInsets.only(left: 15),
                 child: _container,
               );
             }),

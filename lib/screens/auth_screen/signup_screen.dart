@@ -21,13 +21,19 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _nameController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final FocusNode _field1FocusNode = FocusNode();
+  final FocusNode _field2FocusNode = FocusNode();
+  final FocusNode _field3FocusNode = FocusNode();
 
   @override
   void dispose() {
-    super.dispose();
+    _field1FocusNode.dispose();
+    _field2FocusNode.dispose();
+    _field3FocusNode.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     _nameController.dispose();
+    super.dispose();
   }
 
   @override
@@ -118,142 +124,98 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         ),
                       ],
                     ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 15, vertical: 15),
-                      child: Form(
-                        key: _formKey,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            CustomTextFormField(
-                              controller: _nameController,
-                              autofocus: false,
-                              radius: 10,
-                              hintText: "Name",
-                              vertical: 16,
-                              fillColor: textFieldColor,
-                              hintStyle: const TextStyle(color: Colors.grey),
-                              textStyle: const TextStyle(color: Colors.white),
-                              validator: (value) {
-                                if (value!.isEmpty) {
-                                  return 'Please enter your name';
-                                }
-                                if (value.length < 3) {
-                                  return 'Name must be at least 3 characters long';
-                                }
-                                return null;
-                              },
-                            ),
-                            const SizedBox(
-                              height: 10,
-                            ),
-                            CustomTextFormField(
-                              controller: _emailController,
-                              autofocus: false,
-                              radius: 10,
-                              hintText: "Email Address",
-                              vertical: 16,
-                              fillColor: textFieldColor,
-                              hintStyle: const TextStyle(color: Colors.grey),
-                              textStyle: const TextStyle(color: Colors.white),
-                              validator: (value) {
-                                if (value!.isEmpty) {
-                                  return 'Please enter email';
-                                }
-                                if (!isEmailValid(value)) {
-                                  return 'Please enter a valid email address';
-                                }
-                                return null;
-                              },
-                            ),
-                            const SizedBox(
-                              height: 10,
-                            ),
-                            CustomTextFormField(
-                              controller: _passwordController,
-                              autofocus: false,
-                              radius: 10,
-                              hintText: "Password",
-                              obscureText: !passwordToggle.isPasswordVisible,
-                              vertical: 16,
-                              validator: (value) {
-                                if (value!.isEmpty) {
-                                  return 'Please enter password';
-                                }
-                                if (value.length < 6) {
-                                  return 'Password must be at least 6 characters long';
-                                }
-                                return null;
-                              },
-                              suffix: IconButton(
-                                color: Colors.white,
-                                icon: Icon(
-                                  passwordToggle.isPasswordVisible
-                                      ? Icons.visibility
-                                      : Icons.visibility_off,
-                                ),
-                                onPressed: () {
-                                  passwordToggle.togglePasswordVisibility();
+                    SizedBox(
+                      height: MediaQuery.of(context).size.shortestSide,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 15, vertical: 5),
+                        child: Form(
+                          key: _formKey,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              CustomTextFormField(
+                                focusNode: _field1FocusNode,
+                                controller: _nameController,
+                                autofocus: false,
+                                radius: 10,
+                                hintText: "Name",
+                                vertical: 16,
+                                fillColor: textFieldColor,
+                                hintStyle: const TextStyle(color: Colors.grey),
+                                textStyle: const TextStyle(color: Colors.white),
+                                validator: (value) {
+                                  if (value!.isEmpty) {
+                                    return 'Please enter your name';
+                                  }
+                                  if (value.length < 3) {
+                                    return 'Name must be at least 3 characters long';
+                                  }
+                                  return null;
                                 },
                               ),
-                              fillColor: textFieldColor,
-                              hintStyle: const TextStyle(color: Colors.grey),
-                              textStyle: const TextStyle(color: Colors.white),
-                            ),
-                            const SizedBox(
-                              height: 20,
-                            ),
-                            CustomElevatedButton(
-                              onTap: submit,
-                              height: 42,
-                              text: 'Create Account',
-                              buttonTextStyle: const TextStyle(
-                                  color: Colors.white, fontSize: 18),
-                              buttonStyle: ButtonStyle(
-                                shape: MaterialStateProperty.all(
-                                  RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                ),
-                                fixedSize:
-                                    MaterialStateProperty.resolveWith<Size?>(
-                                  (Set<MaterialState> states) {
-                                    if (states
-                                        .contains(MaterialState.disabled)) {
-                                      return Size(
-                                          1.sw, 40); // Size for disabled state
-                                    }
-                                    return Size(1.sw,
-                                        40); // Default size for enabled state
-                                  },
-                                ),
-                                backgroundColor:
-                                    MaterialStateProperty.resolveWith<Color?>(
-                                  (Set<MaterialState> states) {
-                                    if (states
-                                        .contains(MaterialState.disabled)) {
-                                      return Colors
-                                          .grey; // Color for disabled state
-                                    }
-                                    return Colors
-                                        .blue; // Default color for enabled state
-                                  },
-                                ),
+                              CustomTextFormField(
+                                focusNode: _field2FocusNode,
+                                controller: _emailController,
+                                autofocus: false,
+                                radius: 10,
+                                hintText: "Email Address",
+                                vertical: 16,
+                                fillColor: textFieldColor,
+                                hintStyle: const TextStyle(color: Colors.grey),
+                                textStyle: const TextStyle(color: Colors.white),
+                                validator: (value) {
+                                  if (value!.isEmpty) {
+                                    return 'Please enter email';
+                                  }
+                                  if (!isEmailValid(value)) {
+                                    return 'Please enter a valid email address';
+                                  }
+                                  return null;
+                                },
                               ),
-                            ),
-                            const SizedBox(
-                              height: 10,
-                            ),
-                            const Text(
-                              '( OR )',
-                              style: TextStyle(color: Colors.white),
-                            ),
-                            const SizedBox(
-                              height: 10,
-                            ),
-                            OutlinedButton(
-                                style: ButtonStyle(
+                              CustomTextFormField(
+                                focusNode: _field3FocusNode,
+                                controller: _passwordController,
+                                autofocus: false,
+                                radius: 10,
+                                hintText: "Password",
+                                obscureText: !passwordToggle.isPasswordVisible,
+                                vertical: 16,
+                                validator: (value) {
+                                  if (value!.isEmpty) {
+                                    return 'Please enter password';
+                                  }
+                                  if (value.length < 6) {
+                                    return 'Password must be at least 6 characters long';
+                                  }
+                                  return null;
+                                },
+                                suffix: IconButton(
+                                  color: Colors.white,
+                                  icon: Icon(
+                                    passwordToggle.isPasswordVisible
+                                        ? Icons.visibility
+                                        : Icons.visibility_off,
+                                  ),
+                                  onPressed: () {
+                                    passwordToggle.togglePasswordVisibility();
+                                  },
+                                ),
+                                fillColor: textFieldColor,
+                                hintStyle: const TextStyle(color: Colors.grey),
+                                textStyle: const TextStyle(color: Colors.white),
+                              ),
+                              const SizedBox(
+                                height: 5,
+                              ),
+                              CustomElevatedButton(
+                                onTap: submit,
+                                height: 42,
+                                text: 'Create Account',
+                                buttonTextStyle: const TextStyle(
+                                    color: Colors.white, fontSize: 18),
+                                buttonStyle: ButtonStyle(
                                   shape: MaterialStateProperty.all(
                                     RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(10),
@@ -276,53 +238,88 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                     (Set<MaterialState> states) {
                                       if (states
                                           .contains(MaterialState.disabled)) {
-                                        return Colors
-                                            .grey; // Color for disabled state
+                                        return const Color.fromRGBO(158, 158,
+                                            158, 1); // Color for disabled state
                                       }
                                       return Colors
-                                          .white; // Default color for enabled state
+                                          .blue; // Default color for enabled state
                                     },
                                   ),
                                 ),
-                                onPressed: () {},
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Image.asset(
-                                      googleLogo,
-                                      height: 20,
+                              ),
+                              const Text(
+                                '( OR )',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              OutlinedButton(
+                                  style: ButtonStyle(
+                                    shape: MaterialStateProperty.all(
+                                      RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
                                     ),
-                                    const SizedBox(
-                                      width: 20,
+                                    fixedSize: MaterialStateProperty
+                                        .resolveWith<Size?>(
+                                      (Set<MaterialState> states) {
+                                        if (states
+                                            .contains(MaterialState.disabled)) {
+                                          return Size(1.sw,
+                                              40); // Size for disabled state
+                                        }
+                                        return Size(1.sw,
+                                            40); // Default size for enabled state
+                                      },
                                     ),
-                                    const Text(
-                                      'Signup With Google',
-                                      style: TextStyle(color: Colors.blue),
+                                    backgroundColor: MaterialStateProperty
+                                        .resolveWith<Color?>(
+                                      (Set<MaterialState> states) {
+                                        if (states
+                                            .contains(MaterialState.disabled)) {
+                                          return Colors
+                                              .grey; // Color for disabled state
+                                        }
+                                        return Colors
+                                            .white; // Default color for enabled state
+                                      },
                                     ),
-                                  ],
-                                )),
-                            const SizedBox(
-                              height: 10,
-                            ),
-                            RichText(
-                              text: TextSpan(
-                                  text: 'Already have account?',
-                                  style: const TextStyle(
-                                      color: Colors.white, fontSize: 16),
-                                  children: [
-                                    TextSpan(
-                                        text: ' Login',
-                                        recognizer: TapGestureRecognizer()
-                                          ..onTap = () {
-                                            Get.off(const LoginScreen(),
-                                                transition:
-                                                    Transition.leftToRight);
-                                          },
-                                        style:
-                                            const TextStyle(color: Colors.blue))
-                                  ]),
-                            )
-                          ],
+                                  ),
+                                  onPressed: () {},
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Image.asset(
+                                        googleLogo,
+                                        height: 20,
+                                      ),
+                                      const SizedBox(
+                                        width: 20,
+                                      ),
+                                      const Text(
+                                        'Signup With Google',
+                                        style: TextStyle(color: Colors.blue),
+                                      ),
+                                    ],
+                                  )),
+                              RichText(
+                                text: TextSpan(
+                                    text: 'Already have account?',
+                                    style: const TextStyle(
+                                        color: Colors.white, fontSize: 16),
+                                    children: [
+                                      TextSpan(
+                                          text: ' Login',
+                                          recognizer: TapGestureRecognizer()
+                                            ..onTap = () {
+                                              Get.off(const LoginScreen(),
+                                                  transition:
+                                                      Transition.leftToRight);
+                                            },
+                                          style: const TextStyle(
+                                              color: Colors.blue))
+                                    ]),
+                              )
+                            ],
+                          ),
                         ),
                       ),
                     )

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:onpods/screens/home_screen/widgets/our_podcast.dart';
 import 'package:onpods/screens/home_screen/widgets/quotes_for_you.dart';
 import 'package:onpods/screens/home_screen/widgets/recommendation.dart';
@@ -32,25 +33,14 @@ class _HomeScreenState extends State<HomeScreen> {
           now.difference(currentBackPressTime!) > const Duration(seconds: 2)) {
         currentBackPressTime = now;
         ScaffoldMessenger.of(context).removeCurrentSnackBar();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            backgroundColor: Colors.transparent,
-            behavior: SnackBarBehavior.floating,
-            width: 0.55.sw,
-            content: Container(
-              margin: const EdgeInsets.symmetric(vertical: 2.0),
-              padding: const EdgeInsets.symmetric(vertical: 10),
-              decoration: BoxDecoration(
-                  color: Colors.grey.withOpacity(0.9),
-                  borderRadius: BorderRadius.circular(60)),
-              child: const Text(
-                'Press back again to exit',
-                style: TextStyle(color: Colors.black),
-                textAlign: TextAlign.center,
-              ),
-            ),
-          ),
-        );
+        Fluttertoast.showToast(
+            msg: "Press again to Exist.",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.white,
+            textColor: Colors.black,
+            fontSize: 16.0);
         return Future.value(false);
       }
       return Future.value(true);
@@ -67,51 +57,51 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: WillPopScope(
         onWillPop: onWillPop,
-        child: const Padding(
-          padding: EdgeInsets.only(left: 18),
+        child: Padding(
+          padding: const EdgeInsets.only(),
           child: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // FutureBuilder<String?>(
-                //   future: getStoredUsername(),
-                //   builder: (context, snapshot) {
-                //     if (snapshot.hasError) {
-                //       return Text('Error: ${snapshot.error}');
-                //     } else if (snapshot.hasData) {
-                //       return Text(
-                //         snapshot.data!,
-                //         style: const TextStyle(color: Colors.white),
-                //       );
-                //     }
-                //     return const CircularProgressIndicator();
-                //   },
-                // ),
-                // ElevatedButton(
-                //   onPressed: () {
-                //     userProvider.logout();
-                //     Get.off(const LoginScreen(),
-                //         transition: Transition.leftToRight);
-                //   },
-                //   child: const Text('Logout'),
-                // ),
-                SizedBox(
+                const SizedBox(
                   height: 20,
                 ),
-                OurPodcast(),
-                SizedBox(
+                const OurPodcast(),
+                const SizedBox(
                   height: 20,
                 ),
-                Recommendation(),
-                SizedBox(
+                const Recommendation(),
+                const SizedBox(
                   height: 20,
                 ),
-                TrendingPodcast(),
-                SizedBox(
+                const TrendingPodcast(),
+                const SizedBox(
                   height: 20,
                 ),
-                QuotesForYou()
+                const QuotesForYou(),
+                const SizedBox(
+                  height: 20,
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(left: 20, bottom: 20),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Image.network(
+                        'https://gcdnb.pbrd.co/images/xj3ry1ACQnt0.png?o=1',
+                        scale: 5,
+                      ),
+                      const Text(
+                        'Explore,\nListen, Repeat.',
+                        style: TextStyle(
+                            fontSize: 28,
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                ),
               ],
             ),
           ),

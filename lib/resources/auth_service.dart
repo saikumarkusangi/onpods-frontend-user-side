@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:onpods/providers/auth_provider.dart';
-import 'package:onpods/screens/Layout.dart';
+import 'package:onpods/screens/layout_screen.dart';
 import 'package:onpods/screens/screens_exports.dart';
 import 'package:onpods/utils/utils_exports.dart';
 
@@ -17,10 +17,10 @@ class AuthService {
   Future<Map<String, dynamic>> login(String email, String password) async {
     try {
       final response = await http.post(
-        Uri.parse('$baseUrl/signin'),
+        Uri.parse('$baseUrl/auth/login'),
         body: {
-          'user_email': email,
-          'user_password': password,
+          'email': email,
+          'password': password,
         },
       ).timeout(const Duration(seconds: 30));
       if (response.statusCode == 200) {
@@ -31,8 +31,8 @@ class AuthService {
         return userData;
       } else {
         final Map<String, dynamic> error = json.decode(response.body);
-        showSnackbar('Something Went Wrong', error['message']);
-        throw Exception('Login failed with status code: ${error['message']}');
+
+        throw error['message'];
       }
     } catch (e) {
       if (e is TimeoutException) {
@@ -44,7 +44,7 @@ class AuthService {
             'Network Connection Error', 'Check your Internet Connection!!!');
       } else {
         // Handle other exceptions
-        showSnackbar('Error', 'An error occurred: $e');
+        showSnackbar('Something Went Wrong', e);
       }
       throw Exception('Error: $e');
     }
@@ -56,13 +56,14 @@ class AuthService {
       String name, String email, String password) async {
     try {
       final response = await http.post(
-        Uri.parse('$baseUrl/signup'),
+        Uri.parse('$baseUrl/auth/register'),
         body: {
-          'user_name': name,
-          'user_email': email,
-          'user_password': password,
+          'username': name,
+          'email': email,
+          'password': password,
         },
       ).timeout(const Duration(seconds: 30));
+
       if (response.statusCode == 200) {
         final Map<String, dynamic> userData = json.decode(response.body);
         authProvider.storeUserData(userData);
@@ -72,8 +73,7 @@ class AuthService {
         return userData;
       } else {
         final Map<String, dynamic> error = json.decode(response.body);
-        showSnackbar('Something Went Wrong', error['message']);
-        throw Exception('Signup failed with status code: ${error['message']}');
+        throw error['message'];
       }
     } catch (e) {
       if (e is TimeoutException) {
@@ -85,7 +85,7 @@ class AuthService {
             'Network Connection Error', 'Check your Internet Connection!!!');
       } else {
         // Handle other exceptions
-        showSnackbar('Error', 'An error occurred: $e');
+        showSnackbar('Something Went Wrong', e);
       }
       throw Exception('Error: $e');
     }

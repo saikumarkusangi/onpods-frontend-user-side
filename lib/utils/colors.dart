@@ -33,3 +33,5 @@ const Color greenColor = Color(0xFF05CC61);
 const Color searchColor = Color(0xFF50D2FF);
 const Color borderColor = Color(0xffB9EDFF);
 const Color followerFollowingButtonColor = Color(0xff3369FF);
+
+

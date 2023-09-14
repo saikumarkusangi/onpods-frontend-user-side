@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:onpods/models/user.dart';
-import 'package:onpods/resources/auth_service.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class ChatRoomProvider with ChangeNotifier {
   bool _isLoading = false;

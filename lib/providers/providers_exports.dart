@@ -1,4 +1,7 @@
 export './auth_provider.dart';
 export './ui_providers/password_toggle.dart';
-export './ui_providers/icon_color_changer.dart';
 export './chat_room_provider.dart';
+export 'ui_providers/background_image_provider.dart';
+export './recorder_provider.dart';
+export './audio_player_provider.dart';
+export './quotes_provider.dart';

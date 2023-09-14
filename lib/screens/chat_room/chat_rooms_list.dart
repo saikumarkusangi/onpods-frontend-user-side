@@ -25,7 +25,6 @@ class _ChatRoomListState extends State<ChatRoomList> {
 
   @override
   Widget build(BuildContext context) {
-    print('object');
     return DefaultTabController(
       length: 2,
       child: Scaffold(

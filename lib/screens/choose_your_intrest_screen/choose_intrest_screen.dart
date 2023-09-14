@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:onpods/screens/layout.dart';
+import 'package:onpods/screens/layout_screen.dart';
 import 'package:onpods/widgets/widgets_exports.dart';
 import '../../utils/utils_exports.dart';
 import 'widget/chip_item_widget.dart';
