@@ -26,6 +26,7 @@ class CacheImage extends StatelessWidget {
                 ),
               ),
             ),
-        errorWidget: (context, url, error) => Image.network('https://www.publictransport.com.mt/images/failed-to-load-prview-placeholder.jpg'));
+        errorWidget: (context, url, error) => Image.network(
+            'https://www.publictransport.com.mt/images/failed-to-load-prview-placeholder.jpg'));
   }
 }

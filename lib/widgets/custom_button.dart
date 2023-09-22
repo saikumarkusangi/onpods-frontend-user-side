@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'widgets_exports.dart';
 
 class CustomElevatedButton extends BaseButton {
-  const CustomElevatedButton({super.key, 
-  
+  const CustomElevatedButton({
+    super.key,
     this.decoration,
     this.leftIcon,
     this.rightIcon,
@@ -51,7 +51,6 @@ class CustomElevatedButton extends BaseButton {
         decoration: decoration,
         child: ElevatedButton(
           style: buttonStyle,
-          
           onPressed: isDisabled ?? false ? null : onTap ?? () {},
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -60,7 +59,7 @@ class CustomElevatedButton extends BaseButton {
               leftIcon ?? const SizedBox.shrink(),
               Text(
                 text,
-             style: buttonTextStyle,
+                style: buttonTextStyle,
               ),
               rightIcon ?? const SizedBox.shrink(),
             ],

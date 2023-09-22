@@ -1,31 +1,42 @@
+import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import 'package:onpods/providers/dummy_provider.dart';
+import 'package:onpods/providers/ui_providers/timer_provider.dart';
 import 'package:onpods/routes/app_routes.dart';
+import 'package:onpods/screens/podcast_screen/record_podcast.dart';
 import 'package:onpods/screens/screens_exports.dart';
+import 'package:onpods/widgets/connection_error.dart';
 import 'package:provider/provider.dart';
 import 'providers/providers_exports.dart';
 import 'utils/utils_exports.dart';
 
-void main() async {
-   await JustAudioBackground.init(
-    androidNotificationChannelId: 'com.ryanheise.bg_demo.channel.audio',
-    androidNotificationChannelName: 'Audio playback',
-    androidNotificationOngoing: true,
-  );
-   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-    systemNavigationBarColor: scaffoldBackgroundColor,
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  // await JustAudioBackground.init(
+  //   androidNotificationChannelId: 'com.ryanheise.bg_demo.channel.audio',
+  //   androidNotificationChannelName: 'Audio playback',
+  //   androidNotificationOngoing: true,
+  // );
+  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+    systemNavigationBarColor: Colors.black,
     systemNavigationBarIconBrightness: Brightness.light,
   ));
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
- 
-  
+  Connectivity().onConnectivityChanged.listen((ConnectivityResult result) {
+    if (result == ConnectivityResult.none) {
+      Get.to(const NoConnection());
+    }
+  });
+  await FlutterDownloader.initialize(debug: true);
+
   runApp(const MyApp());
 }
 
@@ -41,9 +52,20 @@ class MyApp extends StatelessWidget {
                 ChangeNotifierProvider(create: (_) => BackGroundProvider()),
                 ChangeNotifierProvider(create: (_) => PasswordToggle()),
                 ChangeNotifierProvider(create: (_) => RecorderProvider()),
-                ChangeNotifierProvider(create: (_) => AudioPlayerProvider()),
-                ChangeNotifierProvider(create: (_)=>DummyProvider()),
-                 ChangeNotifierProvider(create: (_)=>QuoteProvider())
+                ChangeNotifierProvider(create: (_) => CurrentAudioProvider()),
+                ChangeNotifierProvider(create: (_) => DummyProvider()),
+                ChangeNotifierProvider(create: (_) => QuoteProvider()),
+                ChangeNotifierProvider(create: (_) => BgAudioProvider()),
+                ChangeNotifierProvider(
+                  create: (context) => FileDownloaderProvider(),
+                ),
+                ChangeNotifierProvider(
+                  create: (context) => WishlistProvider(),
+                ),
+                ChangeNotifierProvider(
+                  create: (_) => RecordingDurationProvider(),
+                  child: const RecordPodcast(),
+                )
               ],
               child: GetMaterialApp(
                 title: 'Onpods',
@@ -54,7 +76,7 @@ class MyApp extends StatelessWidget {
                     bottomNavigationBarTheme:
                         const BottomNavigationBarThemeData(
                             backgroundColor: bottomNavColor),
-                    scaffoldBackgroundColor: scaffoldBackgroundColor,
+                    scaffoldBackgroundColor: Colors.black,
                     useMaterial3: true),
                 home: const SplashScreen(),
               ),

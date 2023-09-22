@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../utils/utils_exports.dart';
+
 // ignore: must_be_immutable
 class ChipItemWidget extends StatelessWidget {
   final String text;
@@ -21,12 +23,11 @@ class ChipItemWidget extends StatelessWidget {
           style: const TextStyle(
             color: Colors.white,
             fontSize: 16,
-           
           ),
         ),
         selected: false,
         backgroundColor: Colors.transparent,
-        selectedColor: Colors.blue,
+        selectedColor: blueColor,
         shape: RoundedRectangleBorder(
           side: const BorderSide(color: Colors.grey, width: 0.4),
           borderRadius: BorderRadius.circular(20),

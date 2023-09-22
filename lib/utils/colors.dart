@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-const scaffoldBackgroundColor = Color(0xFF0A121D);
-const textFieldColor = Color(0xFF313E55);
-const bottomSheetColor = Color.fromARGB(255, 39, 46, 60);
-const chatCard = Color.fromARGB(173, 49, 62, 85);
-const bottomNavColor = Color(0xFF070D15);
+const Color scaffoldBackgroundColor = Color(0xFF0A121D);
+const Color textFieldColor = Color(0xFF313E55);
+const Color bottomSheetColor = Color.fromARGB(255, 39, 46, 60);
+const Color chatCard = Color.fromARGB(173, 49, 62, 85);
+const Color bottomNavColor = Color(0xFF070D15);
 const Color darkBackgroundColor = Color(0xFF181C1E);
 const Color darkCardColor = Color(0xFF262F34);
 const Color darkLightColor = Color(0xFF656D77);
@@ -33,5 +33,3 @@ const Color greenColor = Color(0xFF05CC61);
 const Color searchColor = Color(0xFF50D2FF);
 const Color borderColor = Color(0xffB9EDFF);
 const Color followerFollowingButtonColor = Color(0xff3369FF);
-
-

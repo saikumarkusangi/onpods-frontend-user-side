@@ -1,0 +1,146 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:onpods/widgets/custom_button.dart';
+import 'package:onpods/widgets/custom_text_field.dart';
+import 'package:provider/provider.dart';
+
+import '../../providers/auth_provider.dart';
+import '../../utils/utils_exports.dart';
+
+class ResetPassword extends StatefulWidget {
+  const ResetPassword({super.key});
+
+  @override
+  State<ResetPassword> createState() => _ResetPasswordState();
+}
+
+class _ResetPasswordState extends State<ResetPassword> {
+  final TextEditingController _passwordController1 = TextEditingController();
+  final TextEditingController _passwordController2 = TextEditingController();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final FocusNode _field1FocusNode = FocusNode();
+  final FocusNode _field2FocusNode = FocusNode();
+  @override
+  void dispose() {
+    _passwordController1.dispose();
+    _passwordController2.dispose();
+    _field1FocusNode.dispose();
+    _field2FocusNode.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final authProvider = Provider.of<AuthProvider>(context);
+    void submit() {
+      if (_formKey.currentState!.validate()) {
+        _formKey.currentState!.save();
+        // authProvider.forgotPassword(_passwordController1.text.trim());
+      }
+    }
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Reset Password'),
+        titleTextStyle: const TextStyle(color: Colors.white, fontSize: 24),
+        backgroundColor: Colors.transparent,
+        iconTheme: const IconThemeData(size: 32, color: Colors.white),
+      ),
+      body: Form(
+        key: _formKey,
+        child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
+          const SizedBox(
+            height: 30,
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 14),
+            child: CustomTextFormField(
+              controller: _passwordController1,
+              autofocus: false,
+              focusNode: _field1FocusNode,
+              radius: 10,
+              hintText: "Enter new password",
+              obscureText: false,
+              vertical: 16,
+              fillColor: textFieldColor,
+              hintStyle: const TextStyle(color: Colors.grey),
+              textStyle: const TextStyle(color: Colors.white),
+              validator: (value) {
+                if (value!.isEmpty) {
+                  return 'Please enter password';
+                }
+                if (value.length < 6) {
+                  return 'Password must atleast length of 6';
+                }
+                return null;
+              },
+            ),
+          ),
+          const SizedBox(
+            height: 20,
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 14),
+            child: CustomTextFormField(
+              controller: _passwordController2,
+              autofocus: false,
+              focusNode: _field2FocusNode,
+              radius: 10,
+              hintText: "Confirm password",
+              obscureText: false,
+              vertical: 16,
+              fillColor: textFieldColor,
+              hintStyle: const TextStyle(color: Colors.grey),
+              textStyle: const TextStyle(color: Colors.white),
+              validator: (value) {
+                if (value!.isEmpty) {
+                  return 'Please enter password';
+                }
+                if (value != _passwordController1.text) {
+                  return 'Password must be match';
+                }
+                return null;
+              },
+            ),
+          ),
+          const SizedBox(
+            height: 40,
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 14),
+            child: CustomElevatedButton(
+              onTap: submit,
+              height: 45,
+              text: 'Reset Password',
+              buttonTextStyle:
+                  const TextStyle(color: Colors.white, fontSize: 18),
+              buttonStyle: ButtonStyle(
+                shape: MaterialStateProperty.all(
+                  RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                fixedSize: MaterialStateProperty.resolveWith<Size?>(
+                  (Set<MaterialState> states) {
+                    if (states.contains(MaterialState.disabled)) {
+                      return Size(1.sw, 40); // Size for disabled state
+                    }
+                    return Size(1.sw, 40); // Default size for enabled state
+                  },
+                ),
+                backgroundColor: MaterialStateProperty.resolveWith<Color?>(
+                  (Set<MaterialState> states) {
+                    if (states.contains(MaterialState.disabled)) {
+                      return Colors.grey; // Color for disabled state
+                    }
+                    return blueColor; // Default color for enabled state
+                  },
+                ),
+              ),
+            ),
+          ),
+        ]),
+      ),
+    );
+  }
+}

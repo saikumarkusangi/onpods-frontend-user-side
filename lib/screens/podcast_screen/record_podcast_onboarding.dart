@@ -23,12 +23,8 @@ class _RecordPodcastBoardingState extends State<RecordPodcastBoarding> {
    
     return Scaffold(
       appBar: AppBar(
-        leadingWidth: 120,
-        backgroundColor: scaffoldBackgroundColor,
-        leading: Padding(
-          padding: const EdgeInsets.only(left: 10),
-          child: Image.asset(appBarLogo),
-        ),
+        backgroundColor: Colors.black,
+       iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -49,13 +45,13 @@ class _RecordPodcastBoardingState extends State<RecordPodcastBoarding> {
             Center(
               child: SvgPicture.asset(
                 recordAudio,
-                width: MediaQuery.of(context).size.width * 0.6,
+                width: MediaQuery.of(context).size.width * 0.5,
                 alignment: Alignment.center,
               ),
             ).animate().fadeIn(),
             CustomElevatedButton(
               width: 0.6.sw,
-              onTap: () => Get.to( const RecordPodcast(),
+              onTap: () => Get.to(  RecordPodcast(),
                   transition: Transition.cupertinoDialog),
               height: 42,
               text: 'Record Audio',
@@ -91,7 +87,7 @@ class _RecordPodcastBoardingState extends State<RecordPodcastBoarding> {
             Center(
               child: SvgPicture.asset(
                 audioUpload,
-                width: MediaQuery.of(context).size.width * 0.6,
+                width: MediaQuery.of(context).size.width * 0.5,
                 alignment: Alignment.center,
               ),
             ).animate().fadeIn(),

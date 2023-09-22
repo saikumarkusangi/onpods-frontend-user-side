@@ -27,7 +27,8 @@ class CustomTextFormField extends StatelessWidget {
       this.validator,
       this.vertical,
       this.height,
-      this.radius, this.onSubmit})
+      this.radius,
+      this.onSubmit})
       : super(
           key: key,
         );
@@ -118,26 +119,14 @@ class CustomTextFormField extends StatelessWidget {
         border: borderDecoration ??
             OutlineInputBorder(
               borderRadius: BorderRadius.circular(radius!),
-              // borderSide: BorderSide(
-              //   color: theme.colorScheme.onErrorContainer.withOpacity(1),
-              //   width: 1,
-              // ),
             ),
         enabledBorder: borderDecoration ??
             OutlineInputBorder(
               borderRadius: BorderRadius.circular(radius!),
-              // borderSide: BorderSide(
-              //   color: theme.colorScheme.onErrorContainer.withOpacity(1),
-              //   width: 1,
-              // ),
             ),
         focusedBorder: borderDecoration ??
             OutlineInputBorder(
               borderRadius: BorderRadius.circular(radius!),
-              // borderSide: BorderSide(
-              //   color: appTheme.lightBlue600,
-              //   width: 1,
-              // ),
             ),
       );
 }

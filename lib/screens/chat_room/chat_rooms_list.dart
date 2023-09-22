@@ -15,8 +15,6 @@ class ChatRoomList extends StatefulWidget {
 }
 
 class _ChatRoomListState extends State<ChatRoomList> {
-  bool _showFab = true;
-
   final data = [
     {'title': 'Basics of flutter development'},
     {'title': 'How to influence people'},
@@ -26,60 +24,51 @@ class _ChatRoomListState extends State<ChatRoomList> {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 2,
-      child: Scaffold(
-        appBar: AppBar(
-          leadingWidth: 120,
-          backgroundColor: scaffoldBackgroundColor,
-          leading: Padding(
-            padding: const EdgeInsets.only(left: 10),
-            child: Image.asset(appBarLogo),
+        length: 2,
+        child: Scaffold(
+          appBar: AppBar(
+            backgroundColor: Colors.black,
+            flexibleSpace: const Padding(
+                padding: EdgeInsets.only(top: 50, left: 10, right: 10),
+                child: CustomTextFormField(
+                  autofocus: false,
+                  radius: 10,
+                  prefix: Icon(
+                    Icons.search_rounded,
+                    color: Colors.grey,
+                    size: 26,
+                  ),
+                  hintText: "Search author,category & more...",
+                  vertical: 16,
+                  fillColor: textFieldColor,
+                  hintStyle: TextStyle(color: Colors.grey, fontSize: 14),
+                  textStyle: TextStyle(color: Colors.white),
+                )),
+            bottom: const PreferredSize(
+                preferredSize: Size(0, 80),
+                child: Padding(
+                  padding: EdgeInsets.only(bottom: 10),
+                  child: Column(
+                    children: [
+                      TabBar(
+                        splashFactory: NoSplash.splashFactory,
+                        tabAlignment: TabAlignment.start,
+                        indicatorColor: blueColor,
+                        isScrollable: true,
+                        splashBorderRadius: BorderRadius.zero,
+                        dividerColor: Colors.transparent,
+                        labelColor: blueColor,
+                        indicatorSize: TabBarIndicatorSize.tab,
+                        unselectedLabelColor:
+                            Color.fromARGB(255, 114, 111, 111),
+                        labelStyle: TextStyle(fontSize: 20),
+                        tabs: [Tab(text: "Live"), Tab(text: "Upcoming")],
+                      ),
+                    ],
+                  ),
+                )),
           ),
-          bottom: const PreferredSize(
-              preferredSize: Size(0, 120),
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 14),
-                child: Column(
-                  children: [
-                    CustomTextFormField(
-                      autofocus: false,
-                      radius: 10,
-                      hintText: "Search...",
-                      vertical: 16,
-                      fillColor: textFieldColor,
-                      hintStyle: TextStyle(color: Colors.grey),
-                      textStyle: TextStyle(color: Colors.white),
-                    ),
-                    TabBar(
-                      splashFactory: NoSplash.splashFactory,
-                      tabAlignment: TabAlignment.start,
-                      indicatorColor: Colors.blue,
-                      isScrollable: true,
-                      splashBorderRadius: BorderRadius.zero,
-                      dividerColor: Colors.transparent,
-                      labelColor: Colors.blue,
-                      indicatorSize: TabBarIndicatorSize.tab,
-                      unselectedLabelColor: Color.fromARGB(255, 114, 111, 111),
-                      labelStyle: TextStyle(fontSize: 20),
-                      tabs: [Tab(text: "Live"), Tab(text: "Upcoming")],
-                    ),
-                  ],
-                ),
-              )),
-        ),
-        body: NotificationListener<UserScrollNotification>(
-          onNotification: (notification) {
-            final ScrollDirection direction = notification.direction;
-            setState(() {
-              if (direction == ScrollDirection.reverse) {
-                _showFab = false;
-              } else if (direction == ScrollDirection.forward) {
-                _showFab = true;
-              }
-            });
-            return true;
-          },
-          child: Padding(
+          body: Padding(
             padding: const EdgeInsets.only(left: 15, right: 15, top: 10),
             child: TabBarView(children: [
               ListView.builder(
@@ -95,23 +84,16 @@ class _ChatRoomListState extends State<ChatRoomList> {
               const ChatRoomListkeleton()
             ]),
           ),
-        ),
-        floatingActionButton: FloatingActionButton.extended(
-            backgroundColor: Colors.blue,
+          floatingActionButton: FloatingActionButton(
+            backgroundColor: blueColor,
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(40)),
             onPressed: () {},
-            isExtended: _showFab,
-            icon: const Icon(
+            child: const Icon(
               Icons.add,
               color: Colors.white,
             ),
-            label: const Text(
-              'Start a room',
-              style: TextStyle(color: Colors.white, fontSize: 16),
-            )),
-      ),
-    );
+          ),
+        ));
   }
 }
-

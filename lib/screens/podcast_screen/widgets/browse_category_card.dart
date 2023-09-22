@@ -16,50 +16,50 @@ class _BrowseAllCardState extends State<BrowseAllCard> {
     List data = [
       {
         'name': 'Motivation',
-        'color': '0xFFf77f00',
+        'color': '0xFFEC7A00',
         "image":
-            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS1k77e_FxORW4ninNpZ7irpy0iQTHRIe9czOB704Vxs1n20IL-1IUs7NAJFEJl7IjTBFk&usqp=CAU"
+            "https://cdn-icons-png.flaticon.com/512/3094/3094768.png"
       },
       {
         'name': 'Business',
-        'color': '0xFFfface4',
+        'color': '0xFFDE0094',
         'image':
-            'https://online.hbs.edu/Style%20Library/api/resize.aspx?imgpath=/PublishingImages/overhead-view-of-business-strategy-meeting.jpg&w=1200&h=630'
+            'https://static.vecteezy.com/system/resources/thumbnails/009/343/580/small/3d-business-analysis-chart-illustration-png.png'
       },
       {
-        'color': '0xFF83c5be',
+        'color': '0xFF07C0AD',
         'name': 'Political',
         'image':
-            'https://leverageedublog.s3.ap-south-1.amazonaws.com/blog/wp-content/uploads/2020/03/05191207/Political-Leaders.png'
+            'https://cdn-icons-png.flaticon.com/512/1651/1651652.png'
       },
       {
-        'color': '0xFFA1EE27',
+        'color': '0xFF8AD80B',
         'name': 'Love',
         'image':
-            'https://www.yourtango.com/sites/default/files/image_blog/how%20to%20get%20him%20to%20be%20more%20romantic.jpg'
+            'https://cdn.pixabay.com/photo/2020/02/03/05/31/couple-4814817_960_720.png'
       },
       {
-        'color': '0xFFb5e2fa',
+        'color': '0xFF0876B1',
         'name': 'Peace',
         'image':
-            'https://kashmirpulse.com/wp-content/uploads/2019/02/Pigeon-Dove-Peace.jpg'
+            'https://www.pngkit.com/png/full/174-1744675_open-dove-of-peace-emoji-png.png'
       },
       {
-        'color': '0xFF669bbc',
+        'color': '0xFF3DA0DD',
         'name': 'Friendship',
         'image':
-            'https://miro.medium.com/v2/resize:fit:1400/1*FU5FeZPahK3OoL217xB0hA.jpeg'
+            'https://freepngimg.com/save/108661-forever-friendship-hq-image-free/1500x1000'
       },
       {
         'color': '0xFFffd500',
         'name': 'Family',
         'image':
-            'https://images.squarespace-cdn.com/content/v1/5a0f0ac6bff2002ba3f1c5b6/7f52594a-6ebf-4da0-9d11-c30f3ae2ab1f/how-can-family-focused-ABA-therapy-help-children.jpg'
+            'https://www.pngmart.com/files/21/Happy-Family-Vector-PNG-Isolated-HD.png'
       },
       {
-        'color': '0xFFf28482',
+        'color': '0xFFF46866',
         'name': 'Success',
-        'image': 'https://iasbaba.com/wp-content/uploads/2021/01/Successful.jpg'
+        'image': 'https://freepngimg.com/save/18341-success-png/450x283'
       }
     ];
     return Padding(
@@ -76,7 +76,7 @@ class _BrowseAllCardState extends State<BrowseAllCard> {
                 crossAxisCount: 2),
             itemBuilder: (context, index) {
               return GestureDetector(
-                onTap: () => Get.to(
+                onTap: () => Get.to(()=>
                   SinglePodcastCategory(
                   title: data[index]['name'],
                   image: data[index]['image'],
@@ -88,27 +88,19 @@ class _BrowseAllCardState extends State<BrowseAllCard> {
                   child: Stack(
                     children: [
                       Positioned(
-                        bottom: -5,
-                        right: -5,
-                        child: RotationTransition(
-                          turns: const AlwaysStoppedAnimation(15 / 360),
-                          child: Container(
-                            decoration: BoxDecoration(
-                                boxShadow: const [
-                                  BoxShadow(
-                                      color: Colors.black38,
-                                      blurRadius: 2,
-                                      offset: Offset(-3, 3))
-                                ],
-                                borderRadius: BorderRadius.circular(10),
-                                image: DecorationImage(
-                                    image: NetworkImage(
-                                      data[index]['image'],
-                                    ),
-                                    fit: BoxFit.cover)),
-                            width: 70,
-                            height: 70,
-                          ),
+                        bottom: 0,
+                        right: 0,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            
+                              borderRadius: BorderRadius.circular(10),
+                              image: DecorationImage(
+                                  image: NetworkImage(
+                                    data[index]['image'],
+                                  ),
+                                  fit: BoxFit.contain)),
+                          width:100,
+                          height: 70,
                         ),
                       ),
                       Align(

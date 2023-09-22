@@ -101,10 +101,10 @@ class ChooseYourInterestScreen extends StatelessWidget {
   }
 
   void onTapSkip(BuildContext context) {
-    Get.off(const Layout(), transition: Transition.rightToLeft);
+    Get.off(()=>const Layout(), transition: Transition.rightToLeft);
   }
 
   void onTapContinue(BuildContext context) {
-    Get.off(const Layout(), transition: Transition.rightToLeft);
+    Get.off(()=>const Layout(), transition: Transition.rightToLeft);
   }
 }

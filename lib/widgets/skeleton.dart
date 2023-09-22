@@ -89,8 +89,6 @@ class RecommendationSkeleton extends StatelessWidget {
   }
 }
 
-
-
 class OurPodcastsSkeleton extends StatelessWidget {
   const OurPodcastsSkeleton({super.key});
   static final Widget _container = Padding(
@@ -130,7 +128,6 @@ class OurPodcastsSkeleton extends StatelessWidget {
     );
   }
 }
-
 
 class QuotesSkeleton extends StatelessWidget {
   const QuotesSkeleton({super.key});

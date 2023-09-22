@@ -7,3 +7,6 @@ export './choose_your_intrest_screen/choose_intrest_screen.dart';
 export './profile_screen/profile_screen.dart';
 export './podcast_screen/podcast_screen.dart';
 export './quotes_screen/quotes_screen.dart';
+export './notification_screen.dart';
+export './view_all_screen.dart';
+export './downloads_screen.dart';

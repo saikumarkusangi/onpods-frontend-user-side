@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:onpods/models/models_exports.dart';
-import 'package:onpods/resources/dummy_service.dart';
 import 'package:onpods/resources/quote_service.dart';
 
 class QuoteProvider with ChangeNotifier {

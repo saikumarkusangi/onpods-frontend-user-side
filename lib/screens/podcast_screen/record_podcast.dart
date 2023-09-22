@@ -1,15 +1,20 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:avatar_glow/avatar_glow.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:flutter_sound_lite/public/flutter_sound_recorder.dart';
+import 'package:flutter_sound_lite/flutter_sound.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:onpods/providers/providers_exports.dart';
+import 'package:onpods/providers/ui_providers/timer_provider.dart';
+import 'package:onpods/screens/podcast_screen/bg_add.dart';
 import 'package:onpods/screens/podcast_screen/custom_audio_player.dart';
 import 'package:onpods/utils/utils_exports.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
+import 'package:path_provider/path_provider.dart';
 
 class RecordPodcast extends StatefulWidget {
   const RecordPodcast({super.key});
@@ -19,15 +24,161 @@ class RecordPodcast extends StatefulWidget {
 }
 
 class _RecordPodcastState extends State<RecordPodcast> {
-  final recorder = FlutterSoundRecorder();
-  CustomAudioPlayer _player = CustomAudioPlayer();
-
-  Future record() async {
-    await recorder.startRecorder(toFile: '/downloads');
+  late Timer _timer;
+  StreamController<Duration> _recordingDurationStreamController =
+      StreamController<Duration>();
+  late FlutterSoundPlayer _audioPlayer;
+  late FlutterSoundRecorder _audioRecorder;
+  bool _isRecording = false;
+  bool _isPaused = false;
+  bool _isStoped = false;
+  bool _isPlaying = false;
+  late String _audioFilePath; // Store the path to the recorded audio file
+  @override
+  void initState() {
+    super.initState();
+    _audioPlayer = FlutterSoundPlayer();
+    _audioRecorder = FlutterSoundRecorder();
+    _recordingDurationStreamController.add(Duration.zero);
   }
 
-  Future pause() async {
-    await recorder.pauseRecorder();
+  Future<void> _startRecording() async {
+    try {
+      final status = await Permission.microphone.request();
+      if (status != PermissionStatus.granted) {
+        throw 'Microphone permission not granted';
+      }
+
+      await _audioRecorder.openAudioSession();
+      _audioFilePath = 'recording.aac'; // Set the file path
+      await _audioRecorder.startRecorder(
+        toFile: _audioFilePath,
+        codec: Codec.aacADTS,
+      );
+      _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+        context.read<RecordingDurationProvider>().updateRecordingDuration(
+              context.read<RecordingDurationProvider>().recordingDuration +
+                  Duration(seconds: 1),
+            );
+      });
+
+      setState(() {
+        _isRecording = true;
+      });
+    } catch (e) {
+      print('Error starting recording: $e');
+    }
+  }
+
+  Future<void> _stopRecording() async {
+    try {
+      await _audioRecorder.stopRecorder();
+      _timer?.cancel();
+
+      // Update the recording duration to zero using Provider
+      context
+          .read<RecordingDurationProvider>()
+          .updateRecordingDuration(Duration.zero);
+      setState(() {
+        _isRecording = false;
+        _isStoped = true;
+      });
+    } catch (e) {
+      print('Error stopping recording: $e');
+    }
+  }
+
+  Future<void> _resumeRecording() async {
+    try {
+      await _audioRecorder.resumeRecorder();
+      _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+        context.read<RecordingDurationProvider>().updateRecordingDuration(
+              context.read<RecordingDurationProvider>().recordingDuration +
+                  Duration(seconds: 1),
+            );
+      });
+      setState(() {
+        _isPaused = false;
+      });
+    } catch (e) {
+      print('Error stopping recording: $e');
+    }
+  }
+
+  Future<void> _pausedRecording() async {
+    try {
+      await _audioRecorder.pauseRecorder();
+      _timer?.cancel();
+
+      setState(() {
+        _isPaused = true;
+      });
+    } catch (e) {
+      print('Error stopping recording: $e');
+    }
+  }
+
+  Future<void> _startPlayback() async {
+    try {
+      await _audioPlayer.openAudioSession();
+
+      await _audioPlayer.startPlayer(
+        fromURI: _audioFilePath, // Use the recorded file path
+        whenFinished: () {
+          setState(() {
+            _isPlaying = false;
+          });
+        },
+      );
+
+      setState(() {
+        _isPlaying = true;
+      });
+    } catch (e) {
+      print('Error starting playback: $e');
+    }
+  }
+
+  Future<void> _stopPlayback() async {
+    try {
+      await _audioPlayer.stopPlayer();
+
+      setState(() {
+        _isPlaying = false;
+      });
+    } catch (e) {
+      print('Error stopping playback: $e');
+    }
+  }
+
+  Future<void> _deleteAudioFile() async {
+    try {
+      print('-------------- deleting  -----------------');
+
+      final file = File(_audioFilePath);
+      if (await file.exists()) {
+        print('------------ deleted  ------------------');
+        await file.delete();
+      }
+    } catch (e) {
+      print('------------ $e  ------------------');
+      print('Error deleting audio file: $e');
+    }
+  }
+
+  @override
+  void dispose() {
+    _audioPlayer.closeAudioSession();
+    _audioRecorder.closeAudioSession();
+
+    _deleteAudioFile(); // Delete the audio file when disposing
+    _timer?.cancel();
+
+    // Update the recording duration to zero using Provider
+    context
+        .read<RecordingDurationProvider>()
+        .updateRecordingDuration(Duration.zero);
+    super.dispose();
   }
 
   Future delete() async {
@@ -50,56 +201,43 @@ class _RecordPodcastState extends State<RecordPodcast> {
                 },
                 child: const Text(
                   'No',
-                  style: TextStyle(fontSize: 14, color: Colors.blue),
+                  style: TextStyle(fontSize: 20, color: blueColor),
                 )),
             TextButton(
               onPressed: () {
+                setState(() {
+                  _isStoped = false;
+                  _isPaused = false;
+                });
                 Navigator.of(context).pop(true);
               },
               child: const Text('Yes',
-                  style: TextStyle(fontSize: 14, color: Colors.blue)),
+                  style: TextStyle(fontSize: 20, color: blueColor)),
             ),
           ],
         );
       },
     );
-    if (confirm) {
-      bool? result = await recorder.deleteRecord(fileName: 'audio');
+    if (confirm) _deleteAudioFile();
+  }
+
+  String formatDuration(Duration duration) {
+    if (duration.inHours > 0) {
+      // If duration is greater than an hour, format as hh:mm:ss
+      final twoDigitHours = duration.inHours.toString().padLeft(2, '0');
+      final twoDigitMinutes =
+          (duration.inMinutes % 60).toString().padLeft(2, '0');
+      final twoDigitSeconds =
+          (duration.inSeconds % 60).toString().padLeft(2, '0');
+      return '$twoDigitHours:$twoDigitMinutes:$twoDigitSeconds';
+    } else {
+      // Otherwise, format as mm:ss
+      final twoDigitMinutes =
+          (duration.inMinutes % 60).toString().padLeft(2, '0');
+      final twoDigitSeconds =
+          (duration.inSeconds % 60).toString().padLeft(2, '0');
+      return '$twoDigitMinutes:$twoDigitSeconds';
     }
-  }
-
-  Future resume() async {
-    await recorder.resumeRecorder();
-  }
-
-  Future stop() async {
-    final path = await recorder.stopRecorder();
-    final audioFile = path!;
-    print(audioFile);
-  }
-
-  @override
-  void initState() {
-    super.initState();
-
-    initRecorder();
-  }
-
-  @override
-  void dispose() {
-    recorder.closeAudioSession();
-    super.dispose();
-  }
-
-  Future initRecorder() async {
-    final status = await Permission.microphone.request();
-    if (status != PermissionStatus.granted) {
-      throw 'Microphone permission not granted';
-    }
-
-    await recorder.openAudioSession();
-
-    recorder.setSubscriptionDuration(const Duration(milliseconds: 500));
   }
 
   Future<bool> showBackDialog() async {
@@ -122,14 +260,14 @@ class _RecordPodcastState extends State<RecordPodcast> {
                 },
                 child: const Text(
                   'No',
-                  style: TextStyle(fontSize: 14, color: Colors.blue),
+                  style: TextStyle(fontSize: 18, color: blueColor),
                 )),
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop(true);
               },
               child: const Text('Yes',
-                  style: TextStyle(fontSize: 14, color: Colors.blue)),
+                  style: TextStyle(fontSize: 18, color: blueColor)),
             ),
           ],
         );
@@ -140,24 +278,24 @@ class _RecordPodcastState extends State<RecordPodcast> {
 
   @override
   Widget build(BuildContext context) {
+    print('@@@@@@@@@@@@@');
     final recorderProvider = Provider.of<RecorderProvider>(context);
-    final audioProvider = Provider.of<AudioPlayerProvider>(context);
 
-    
     return Scaffold(
       body: WillPopScope(
         onWillPop: () async {
-          if (recorderProvider.state == 'recording' ||
-              recorderProvider.state == 'paused' ||
-              recorderProvider.state == "stopped" ||
-              recorderProvider.state == 'resume') {
+          if (_isRecording || _isStoped) {
+            _pausedRecording();
             bool res = await showBackDialog();
             if (res) {
-              recorderProvider.updateState('not_recording');
+              context
+                  .read<RecordingDurationProvider>()
+                  .updateRecordingDuration(Duration.zero);
+              Get.back();
             }
           }
 
-          return recorderProvider.state == 'not_recording';
+          return true;
         },
         child: Stack(
           children: [
@@ -184,51 +322,54 @@ class _RecordPodcastState extends State<RecordPodcast> {
               padding: const EdgeInsets.only(top: 80),
               child: Align(
                   alignment: Alignment.topCenter,
-                  child: recorderProvider.state == 'stopped'
+                  child: _isStoped
                       ? ElevatedButton.icon(
                           onPressed: () async {
-                            if (audioProvider.isPlaying) {
-                              await _player.playSounds();
-                              audioProvider.playing();
+                            if (_isPlaying) {
+                              _stopPlayback();
                             } else {
-                              await _player.stop();
-                              audioProvider.stopped();
+                              _startPlayback();
                             }
                           },
-                          icon: audioProvider.isPlaying
-                              ? const Icon(Icons.pause)
-                              : const Icon(Icons.play_arrow),
-                          label: const Text('Preview'))
+                          icon: _isPlaying
+                              ? const Icon(
+                                  Icons.pause,
+                                  color: blueColor,
+                                  size: 28,
+                                )
+                              : const Icon(
+                                  Icons.play_arrow,
+                                  color: blueColor,
+                                  size: 28,
+                                ),
+                          label: const Text(
+                            'Preview',
+                            style: TextStyle(color: blueColor, fontSize: 18),
+                          ))
                       : null),
             ),
-            Positioned(
-              top: 100,
-              left: MediaQuery.of(context).size.width * 0.4,
-              child: Align(
-                alignment: Alignment.topCenter,
-                child: StreamBuilder<RecordingDisposition>(
-                    stream: recorder.onProgress,
-                    builder: (context, snapshot) {
-                      final duration = snapshot.hasData
-                          ? snapshot.data!.duration
-                          : Duration.zero;
+            _isRecording
+                ? Align(
+                    alignment: Alignment.topCenter,
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 50),
+                      child: Consumer<RecordingDurationProvider>(
+                        builder: (context, durationProvider, child) {
+                          return Text(
+                            formatDuration(durationProvider.recordingDuration),
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 70,
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  )
+                : const SizedBox(),
 
-                      String towDigits(int n) => n.toString().padLeft(2);
-                      final twoDigitMinutes =
-                          towDigits(duration.inMinutes.remainder(60));
-                      final twoDigitSeconds =
-                          towDigits(duration.inSeconds.remainder(60));
-
-                      return Text(
-                        '$twoDigitMinutes :$twoDigitSeconds',
-                        style:
-                            const TextStyle(color: Colors.white, fontSize: 32),
-                      );
-                    }),
-              ),
-            ),
-
-            recorderProvider.state == 'recording'
+            _isRecording && !_isPaused
                 ? const Align(
                     heightFactor: 2,
                     alignment: Alignment.center,
@@ -246,7 +387,7 @@ class _RecordPodcastState extends State<RecordPodcast> {
                   )
                 : const SizedBox(),
 
-            recorderProvider.state != 'stopped'
+            !_isStoped
                 ? Align(
                     alignment: Alignment.bottomCenter,
                     child: Image.asset(
@@ -259,109 +400,110 @@ class _RecordPodcastState extends State<RecordPodcast> {
                 : Align(
                     alignment: Alignment.center,
                     child: RotationTransition(
-                      turns: const AlwaysStoppedAnimation(90 / 360),
-                      child: audioProvider.isPlaying
-                          ? Image.network('https://i.gifer.com/KNGq.gif')
-                          : SvgPicture.asset(
-                              cdImage,
-                            ),
-                    ),
+                        turns: const AlwaysStoppedAnimation(90 / 360),
+                        child:
+                            Image.asset(_isPlaying ? playerGif : playerImage)),
                   ).animate().moveY(
                       begin: MediaQuery.of(context).size.height * 1.5,
                       delay: 4.ms,
                     ),
+
             Align(
               alignment: Alignment.bottomLeft,
               child: Padding(
                 padding: const EdgeInsets.only(bottom: 20, left: 20),
-                child: recorderProvider.state == 'stopped' ||
-                        recorderProvider.state == 'paused' ||
-                        recorderProvider.state == 'resume' ||
-                        recorderProvider.state == 'recording'
+                child: _isRecording
                     ? IconButton(
                         onPressed: () async {
-                          if (recorderProvider.state == 'recording') {
-                            recorderProvider.updateState('paused');
-                            await pause();
-                          } else if (recorderProvider.state == 'paused') {
-                            recorderProvider.updateState('resume');
-                            await resume();
-                          } else if (recorderProvider.state == 'stoped') {
-                            await delete();
-                            recorderProvider.updateState('not_recording');
+                          if (!_isPaused) {
+                            _pausedRecording();
+                          } else {
+                            _resumeRecording();
                           }
                         },
                         icon: CircleAvatar(
                           backgroundColor: Colors.grey,
                           radius: 34,
                           child: Icon(
-                            recorderProvider.state == 'paused'
-                                ? Icons.play_arrow
-                                : recorderProvider.state == 'stopped'
-                                    ? Icons.delete
-                                    : Icons.pause,
+                            _isPaused ? Icons.play_arrow : Icons.pause,
                             color: Colors.white,
                             size: 38,
                           ),
-                        ))
-                    : null,
+                        ),
+                      )
+                    : const SizedBox(),
               ),
             ),
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: Padding(
-                padding: const EdgeInsets.only(bottom: 20),
-                child: IconButton(
-                    onPressed: () async {
-                    
-                      if (recorderProvider.state == 'recording') {
-                          bool confirm = await showBackDialog();
-                        recorderProvider.updateState('paused');
-                        await pause();
-                      
-                        if (confirm) {
-                          recorderProvider.updateState('stopped');
-                          await stop();
-                        }
-                      } else {
-                        recorderProvider.updateState('recording');
-                        await resume();
-                      }
-                    },
-                    icon: CircleAvatar(
-                      backgroundColor: Colors.red,
-                      radius: 34,
-                      child: Icon(
-                        recorderProvider.state == 'recording' ||
-                                recorderProvider.state == 'paused' ||
-                                recorderProvider.state == 'resume'
-                            ? Icons.stop
-                            : Icons.mic,
-                        color: Colors.white,
-                        size: 38,
+            _isStoped
+                ? Align(
+                    alignment: Alignment.bottomLeft,
+                    child: Padding(
+                        padding: const EdgeInsets.only(bottom: 20, left: 20),
+                        child: IconButton(
+                          onPressed: () async {
+                            delete();
+                            _stopPlayback();
+                          },
+                          icon: const CircleAvatar(
+                            backgroundColor: Colors.grey,
+                            radius: 34,
+                            child: Icon(
+                              Icons.delete,
+                              color: Colors.white,
+                              size: 38,
+                            ),
+                          ),
+                        )),
+                  )
+                : const SizedBox(),
+            !_isStoped
+                ? Align(
+                    alignment: Alignment.bottomCenter,
+                    child: Padding(
+                      padding: const EdgeInsets.only(bottom: 20),
+                      child: IconButton(
+                        onPressed: () async {
+                          if (_isRecording) {
+                            _stopRecording();
+                          } else {
+                            _startRecording();
+                          }
+                        },
+                        icon: CircleAvatar(
+                          backgroundColor: Colors.red,
+                          radius: 34,
+                          child: Icon(
+                            _isRecording ? Icons.stop : Icons.mic,
+                            color: Colors.white,
+                            size: 38,
+                          ),
+                        ),
                       ),
-                    )),
-              ),
-            ).animate().fadeIn(delay: const Duration(milliseconds: 700)),
+                    ),
+                  )
+                : const SizedBox(),
             Align(
               alignment: Alignment.bottomRight,
               child: Padding(
                 padding: const EdgeInsets.only(bottom: 20, right: 20),
-                child: recorderProvider.state == 'stopped'
+                child: _isStoped
                     ? IconButton(
-                        onPressed: () async {},
-                        icon: CircleAvatar(
+                        onPressed: () {
+                          _stopPlayback();
+                          Get.to(() => BgAdd(filePath: _audioFilePath),
+                              transition: Transition.cupertino);
+                        },
+                        icon: const CircleAvatar(
                           backgroundColor: Colors.green,
                           radius: 34,
                           child: Icon(
-                            recorderProvider.state == 'stopped'
-                                ? Icons.arrow_forward_rounded
-                                : null,
+                            Icons.arrow_forward_rounded,
                             color: Colors.white,
                             size: 38,
                           ),
-                        ))
-                    : null,
+                        ),
+                      )
+                    : const SizedBox(),
               ),
             ),
           ],

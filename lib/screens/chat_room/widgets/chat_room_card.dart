@@ -26,17 +26,17 @@ class ChartRoomCard extends StatelessWidget {
                   Image.asset(
                     liveGif,
                     width: 20,
-                    color: Colors.blue,
+                    color: Colors.white,
                   ),
                   const SizedBox(
                     width: 5,
                   ),
-                  Text(
+                  const Text(
                     'LIVE',
                     style: TextStyle(
                         fontWeight: FontWeight.w900,
                         fontSize: 12,
-                        color: Colors.white.withOpacity(0.4)),
+                        color: Colors.red),
                   )
                 ],
               ),
@@ -118,7 +118,7 @@ class ChartRoomCard extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 6, vertical: 1.5),
                     decoration: BoxDecoration(
-                        color: Colors.blue.withOpacity(0.4),
+                        color: blueColor.withOpacity(0.4),
                         borderRadius: BorderRadius.circular(10)),
                     child: const Text(
                       'HOST',

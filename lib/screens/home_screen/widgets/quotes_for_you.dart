@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:onpods/utils/utils_exports.dart';
 
 class QuotesForYou extends StatefulWidget {

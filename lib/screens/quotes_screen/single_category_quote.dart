@@ -107,8 +107,8 @@ class _SingleCategoryQuoteState extends State<SingleCategoryQuote> {
           else if (dummyProvider.data.isEmpty)
             SliverToBoxAdapter(
               child: Center(
-                child: Image.network(
-                  'https://cdni.iconscout.com/illustration/premium/thumb/empty-box-4344460-3613888.png',
+                child:Image.asset(
+                 emptyImage,
                 ),
               ),
             )

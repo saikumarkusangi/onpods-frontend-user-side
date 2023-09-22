@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hud/flutter_hud.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:onpods/screens/auth_screen/Forgot_password_screen.dart';
 import 'package:onpods/screens/screens_exports.dart';
 import 'package:onpods/utils/utils_exports.dart';
 import 'package:onpods/widgets/widgets_exports.dart';
@@ -53,8 +54,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
     return WidgetHUD(
       hud: HUD(
-          progressIndicator: const CircularProgressIndicator(
-        color: Colors.blue,
+          progressIndicator: Image.asset(
+        liveGif,
+        color: blueColor,
+        scale: 3,
       )),
       showHUD: authProvider.isLoading,
       builder: (context, child) => Scaffold(
@@ -64,7 +67,7 @@ class _LoginScreenState extends State<LoginScreen> {
               Stack(
                 children: [
                   SizedBox(
-                    height: 0.55.sh,
+                    height: 0.52.sh,
                     child: Image.asset(
                       loginImage,
                       fit: BoxFit.cover,
@@ -91,7 +94,8 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                         child: const Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 20),
+                          padding:
+                              EdgeInsets.only(bottom: 10, left: 20, right: 20),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisAlignment: MainAxisAlignment.end,
@@ -216,12 +220,16 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                           ),
                         ),
-                        const Align(
-                            alignment: Alignment.centerRight,
-                            child: Text(
-                              'Forgot Password?',
-                              style: TextStyle(color: Colors.blue),
-                            )),
+                        GestureDetector(
+                          onTap: () => Get.to(const ForgotPasswordScreen(),
+                              transition: Transition.rightToLeft),
+                          child: const Align(
+                              alignment: Alignment.centerRight,
+                              child: Text(
+                                'Forgot Password?',
+                                style: TextStyle(color: blueColor),
+                              )),
+                        ),
                         const Text(
                           '( OR )',
                           style: TextStyle(color: Colors.white),
@@ -269,7 +277,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ),
                                 const Text(
                                   'Login With Google',
-                                  style: TextStyle(color: Colors.blue),
+                                  style: TextStyle(color: blueColor),
                                 ),
                               ],
                             )),
@@ -286,7 +294,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                             transition: Transition.rightToLeft);
                                       },
                                     text: ' Sign up',
-                                    style: const TextStyle(color: Colors.blue))
+                                    style: const TextStyle(color: blueColor))
                               ]),
                         )
                       ],

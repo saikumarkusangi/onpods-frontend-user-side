@@ -234,24 +234,30 @@ class QuotesCategoriesSkeleton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Shimmer.fromColors(
-      baseColor: const Color(0xff19232F),
-      highlightColor: const Color.fromARGB(255, 43, 52, 64),
-      child: SizedBox(
-        child: GridView.builder(
+        baseColor: const Color(0xff19232F),
+        highlightColor: const Color.fromARGB(255, 43, 52, 64),
+        child: SizedBox(
+          height: 40,
+          width: double.maxFinite,
+          child: ListView.builder(
             shrinkWrap: true,
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              childAspectRatio: 1.2
-            ),
+            scrollDirection: Axis.horizontal,
             itemCount: 6,
-            physics: const NeverScrollableScrollPhysics(),
             itemBuilder: (context, index) {
               return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 5),
-                child: _container,
+                padding: const EdgeInsets.only(left: 10),
+                child: Container(
+                  width: 80,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(60),
+                    color: Colors.white,
+                  ),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                ),
               );
-            }),
-      ),
-    );
+            },
+          ),
+        ));
   }
 }

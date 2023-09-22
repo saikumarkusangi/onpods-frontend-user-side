@@ -39,17 +39,18 @@ class AuthProvider with ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     prefs.setBool('isUserLoggedIn', true);
     prefs.setString('user_id', user.data.id);
+    // prefs.setString('user_email', user.data.email);
     prefs.setString('user_name', user.data.username);
     notifyListeners();
   }
 
   // ---------------------------- Sign UP -----------------------------------------
 
-  Future<void> signUp(String name,String email, String password) async {
+  Future<void> signUp(String name, String email, String password) async {
     _isLoading = true;
     notifyListeners();
     try {
-      final userData = await _authService!.signup(name,email, password);
+      final userData = await _authService!.signup(name, email, password);
       storeUserData(userData);
     } catch (error) {
       throw Exception(error);
@@ -59,6 +60,21 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
+  // ---------------------------- Forgot Password -----------------------------------------
+
+  Future<Map<String, dynamic>> forgotPassword(String email) async {
+    _isLoading = true;
+    notifyListeners();
+    try {
+      final otp = await _authService!.forgotPassword(email);
+      return otp;
+    } catch (error) {
+      throw Exception(error);
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
 
 // ---------------------------- Logout -----------------------------------------
 

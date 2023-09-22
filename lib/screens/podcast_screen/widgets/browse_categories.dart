@@ -12,19 +12,22 @@ class BrowseCategories extends StatefulWidget {
 class _BrowseCategoriesState extends State<BrowseCategories> {
   @override
   Widget build(BuildContext context) {
-    return const Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-            padding: EdgeInsets.only( top: 10),
-            child: Text(
-              "Browse All",
-              overflow: TextOverflow.ellipsis,
-              textAlign: TextAlign.left,
-              style: TextStyle(color: Colors.white, fontSize: 22),
-            )),
-            BrowseAllCard()
-      ],
+    return const Padding(
+      padding: EdgeInsets.symmetric(horizontal: 14),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+              padding: EdgeInsets.only(top: 10),
+              child: Text(
+                "Browse All",
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.left,
+                style: TextStyle(color: Colors.white, fontSize: 22),
+              )),
+          BrowseAllCard()
+        ],
+      ),
     );
   }
 }

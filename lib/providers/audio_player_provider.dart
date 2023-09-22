@@ -1,16 +1,14 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:onpods/models/audio_model.dart';
 
-class AudioPlayerProvider with ChangeNotifier {
-  bool _isPlaying = false;
-  bool get isPlaying => _isPlaying;
+class CurrentAudioProvider extends ChangeNotifier {
+  AudioModel? _currentAudio;
 
-  playing() {
-    _isPlaying = true;
-    notifyListeners();
-  }
+  AudioModel? get currentAudio => _currentAudio;
 
-  stopped() {
-    _isPlaying = false;
+  void setAudio(AudioModel audio) {
+    _currentAudio = audio;
     notifyListeners();
   }
 }

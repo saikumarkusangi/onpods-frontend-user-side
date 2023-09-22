@@ -3,8 +3,9 @@ import 'package:get/get.dart';
 import 'package:onpods/screens/quotes_screen/single_quote.dart';
 import 'package:onpods/utils/utils_exports.dart';
 
-class PopularQuotes extends StatelessWidget {
-  const PopularQuotes({super.key});
+class QuoteCardTemplate extends StatelessWidget {
+  final String categoryTitle;
+  const QuoteCardTemplate({super.key, required this.categoryTitle});
 
   @override
   Widget build(BuildContext context) {
@@ -17,13 +18,36 @@ class PopularQuotes extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Padding(
-          padding: EdgeInsets.only(left: 10),
-          child: Text(
-            "Popular Quotes",
-            overflow: TextOverflow.ellipsis,
-            textAlign: TextAlign.left,
-            style: TextStyle(color: Colors.white, fontSize: 22),
+        Padding(
+          padding: const EdgeInsets.all(8),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                categoryTitle,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.left,
+                style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 22),
+              ),
+              GestureDetector(
+                // onTap: () => Get.to(
+                //     ViewAllScreen(
+                //       title: categoryTitle,
+                //     ),
+                //     transition: Transition.cupertino),
+                child: const Text(
+                  'View All',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: blueColor,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
         const SizedBox(
@@ -40,15 +64,12 @@ class PopularQuotes extends StatelessWidget {
               child: ClipRRect(
                   borderRadius: BorderRadius.circular(10),
                   child: InkWell(
-                    onTap: () => Get.to(
-                      SingleQuote(
-                        image: data[index],
-                      
-                      ),
-                      transition: Transition.cupertino
-                    ),
-                    child: CacheImage(image: data[index])
-                  )),
+                      onTap: () => Get.to(
+                          SingleQuote(
+                            image: data[index],
+                          ),
+                          transition: Transition.cupertino),
+                      child: CacheImage(image: data[index]))),
             ),
           ),
         )

@@ -48,7 +48,7 @@ class _BackGroundImagesState extends State<BackGroundImages> {
         body: bgProvider.isLoading
             ? const Center(
                 child: CircularProgressIndicator(
-                  color: Colors.blue,
+                  color: blueColor,
                 ),
               )
             : bgProvider.data.isEmpty

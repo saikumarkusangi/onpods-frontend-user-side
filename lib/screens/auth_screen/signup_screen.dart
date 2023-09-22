@@ -58,8 +58,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
     return WidgetHUD(
         showHUD: authProvider.isLoading,
         hud: HUD(
-            progressIndicator: const CircularProgressIndicator(
-          color: Colors.blue,
+            progressIndicator: Image.asset(
+          liveGif,
+          color: blueColor,
+          scale: 3,
         )),
         builder: (context, child) => Scaffold(
               body: SingleChildScrollView(
@@ -96,7 +98,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                 ),
                               ),
                               child: const Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 20),
+                                padding: EdgeInsets.only(
+                                    bottom: 10, left: 20, right: 20),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   mainAxisAlignment: MainAxisAlignment.end,
@@ -296,7 +299,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                       ),
                                       const Text(
                                         'Signup With Google',
-                                        style: TextStyle(color: Colors.blue),
+                                        style: TextStyle(color: blueColor),
                                       ),
                                     ],
                                   )),
@@ -310,12 +313,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                           text: ' Login',
                                           recognizer: TapGestureRecognizer()
                                             ..onTap = () {
-                                              Get.off(const LoginScreen(),
+                                              Get.off(()=>const LoginScreen(),
                                                   transition:
                                                       Transition.leftToRight);
                                             },
-                                          style: const TextStyle(
-                                              color: Colors.blue))
+                                          style:
+                                              const TextStyle(color: blueColor))
                                     ]),
                               )
                             ],

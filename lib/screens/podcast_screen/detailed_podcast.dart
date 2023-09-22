@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:get/get.dart';
 import 'package:palette_generator/palette_generator.dart';
+import 'package:provider/provider.dart';
 import '../../utils/utils_exports.dart';
 import '../player/player_screen.dart';
 
@@ -30,9 +31,8 @@ class DetailedPodcast extends StatefulWidget {
 class _DetailedPodcastState extends State<DetailedPodcast> {
   late String firstHalf;
   late String secondHalf;
-  PaletteGenerator? _paletteGenerator = PaletteGenerator.fromColors(
-   [PaletteColor(Colors.black, 2)]
-  );
+  PaletteGenerator? _paletteGenerator =
+      PaletteGenerator.fromColors([PaletteColor(Colors.black, 2)]);
 
   bool flag = true;
   @override
@@ -55,39 +55,17 @@ class _DetailedPodcastState extends State<DetailedPodcast> {
       _paletteGenerator = await PaletteGenerator.fromImageProvider(provider);
       setState(() {});
     });
-    
   }
-
-  final episodes = [
-    {
-      "title": "Nervous Puking Before Live TV w/ Sarah Squirm",
-      "description":
-          "Eric and pal of the pod, Sarah Squirm, talk about opening for parents weekend and how it's hard to make mom and dad laugh. Talks of SNL ensue and how it's great to collectively bomb as a cast and why people get the rush of stress on live television. This isn't TikTok, this isn't Instagram, THIS IS LIVE TELEVISION BABY! This episode is not sponsored by Zofran, but, it is the drug of choice. Also, they both agree on the biggest heckler at an outdoor comedy show: the sun."
-    },
-    {
-      "title": "Falling Through A Stained Glass Window w/ Mac DeMarco",
-      "description":
-          "Long-time pals, Eric and Mac talk about bombing as a musician. Mac discusses his most epic fail of all time which involves being in a gargoyle stance on an amp. Plus, they reminisce about their time at Coachella 2015 and how it has evolved over the years. A word of caution to this episode: don't drink too many gin martinis."
-    },
-    {
-      "title": "He Coach Cartered Us w/ Sam Jay",
-      "description":
-          "Eric and Sam talk about Dorchester life and performing in Black rooms. Plus, Sam remembers a brawl breaking out on stage involving fists and chairs. Be careful when you crowd surf, might want to protect ya booty hole. "
-    },
-    {
-      "title": "Six Without the Nine w/ Michelle Buteau",
-      "description":
-          "Eric and Michelle talk about their early stand-up days, not knowing how to handle piss, an audience turning on you in Jamaica, and day drinking with Dutch friends. Hold on to your tooth!Rate and Review Bombing with Eric Andre here!"
-    }
-  ];
 
   @override
   Widget build(BuildContext context) {
+    var fileDownloaderProvider =
+        Provider.of<FileDownloaderProvider>(context, listen: false);
     return Scaffold(
       body: CustomScrollView(
         slivers: [
           SliverAppBar.large(
-            backgroundColor:  _paletteGenerator?.dominantColor?.color,
+            backgroundColor: _paletteGenerator?.dominantColor?.color,
             expandedHeight: 250,
             leading: IconButton(
               iconSize: 28,
@@ -218,7 +196,7 @@ class _DetailedPodcastState extends State<DetailedPodcast> {
                             ),
                             TextSpan(
                               text: flag ? " show more" : " show less",
-                              style: const TextStyle(color: Colors.blue),
+                              style: const TextStyle(color: blueColor),
                               recognizer: TapGestureRecognizer()
                                 ..onTap = () {
                                   setState(() {
@@ -245,8 +223,8 @@ class _DetailedPodcastState extends State<DetailedPodcast> {
           if (widget.episodes.isEmpty)
             SliverToBoxAdapter(
               child: Center(
-                child: Image.network(
-                  'https://cdni.iconscout.com/illustration/premium/thumb/empty-box-4344460-3613888.png',
+                child: Image.asset(
+                 emptyImage,
                 ),
               ),
             )
@@ -257,7 +235,8 @@ class _DetailedPodcastState extends State<DetailedPodcast> {
                   return GestureDetector(
                     onTap: () => Get.to(
                         PlayerScreen(
-                          audioUrl: widget.episodes[index].songUrl!,
+                            playlist: widget.episodes,
+                            audioUrl: widget.episodes[index].songUrl!,
                             episode: widget.episodes[index].title!,
                             poster: widget.image,
                             title: widget.title),
@@ -288,7 +267,7 @@ class _DetailedPodcastState extends State<DetailedPodcast> {
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 5),
                             child: Text(
-                              episodes[index]['description']!,
+                              widget.episodes[index].title,
                               maxLines: 3,
                               style: TextStyle(
                                   fontSize: 12,
@@ -317,7 +296,13 @@ class _DetailedPodcastState extends State<DetailedPodcast> {
                                         size: 28,
                                         color: Colors.white,
                                       ),
-                                      onPressed: () {},
+                                      onPressed: () {
+                                        fileDownloaderProvider
+                                            .downloadFile(
+                                                'https://samplelib.com/lib/preview/mp3/sample-3s.mp3r',
+                                                "My File.mp3")
+                                            .then((onValue) {});
+                                      },
                                     ),
                                     IconButton(
                                       icon: const Icon(

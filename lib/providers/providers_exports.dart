@@ -5,3 +5,5 @@ export 'ui_providers/background_image_provider.dart';
 export './recorder_provider.dart';
 export './audio_player_provider.dart';
 export './quotes_provider.dart';
+export './wish_list_provider.dart';
+export './bg_audio_provider.dart';

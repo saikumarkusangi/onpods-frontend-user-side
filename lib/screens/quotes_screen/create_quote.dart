@@ -187,7 +187,8 @@ class _CreateQuoteState extends State<CreateQuote> {
     final File imageFile = await saveUint8ListAsImage(image!);
     final xFile = XFile(imageFile.path);
     await Share.shareXFiles([xFile],
-        text: 'Check out my quote made on onpods. \n www.instagram.com/theonpods/');
+        text:
+            'Check out my quote made on onpods. \n www.instagram.com/theonpods/');
   }
 
   // Function to save the image to the gallery
@@ -248,7 +249,7 @@ class _CreateQuoteState extends State<CreateQuote> {
                   },
                   child: const Text(
                     'Continue Editing',
-                    style: TextStyle(fontSize: 14, color: Colors.blue),
+                    style: TextStyle(fontSize: 14, color: blueColor),
                   )),
               TextButton(
                 onPressed: () {
@@ -257,7 +258,7 @@ class _CreateQuoteState extends State<CreateQuote> {
                   bgProvider.updateLastSelected(0);
                 },
                 child: const Text('Discard',
-                    style: TextStyle(fontSize: 14, color: Colors.blue)),
+                    style: TextStyle(fontSize: 14, color: blueColor)),
               ),
             ],
           );
@@ -314,10 +315,7 @@ class _CreateQuoteState extends State<CreateQuote> {
                                                   backgroundDecoration: null),
                                             ),
                                           )
-                                        : bgProvider.backGroundUrlFromInternet
-                                                    .isNotEmpty &&
-                                                opacityProvider.lastSelected ==
-                                                    4
+                                        : opacityProvider.lastSelected == 4
                                             ? Container(
                                                 color: provider.backgroundColor,
                                               )
@@ -447,7 +445,7 @@ class _CreateQuoteState extends State<CreateQuote> {
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           Slider(
-                            activeColor: Colors.blue,
+                            activeColor: blueColor,
                             value: opacityProvider.opacity,
                             onChanged: (value) =>
                                 opacityProvider.changeOpacity(value),
@@ -526,62 +524,3 @@ class _CreateQuoteState extends State<CreateQuote> {
   }
 }
 
-// void _showBottomSheet(BuildContext context) {
-//   showModalBottomSheet(
-//     context: context,
-//     isScrollControlled: true,
-//     useSafeArea: true,
-//     backgroundColor: scaffoldBackgroundColor,
-//     builder: (BuildContext context) {
-//       final bgProvider =
-//           Provider.of<BackGroundProvider>(context, listen: false);
-//       return Consumer<BackgroundColorProvider>(
-//           builder: (context, bgprovidbgProviderer, child) {
-//         print(bgProvider.data);
-//         return Stack(
-//           children: [
-//             bgProvider.isLoading
-//                 ? const Center(
-//                     child: CircularProgressIndicator(),
-//                   )
-//                 : bgProvider.data.isEmpty
-//                     ? SizedBox(
-//                         height: MediaQuery.of(context).size.height / 1.5,
-//                         child: Image.asset(
-//                           backgoundImageSearchLogo,
-//                           color: Colors.white,
-//                           scale: 1.8,
-//                         ),
-//                       )
-//                     : ListView.builder(
-//                         itemCount: bgProvider.data.length,
-//                         itemBuilder: (context, index) {
-//                           return Image.network(
-//                               'https://cdn-icons-png.flaticon.com/128/2071/2071669.png');
-//                         }),
-//             Padding(
-//               padding: const EdgeInsets.only(
-//                   top: 10, left: 10, right: 10, bottom: 100),
-//               child: CustomTextFormField(
-//                 onSubmit: ((query) =>
-//                     BackGroundProvider().fetchBackGroundImages(query)),
-//                 autofocus: false,
-//                 radius: 10,
-//                 prefix: const Icon(
-//                   Icons.search_rounded,
-//                   color: Colors.grey,
-//                   size: 26,
-//                 ),
-//                 hintText: "Search category,name & more...",
-//                 vertical: 16,
-//                 fillColor: textFieldColor,
-//                 hintStyle: const TextStyle(color: Colors.grey, fontSize: 14),
-//                 textStyle: const TextStyle(color: Colors.white),
-//               ),
-//             ),
-//           ],
-//         );
-//       });
-//     },
-//   );
-// }

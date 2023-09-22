@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:onpods/screens/podcast_screen/widgets/list_skeleton.dart';
 import 'package:onpods/screens/quotes_screen/single_category_quote.dart';
-import 'package:onpods/utils/colors.dart';
 import 'package:provider/provider.dart';
-
 import '../../../providers/providers_exports.dart';
 
 class BrowseAllQuotes extends StatefulWidget {
@@ -25,73 +23,49 @@ class _BrowseAllQuotesState extends State<BrowseAllQuotes> {
 
   @override
   Widget build(BuildContext context) {
-    final quoteCategoryProvider =
-        Provider.of<QuoteProvider>(context);
+    final quoteCategoryProvider = Provider.of<QuoteProvider>(context);
 
     if (quoteCategoryProvider.isLoading) {
       return const QuotesCategoriesSkeleton();
     } else if (quoteCategoryProvider.quotesCategories.isEmpty) {
-      return Center(
-        child: Image.network(
-          'https://cdni.iconscout.com/illustration/premium/thumb/empty-box-4344460-3613888.png',
-        ),
-      );
+      return const SizedBox();
     } else {
-      return Padding(
-        padding: const EdgeInsets.all(15),
-        child: GridView.builder(
+      return SizedBox(
+        height: 40,
+        width: double.maxFinite,
+        child: ListView.builder(
           shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
+          scrollDirection: Axis.horizontal,
           itemCount: quoteCategoryProvider.quotesCategories.length,
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            childAspectRatio: 16 / 11,
-            mainAxisSpacing: 10,
-            crossAxisSpacing: 10,
-            crossAxisCount: 2,
-          ),
           itemBuilder: (context, index) {
             final category = quoteCategoryProvider.quotesCategories[index];
-            return GestureDetector(
-              onTap: ()=>Get.to(SingleCategoryQuote(
-                title: quoteCategoryProvider.quotesCategories[index].name,
-                image: quoteCategoryProvider.quotesCategories[index].imageUrl,
-              ),
-              transition: Transition.rightToLeftWithFade),
-              child: Container(
-                decoration: BoxDecoration(
-                  image: DecorationImage(
-                    image: NetworkImage(category.imageUrl),
-                    fit: BoxFit.cover,
+            return Padding(
+              padding: const EdgeInsets.only(left: 10),
+              child: GestureDetector(
+                onTap: () => Get.to(
+                    SingleCategoryQuote(
+                      title: quoteCategoryProvider.quotesCategories[index].name,
+                      image: quoteCategoryProvider
+                          .quotesCategories[index].imageUrl,
+                    ),
+                    transition: Transition.rightToLeftWithFade),
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(60),
+                    color: Colors.white,
                   ),
-                  color: textFieldColor,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Stack(
-                  children: [
-                    Container(
-                      decoration: const BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.bottomCenter,
-                          end: Alignment.topCenter,
-                          colors: [
-                            Colors.black45,
-                            Colors.black45,
-                          ],
-                        ),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                  child: Center(
+                    child: Text(
+                      category.name,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black,
                       ),
                     ),
-                    Align(
-                      alignment: Alignment.center,
-                      child: Text(
-                        category.name,
-                        style: const TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
               ),
             );
