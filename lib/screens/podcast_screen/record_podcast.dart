@@ -1,20 +1,16 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:avatar_glow/avatar_glow.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_sound_lite/flutter_sound.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:onpods/providers/providers_exports.dart';
+import 'package:onpods/providers/bg_audio_provider.dart';
 import 'package:onpods/providers/ui_providers/timer_provider.dart';
 import 'package:onpods/screens/podcast_screen/bg_add.dart';
-import 'package:onpods/screens/podcast_screen/custom_audio_player.dart';
 import 'package:onpods/utils/utils_exports.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
-import 'package:path_provider/path_provider.dart';
 
 class RecordPodcast extends StatefulWidget {
   const RecordPodcast({super.key});
@@ -25,7 +21,7 @@ class RecordPodcast extends StatefulWidget {
 
 class _RecordPodcastState extends State<RecordPodcast> {
   late Timer _timer;
-  StreamController<Duration> _recordingDurationStreamController =
+  final StreamController<Duration> _recordingDurationStreamController =
       StreamController<Duration>();
   late FlutterSoundPlayer _audioPlayer;
   late FlutterSoundRecorder _audioRecorder;
@@ -33,7 +29,11 @@ class _RecordPodcastState extends State<RecordPodcast> {
   bool _isPaused = false;
   bool _isStoped = false;
   bool _isPlaying = false;
-  late String _audioFilePath; // Store the path to the recorded audio file
+
+  final AudioPlayer _player1 = AudioPlayer();
+  late String _audioFilePath;
+  ValueNotifier<double> musicVolume = ValueNotifier<double>(0.5);
+  ValueNotifier<int> currentBg = ValueNotifier<int>(0);
   @override
   void initState() {
     super.initState();
@@ -48,17 +48,16 @@ class _RecordPodcastState extends State<RecordPodcast> {
       if (status != PermissionStatus.granted) {
         throw 'Microphone permission not granted';
       }
-
       await _audioRecorder.openAudioSession();
       _audioFilePath = 'recording.aac'; // Set the file path
       await _audioRecorder.startRecorder(
         toFile: _audioFilePath,
         codec: Codec.aacADTS,
       );
-      _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+      _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
         context.read<RecordingDurationProvider>().updateRecordingDuration(
               context.read<RecordingDurationProvider>().recordingDuration +
-                  Duration(seconds: 1),
+                  const Duration(seconds: 1),
             );
       });
 
@@ -66,16 +65,16 @@ class _RecordPodcastState extends State<RecordPodcast> {
         _isRecording = true;
       });
     } catch (e) {
-      print('Error starting recording: $e');
+      throw ('Error starting recording: $e');
     }
   }
 
   Future<void> _stopRecording() async {
     try {
       await _audioRecorder.stopRecorder();
-      _timer?.cancel();
+      _timer.cancel();
+      _player1.stop();
 
-      // Update the recording duration to zero using Provider
       context
           .read<RecordingDurationProvider>()
           .updateRecordingDuration(Duration.zero);
@@ -84,37 +83,37 @@ class _RecordPodcastState extends State<RecordPodcast> {
         _isStoped = true;
       });
     } catch (e) {
-      print('Error stopping recording: $e');
+      throw ('Error stopping recording: $e');
     }
   }
 
   Future<void> _resumeRecording() async {
     try {
       await _audioRecorder.resumeRecorder();
-      _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+      _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
         context.read<RecordingDurationProvider>().updateRecordingDuration(
               context.read<RecordingDurationProvider>().recordingDuration +
-                  Duration(seconds: 1),
+                  const Duration(seconds: 1),
             );
       });
       setState(() {
         _isPaused = false;
       });
     } catch (e) {
-      print('Error stopping recording: $e');
+      throw ('Error stopping recording: $e');
     }
   }
 
   Future<void> _pausedRecording() async {
     try {
       await _audioRecorder.pauseRecorder();
-      _timer?.cancel();
+      _timer.cancel();
 
       setState(() {
         _isPaused = true;
       });
     } catch (e) {
-      print('Error stopping recording: $e');
+      throw ('Error stopping recording: $e');
     }
   }
 
@@ -123,7 +122,7 @@ class _RecordPodcastState extends State<RecordPodcast> {
       await _audioPlayer.openAudioSession();
 
       await _audioPlayer.startPlayer(
-        fromURI: _audioFilePath, // Use the recorded file path
+        fromURI: _audioFilePath,
         whenFinished: () {
           setState(() {
             _isPlaying = false;
@@ -135,7 +134,7 @@ class _RecordPodcastState extends State<RecordPodcast> {
         _isPlaying = true;
       });
     } catch (e) {
-      print('Error starting playback: $e');
+      throw ('Error starting playback: $e');
     }
   }
 
@@ -147,37 +146,33 @@ class _RecordPodcastState extends State<RecordPodcast> {
         _isPlaying = false;
       });
     } catch (e) {
-      print('Error stopping playback: $e');
+      throw ('Error stopping playback: $e');
     }
   }
 
   Future<void> _deleteAudioFile() async {
     try {
-      print('-------------- deleting  -----------------');
-
       final file = File(_audioFilePath);
       if (await file.exists()) {
-        print('------------ deleted  ------------------');
         await file.delete();
       }
     } catch (e) {
-      print('------------ $e  ------------------');
-      print('Error deleting audio file: $e');
+      throw ('Error deleting audio file: $e');
     }
   }
 
   @override
   void dispose() {
+    _player1.dispose();
     _audioPlayer.closeAudioSession();
     _audioRecorder.closeAudioSession();
+    _deleteAudioFile();
+    _timer.cancel();
 
-    _deleteAudioFile(); // Delete the audio file when disposing
-    _timer?.cancel();
-
-    // Update the recording duration to zero using Provider
     context
         .read<RecordingDurationProvider>()
         .updateRecordingDuration(Duration.zero);
+
     super.dispose();
   }
 
@@ -278,10 +273,13 @@ class _RecordPodcastState extends State<RecordPodcast> {
 
   @override
   Widget build(BuildContext context) {
-    print('@@@@@@@@@@@@@');
-    final recorderProvider = Provider.of<RecorderProvider>(context);
-
+    final provider = Provider.of<BgAudioProvider>(context);
     return Scaffold(
+      extendBodyBehindAppBar: true,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        iconTheme: const IconThemeData(color: Colors.white),
+      ),
       body: WillPopScope(
         onWillPop: () async {
           if (_isRecording || _isStoped) {
@@ -299,25 +297,6 @@ class _RecordPodcastState extends State<RecordPodcast> {
         },
         child: Stack(
           children: [
-            // Padding(
-            //   padding: const EdgeInsets.only(top: 50),
-            //   child: Align(
-            //       alignment: Alignment.topCenter,
-            //       child: recorderProvider.state == 'recording'
-            //           ? AvatarGlow(
-
-            //                 child: CircleAvatar(
-            //                   backgroundColor: Colors.grey[100],
-            //                   child: Image.asset(
-            //                     'assets/images/dart.png',
-            //                     height: 50,
-            //                   ),
-            //                   radius: 30.0,
-            //                 ),
-            //               ),
-            //             )
-            //           : null),
-            // ),
             Padding(
               padding: const EdgeInsets.only(top: 80),
               child: Align(
@@ -348,66 +327,270 @@ class _RecordPodcastState extends State<RecordPodcast> {
                           ))
                       : null),
             ),
-            _isRecording
-                ? Align(
-                    alignment: Alignment.topCenter,
-                    child: Padding(
-                      padding: const EdgeInsets.only(top: 50),
-                      child: Consumer<RecordingDurationProvider>(
-                        builder: (context, durationProvider, child) {
-                          return Text(
-                            formatDuration(durationProvider.recordingDuration),
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 70,
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  )
-                : const SizedBox(),
-
-            _isRecording && !_isPaused
-                ? const Align(
-                    heightFactor: 2,
-                    alignment: Alignment.center,
-                    child: AvatarGlow(
-                      endRadius: 150.0,
-                      repeatPauseDuration: Duration(milliseconds: 50),
-                      child: Material(
-                        shape: CircleBorder(),
-                        child: CircleAvatar(
-                          backgroundColor: scaffoldBackgroundColor,
-                          radius: 50.0,
-                        ),
-                      ),
-                    ),
-                  )
-                : const SizedBox(),
-
             !_isStoped
-                ? Align(
+                ? const Align(
                     alignment: Alignment.bottomCenter,
-                    child: Image.asset(
-                      micStand,
-                      scale: 1.2,
-                    ).animate().moveY(
-                        begin: MediaQuery.of(context).size.width * 1.5,
-                        delay: 4.ms,
-                        duration: const Duration(milliseconds: 300)))
-                : Align(
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(vertical: 5),
+                      child: Text(
+                        'Use headphones for better quality',
+                        style: TextStyle(
+                            color: Color.fromARGB(255, 255, 255, 255)),
+                      ),
+                    ),
+                  )
+                : const SizedBox(),
+            _isStoped
+                ? Align(
                     alignment: Alignment.center,
                     child: RotationTransition(
-                        turns: const AlwaysStoppedAnimation(90 / 360),
-                        child:
-                            Image.asset(_isPlaying ? playerGif : playerImage)),
-                  ).animate().moveY(
-                      begin: MediaQuery.of(context).size.height * 1.5,
-                      delay: 4.ms,
-                    ),
-
+                            turns: const AlwaysStoppedAnimation(90 / 360),
+                            child: Image.asset(
+                                _isPlaying ? playerGif : playerImage))
+                        .animate()
+                        .moveY(
+                          begin: MediaQuery.of(context).size.height * 1.5,
+                          delay: 4.ms,
+                        ),
+                  )
+                : const SizedBox(),
+            Column(children: [
+              !_isStoped
+                  ? Align(
+                      alignment: Alignment.topCenter,
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 50),
+                        child: Consumer<RecordingDurationProvider>(
+                          builder: (context, durationProvider, child) {
+                            return Text(
+                              formatDuration(
+                                  durationProvider.recordingDuration),
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 32,
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    )
+                  : const SizedBox(),
+              !_isStoped
+                  ? Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        const Icon(
+                          Icons.volume_up_rounded,
+                          color: Colors.white,
+                        ),
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.75,
+                          child: ValueListenableBuilder<double>(
+                            valueListenable: musicVolume,
+                            builder: (context, volume, child) {
+                              return Slider(
+                                activeColor: blueColor,
+                                value: volume,
+                                onChanged: (value) {
+                                  musicVolume.value = value;
+                                  _player1.setVolume(value);
+                                },
+                              );
+                            },
+                          ),
+                        ),
+                        ValueListenableBuilder<double>(
+                            valueListenable: musicVolume,
+                            builder: (context, volume, child) {
+                              return Text(
+                                '${(volume * 100).toStringAsFixed(0)}%',
+                                style: const TextStyle(color: Colors.white),
+                              );
+                            })
+                      ],
+                    )
+                  : const SizedBox(),
+              SizedBox(
+                height: MediaQuery.of(context).size.height * 0.68,
+            
+                child: DefaultTabController(
+                    length: 2,
+                    child: Column(
+                                   mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                      const TabBar(
+                        labelColor: Colors.white,
+                        indicatorColor: blueColor,
+                        dividerColor: Colors.black,
+                        unselectedLabelColor: Colors.white60,
+                              tabs: [
+                                Tab(
+                                  icon: Icon(Icons.music_note),
+                                  text: 'Music',
+                                ),
+                                Tab(
+                                  icon: Icon(Icons.spatial_audio),
+                                  text: 'Sound Effects',
+                                )
+                              ],
+                            ),
+                      Flexible(
+                        child: TabBarView(
+                           
+                            children: [
+                               Container(
+                                child:Text('sss',style: TextStyle(color: Colors.white),) ,
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 4),
+                                child: GridView.builder(
+                                  gridDelegate:
+                                      const SliverGridDelegateWithFixedCrossAxisCount(
+                                          crossAxisCount: 4,
+                                          childAspectRatio: 0.8,               
+                                         mainAxisSpacing: 0.0),
+                                  shrinkWrap: true,
+                                  itemCount: provider.selectedBg.length + 1,
+                                  itemBuilder: (context, index) {
+                                    final data =
+                                        index < provider.selectedBg.length
+                                            ? provider.selectedBg[index]
+                                            : null;
+                                    if (index >= provider.selectedBg.length) {
+                                      return Column(
+                                        children: [
+                                          GestureDetector(
+                                            onTap: () {
+                                              _player1.stop();
+                                              Get.to(const BgAdd());
+                                            },
+                                            child: Container(
+                                              width: 55,
+                                              height: 55,
+                                              decoration: BoxDecoration(
+                                                  color: const Color.fromARGB(
+                                                      255, 44, 41, 41),
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          100)),
+                                              child: const Center(
+                                                  child: Icon(
+                                                Icons.add,
+                                                size: 32,
+                                                color: Colors.white,
+                                              )),
+                                            ),
+                                          ),
+                                        ],
+                                      );
+                                    } else {
+                                      return Column(
+                                        mainAxisAlignment: MainAxisAlignment.start,
+                                        children: [
+                                          GestureDetector(
+                                              onTap: () async {
+                                                final audioUrl =
+                                                    data!['audiourl'];
+                                
+                                                if (audioUrl != null) {
+                                                  final audioSource =
+                                                      AudioSource.uri(
+                                                          Uri.parse(audioUrl));
+                                                  await _player1.setAudioSource(
+                                                      audioSource);
+                                                  if (_player1.playing &&
+                                                      currentBg.value ==
+                                                          index) {
+                                                    _player1.stop();
+                                                  } else {
+                                                    _player1.play();
+                                                    currentBg.value = index;
+                                                  }
+                                                }
+                                              },
+                                              child: Stack(
+                                                children: [
+                                                  Container(
+                                                    width: 50,
+                                                    height: 50,
+                                                    decoration: BoxDecoration(
+                                                      color:
+                                                          const Color.fromARGB(
+                                                              255, 44, 41, 41),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              100),
+                                                    ),
+                                                    child: const Center(
+                                                      child: Icon(
+                                                        Icons.music_note,
+                                                        color: Colors.white,
+                                                        size: 32,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  Positioned.fill(
+                                                    child:
+                                                        StreamBuilder<Duration>(
+                                                      stream: _player1
+                                                          .positionStream, // Stream of audio playback position
+                                                      builder:
+                                                          (context, snapshot) {
+                                                        final position = snapshot
+                                                                .data ??
+                                                            Duration
+                                                                .zero; // Current playback position
+                                                        return CircularProgressIndicator(
+                                                          value: currentBg
+                                                                      .value ==
+                                                                  index
+                                                              ? position
+                                                                      .inMilliseconds /
+                                                                  (_player1
+                                                                          .duration
+                                                                          ?.inMilliseconds ??
+                                                                      1)
+                                                              : 0,
+                                                          backgroundColor:
+                                                              const Color
+                                                                  .fromARGB(
+                                                                  255,
+                                                                  107,
+                                                                  106,
+                                                                  106),
+                                                          valueColor:
+                                                              const AlwaysStoppedAnimation<
+                                                                      Color>(
+                                                                  Colors.white),
+                                                        );
+                                                      },
+                                                    ),
+                                                  ),
+                                                ],
+                                              )),
+                                          const SizedBox(
+                                            height: 6,
+                                          ),
+                                          Text(
+                                            data!['name'] ?? 'undefined',
+                                            maxLines: 1,
+                                            style: const TextStyle(
+                                                overflow: TextOverflow.ellipsis,
+                                                color: Colors.white,
+                                                fontSize: 14),
+                                          ),
+                                        ],
+                                      );
+                                    }
+                                  },
+                                ),
+                              )
+                            ]),
+                      )
+                    ])),
+              )
+            ]),
             Align(
               alignment: Alignment.bottomLeft,
               child: Padding(
@@ -423,7 +606,7 @@ class _RecordPodcastState extends State<RecordPodcast> {
                         },
                         icon: CircleAvatar(
                           backgroundColor: Colors.grey,
-                          radius: 34,
+                          radius: 28,
                           child: Icon(
                             _isPaused ? Icons.play_arrow : Icons.pause,
                             color: Colors.white,
@@ -446,7 +629,7 @@ class _RecordPodcastState extends State<RecordPodcast> {
                           },
                           icon: const CircleAvatar(
                             backgroundColor: Colors.grey,
-                            radius: 34,
+                            radius: 28,
                             child: Icon(
                               Icons.delete,
                               color: Colors.white,
@@ -471,7 +654,7 @@ class _RecordPodcastState extends State<RecordPodcast> {
                         },
                         icon: CircleAvatar(
                           backgroundColor: Colors.red,
-                          radius: 34,
+                          radius: 28,
                           child: Icon(
                             _isRecording ? Icons.stop : Icons.mic,
                             color: Colors.white,
@@ -490,12 +673,12 @@ class _RecordPodcastState extends State<RecordPodcast> {
                     ? IconButton(
                         onPressed: () {
                           _stopPlayback();
-                          Get.to(() => BgAdd(filePath: _audioFilePath),
-                              transition: Transition.cupertino);
+                          // Get.to(() => BgAdd(filePath: _audioFilePath),
+                          //     transition: Transition.cupertino);
                         },
                         icon: const CircleAvatar(
                           backgroundColor: Colors.green,
-                          radius: 34,
+                          radius: 28,
                           child: Icon(
                             Icons.arrow_forward_rounded,
                             color: Colors.white,

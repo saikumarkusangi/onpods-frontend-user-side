@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:palette_generator/palette_generator.dart';
 import 'package:provider/provider.dart';
@@ -119,7 +120,11 @@ class _DetailedPodcastState extends State<DetailedPodcast> {
                           borderRadius: BorderRadius.circular(14),
                           child: CachedNetworkImage(
                             imageUrl: widget.image,
-                            width: MediaQuery.of(context).size.width * 0.4,
+                            height: 150,
+                            width: 0.4.sw,
+                            fit: BoxFit.cover,
+                            placeholder: (context, url) => Image.asset(podcastPlaceHolder),
+                            errorWidget: (context, url, error) =>Image.asset(podcastPlaceHolder) ,
                           ),
                         ),
                         const SizedBox(

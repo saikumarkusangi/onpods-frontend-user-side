@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 const Color scaffoldBackgroundColor = Color(0xFF0A121D);
-const Color textFieldColor = Color(0xFF313E55);
+const Color textFieldColor = Color.fromARGB(255, 44, 44, 44);
 const Color bottomSheetColor = Color.fromARGB(255, 39, 46, 60);
 const Color chatCard = Color.fromARGB(173, 49, 62, 85);
 const Color bottomNavColor = Color(0xFF070D15);

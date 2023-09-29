@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:onpods/screens/podcast_screen/detailed_podcast.dart';
 import 'package:onpods/screens/view_all_screen.dart';
 import 'package:onpods/utils/colors.dart';
-
 import '../../../constants/constants.dart';
 
 class PodcastCardTemplate extends StatelessWidget {
@@ -72,33 +72,45 @@ class PodcastCardTemplate extends StatelessWidget {
       padding: const EdgeInsets.only(right: 14),
       child: SizedBox(
         width: 0.36.sw,
-        child: Column(
-          children: [
-            Container(
-              width: 0.36.sw,
-              height: 0.18.sh,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                color: primaryColor,
-                image: DecorationImage(
-                  image: NetworkImage(itemData['image']!),
-                  fit: BoxFit.cover,
-                  alignment: Alignment.center,
+        child: GestureDetector(
+          onTap: () => Get.to(
+            
+            DetailedPodcast(
+            image: itemData['image'] ?? '',
+             title: itemData['title'] ?? '', 
+             description: itemData['des'] ?? '',
+              episodes: [],
+               rating:4),
+               transition: Transition.cupertino
+               ),
+          child: Column(
+            children: [
+              Container(
+                width: 0.36.sw,
+                height: 0.18.sh,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  color: primaryColor,
+                  image: DecorationImage(
+                    image: NetworkImage(itemData['image']!),
+                    fit: BoxFit.cover,
+                    alignment: Alignment.center,
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(height: 10),
-            Text(
-              itemData['title']!,
-              maxLines: 1,
-              style: const TextStyle(
-                overflow: TextOverflow.ellipsis,
-                color: Colors.white,
-                fontSize: 14,
-                fontWeight: FontWeight.normal,
+              const SizedBox(height: 10),
+              Text(
+                itemData['title']!,
+                maxLines: 1,
+                style: const TextStyle(
+                  overflow: TextOverflow.ellipsis,
+                  color: Colors.white,
+                  fontSize: 14,
+                  fontWeight: FontWeight.normal,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

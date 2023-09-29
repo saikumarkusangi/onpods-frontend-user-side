@@ -84,16 +84,7 @@ class _ChatRoomListState extends State<ChatRoomList> {
               const ChatRoomListkeleton()
             ]),
           ),
-          floatingActionButton: FloatingActionButton(
-            backgroundColor: blueColor,
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(40)),
-            onPressed: () {},
-            child: const Icon(
-              Icons.add,
-              color: Colors.white,
-            ),
-          ),
+      
         ));
   }
 }

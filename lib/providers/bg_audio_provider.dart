@@ -7,6 +7,9 @@ import 'package:onpods/resources/quote_service.dart';
 class BgAudioProvider with ChangeNotifier {
   List<BgModel> _bgCategories = [];
   List<BgModel> get bgCategories => _bgCategories;
+  List<Map<String, String>> _selectedBg = [];
+List<Map<String, String>> get selectedBg => _selectedBg;
+
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 
@@ -24,4 +27,17 @@ class BgAudioProvider with ChangeNotifier {
       notifyListeners();
     }
   }
+
+addSelectedBg(Map<String, String> data) {
+    _selectedBg.add(data);
+  notifyListeners();
+}
+
+removeSelectedBg(Map<String, String> data) {
+  _selectedBg.removeWhere((item) =>
+      item['name'] == data['name']);
+  notifyListeners();
+}
+
+
 }

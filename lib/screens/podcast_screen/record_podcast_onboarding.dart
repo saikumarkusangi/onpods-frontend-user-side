@@ -3,11 +3,8 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
-import 'package:onpods/screens/podcast_screen/custom_audio_player.dart';
 import 'package:onpods/screens/podcast_screen/record_podcast.dart';
 import 'package:onpods/widgets/custom_button.dart';
-import 'package:provider/provider.dart';
-import '../../providers/providers_exports.dart';
 import '../../utils/utils_exports.dart';
 
 class RecordPodcastBoarding extends StatefulWidget {

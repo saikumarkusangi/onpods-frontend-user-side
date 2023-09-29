@@ -23,7 +23,7 @@ class _BrowseCategoriesState extends State<BrowseCategories> {
                 "Browse All",
                 overflow: TextOverflow.ellipsis,
                 textAlign: TextAlign.left,
-                style: TextStyle(color: Colors.white, fontSize: 22),
+                style: TextStyle(color: Colors.white, fontSize: 20,fontWeight: FontWeight.bold),
               )),
           BrowseAllCard()
         ],

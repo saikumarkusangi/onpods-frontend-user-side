@@ -10,19 +10,14 @@ import 'package:provider/provider.dart';
 import '../../utils/utils_exports.dart';
 
 class BgAdd extends StatefulWidget {
-  final filePath;
-
-  const BgAdd({Key? key, this.filePath}) : super(key: key);
+  const BgAdd({Key? key}) : super(key: key);
 
   @override
   _BgAddState createState() => _BgAddState();
 }
 
 class _BgAddState extends State<BgAdd> with AutomaticKeepAliveClientMixin {
-  String? selectedBg;
-
   final AudioPlayer _player1 = AudioPlayer();
-  final FlutterSoundPlayer _player2 = FlutterSoundPlayer();
   bool _isPaused = false;
   bool _isPlaying = false;
   String? currentlyPlayingIndex;
@@ -30,7 +25,6 @@ class _BgAddState extends State<BgAdd> with AutomaticKeepAliveClientMixin {
   @override
   void initState() {
     super.initState();
-    _player2.openAudioSession();
     fetchData();
   }
 
@@ -38,21 +32,10 @@ class _BgAddState extends State<BgAdd> with AutomaticKeepAliveClientMixin {
   void dispose() {
     super.dispose();
     _player1.dispose();
-    _player2.closeAudioSession();
   }
 
   Future<void> _startPlayback(String audioUrl) async {
     try {
-      await _player2.startPlayer(
-        fromURI: widget.filePath,
-        whenFinished: () {
-          setState(() {
-            _isPlaying = false;
-          });
-          _player1.stop();
-        },
-      );
-
       await _player1.setUrl(audioUrl);
       _player1.play();
       _player1.setVolume(1);
@@ -67,7 +50,6 @@ class _BgAddState extends State<BgAdd> with AutomaticKeepAliveClientMixin {
 
   Future<void> _stopPlayback() async {
     try {
-      await _player2.stopPlayer();
       _player1.stop();
       setState(() {
         _isPlaying = false;
@@ -97,7 +79,7 @@ class _BgAddState extends State<BgAdd> with AutomaticKeepAliveClientMixin {
   ];
   @override
   Widget build(BuildContext context) {
-    super.build(context); // Required for AutomaticKeepAliveClientMixin
+    super.build(context);
 
     final provider = Provider.of<BgAudioProvider>(context);
     return Scaffold(
@@ -105,24 +87,24 @@ class _BgAddState extends State<BgAdd> with AutomaticKeepAliveClientMixin {
         iconTheme: const IconThemeData(color: Colors.white),
         backgroundColor: Colors.black,
         title: const Text(
-          "Background Music",
+          "Choose Music",
           style: TextStyle(fontSize: 20, color: Colors.white),
         ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 12),
-            child: TextButton(
-              onPressed: () => Get.to(const PodcastUploadPage(),transition: Transition.cupertino),
-              child: const Text(
-                'Next',
-                style: TextStyle(
-                    color: blueColor,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w400),
-              ),
-            ),
-          )
-        ],
+        // actions: [
+        //   Padding(
+        //     padding: const EdgeInsets.only(right: 12),
+        //     child: TextButton(
+        //       onPressed: () => Get.to(const PodcastUploadPage(),transition: Transition.cupertino),
+        //       child: const Text(
+        //         'Next',
+        //         style: TextStyle(
+        //             color: blueColor,
+        //             fontSize: 18,
+        //             fontWeight: FontWeight.w400),
+        //       ),
+        //     ),
+        //   )
+        // ],
       ),
       body: provider.isLoading
           ? Center(
@@ -141,7 +123,6 @@ class _BgAddState extends State<BgAdd> with AutomaticKeepAliveClientMixin {
                     final category = provider.bgCategories[index];
                     final categoryItems = category.data.map((e) {
                       final isCurrentlyPlaying = currentlyPlayingIndex == e.id;
-                      var isSelected = selectedBg == e.id;
                       return Padding(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 14, vertical: 6),
@@ -185,18 +166,20 @@ class _BgAddState extends State<BgAdd> with AutomaticKeepAliveClientMixin {
                                 ),
                                 IconButton(
                                   onPressed: () {
-                                    if (selectedBg == e.id) {
-                                      setState(() {
-                                        selectedBg = '';
-                                      });
-                                    } else {
-                                      setState(() {
-                                        selectedBg = e.id;
-                                      });
-                                    }
+                                    final data = {
+                                      'name': e.name,
+                                      'audiourl': e.audioUrl,
+                                    };
+                                    provider.selectedBg.any(
+                                            (item) => item['name'] == e.name)
+                                        ? provider.removeSelectedBg(data)
+                                        : provider.addSelectedBg(data);
                                   },
                                   icon: Icon(
-                                    !isSelected ? Icons.add : Icons.done,
+                                    provider.selectedBg.any(
+                                            (item) => item['name'] == e.name)
+                                        ? Icons.remove_circle
+                                        : Icons.add_circle_outline,
                                     size: 38,
                                   ),
                                 ),

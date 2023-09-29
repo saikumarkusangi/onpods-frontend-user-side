@@ -65,6 +65,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         )),
         builder: (context, child) => Scaffold(
               body: SingleChildScrollView(
+                 reverse: true,
                 child: Column(
                   children: [
                     Stack(
@@ -315,7 +316,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                             ..onTap = () {
                                               Get.off(()=>const LoginScreen(),
                                                   transition:
-                                                      Transition.leftToRight);
+                                                      Transition.cupertino);
                                             },
                                           style:
                                               const TextStyle(color: blueColor))

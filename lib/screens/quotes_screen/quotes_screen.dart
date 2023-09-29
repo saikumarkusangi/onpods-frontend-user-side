@@ -14,7 +14,7 @@ class QuotesScreen extends StatefulWidget {
 }
 
 class _QuotesScreenState extends State<QuotesScreen> {
-  @override
+  // @override
   // void initState() {
   //   super.initState();
   //   fetchData();
@@ -25,8 +25,9 @@ class _QuotesScreenState extends State<QuotesScreen> {
   //   await quoteProvider.fetchCategories();
   // }
 
+  @override
   Widget build(BuildContext context) {
-    final quoteProvider = Provider.of<QuoteProvider>(context, listen: false);
+
     return Scaffold(
         appBar: AppBar(
           automaticallyImplyLeading: false,
@@ -36,7 +37,6 @@ class _QuotesScreenState extends State<QuotesScreen> {
             child: BrowseAllQuotes(),
           ),
         ),
-        floatingActionButton: const CustomFAB(toPage: CreateQuote()),
         body: const SafeArea(
           child: SingleChildScrollView(
             child: Column(

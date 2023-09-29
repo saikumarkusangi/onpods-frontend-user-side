@@ -80,20 +80,19 @@ class _BrowseAllCardState extends State<BrowseAllCard> {
                   SinglePodcastCategory(
                   title: data[index]['name'],
                   image: data[index]['image'],
-                ),transition: Transition.rightToLeftWithFade),
+                ),transition: Transition.cupertino),
                 child: Container(
                   decoration: BoxDecoration(
                       color: Color(int.parse(data[index]['color'])),
-                      borderRadius: BorderRadius.circular(8)),
+                      borderRadius: BorderRadius.circular(4)),
                   child: Stack(
                     children: [
                       Positioned(
                         bottom: 0,
                         right: 0,
                         child: Container(
-                          decoration: BoxDecoration(
-                            
-                              borderRadius: BorderRadius.circular(10),
+                          decoration: BoxDecoration(                           
+                              borderRadius: BorderRadius.circular(6),
                               image: DecorationImage(
                                   image: NetworkImage(
                                     data[index]['image'],

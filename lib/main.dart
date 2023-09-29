@@ -4,7 +4,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:just_audio_background/just_audio_background.dart';
 import 'package:onpods/providers/dummy_provider.dart';
 import 'package:onpods/providers/ui_providers/timer_provider.dart';
 import 'package:onpods/routes/app_routes.dart';
@@ -17,11 +16,6 @@ import 'utils/utils_exports.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // await JustAudioBackground.init(
-  //   androidNotificationChannelId: 'com.ryanheise.bg_demo.channel.audio',
-  //   androidNotificationChannelName: 'Audio playback',
-  //   androidNotificationOngoing: true,
-  // );
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
     systemNavigationBarColor: Colors.black,
     systemNavigationBarIconBrightness: Brightness.light,
@@ -30,6 +24,7 @@ Future<void> main() async {
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
+  
   Connectivity().onConnectivityChanged.listen((ConnectivityResult result) {
     if (result == ConnectivityResult.none) {
       Get.to(const NoConnection());
@@ -62,7 +57,7 @@ class MyApp extends StatelessWidget {
                 ChangeNotifierProvider(
                   create: (context) => WishlistProvider(),
                 ),
-                ChangeNotifierProvider(
+                ChangeNotifierProvider(  
                   create: (_) => RecordingDurationProvider(),
                   child: const RecordPodcast(),
                 )
@@ -83,3 +78,7 @@ class MyApp extends StatelessWidget {
             ));
   }
 }
+
+
+
+
