@@ -28,6 +28,7 @@ class PodcastCardTemplate extends StatelessWidget {
                   color: Colors.white,
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
+                 
                 ),
               ),
               GestureDetector(
@@ -51,7 +52,7 @@ class PodcastCardTemplate extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(top: 8, left: 8, bottom: 8),
             child: SizedBox(
-              height: 0.22.sh,
+              height: 170,
               child: ListView.builder(
                 shrinkWrap: true,
                 scrollDirection: Axis.horizontal,
@@ -87,7 +88,7 @@ class PodcastCardTemplate extends StatelessWidget {
             children: [
               Container(
                 width: 0.36.sw,
-                height: 0.18.sh,
+                height: 140,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10),
                   color: primaryColor,

@@ -5,8 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:onpods/screens/quotes_screen/background_images.dart';
+import 'package:onpods/screens/quotes_screen/upload_quote.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:provider/provider.dart';
@@ -70,7 +72,6 @@ class _CreateQuoteState extends State<CreateQuote> {
   }
 
   void _tapHandler() {
-    textNotifier.value == 'Type Here' ? textNotifier.value = '' : null;
     if (editingNotifier.value) {
       showGeneralDialog(
         context: context,
@@ -121,6 +122,7 @@ class _CreateQuoteState extends State<CreateQuote> {
     ImagePicker picker = ImagePicker();
     final pickedFile = await picker.pickImage(
       source: ImageSource.gallery,
+    imageQuality: 50
     );
 
     if (pickedFile?.path != null) {
@@ -137,6 +139,7 @@ class _CreateQuoteState extends State<CreateQuote> {
     ImagePicker picker = ImagePicker();
     final pickedFile = await picker.pickImage(
       source: ImageSource.camera,
+      imageQuality: 50
     );
 
     if (pickedFile?.path != null) {
@@ -427,7 +430,36 @@ class _CreateQuoteState extends State<CreateQuote> {
                                 borderRadius: BorderRadius.circular(60),
                               ),
                               child: IconButton(
-                                onPressed: () {},
+                                onPressed: () async {
+                                  final image =
+                                      await screenshotController.capture();
+
+                                  final File imageFile =
+                                      await saveUint8ListAsImage(image!);
+                                  CroppedFile? croppedFile =
+                                      await ImageCropper().cropImage(
+                                    sourcePath: imageFile.path,
+                                    aspectRatioPresets: [
+                                      CropAspectRatioPreset.square,
+                                      CropAspectRatioPreset.ratio3x2,
+                                      CropAspectRatioPreset.original,
+                                      CropAspectRatioPreset.ratio4x3,
+                                      CropAspectRatioPreset.ratio16x9
+                                    ],
+                                    compressQuality: 100,
+                                    compressFormat: ImageCompressFormat.jpg,
+                                  
+                                  );
+                                  if(croppedFile == null) {
+                                
+                                  } else {
+                                    Get.to(
+                                      UploadQuotes(
+                                        image: File(croppedFile.path),
+                                      ),
+                                      transition: Transition.cupertino);
+                                  }
+                                },
                                 icon: const Icon(
                                   Icons.navigate_next,
                                   size: 32,
@@ -523,4 +555,3 @@ class _CreateQuoteState extends State<CreateQuote> {
     );
   }
 }
-

@@ -3,12 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:onpods/providers/dummy_provider.dart';
 import 'package:onpods/screens/podcast_screen/detailed_podcast.dart';
-import 'package:onpods/screens/podcast_screen/widgets/list_skeleton.dart';
-import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
+import 'package:onpods/widgets/skeleton.dart';
 import 'package:provider/provider.dart';
-
-import '../../providers/providers_exports.dart';
 import '../../utils/utils_exports.dart';
+import '../../widgets/widgets_exports.dart';
 
 class SinglePodcastCategory extends StatefulWidget {
   final String title;
@@ -50,11 +48,7 @@ class _SinglePodcastCategoryState extends State<SinglePodcastCategory> {
             if (dummyProvider.isLoading)
               const ListSkeleton()
             else if (dummyProvider.data.isEmpty)
-              Center(
-                child: Image.asset(
-                  emptyImage,
-                ),
-              )
+            const EmptyPlaceHiolder(message: 'Podcasts',)
             else
               ListView.builder(
                   shrinkWrap: true,

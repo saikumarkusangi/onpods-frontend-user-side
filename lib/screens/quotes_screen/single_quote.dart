@@ -2,12 +2,22 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
-
+import 'package:onpods/resources/quote_service.dart';
+import 'package:onpods/screens/profile_screen/profile_screen.dart';
+import 'package:onpods/screens/user_profile_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../resources/users_service.dart';
 import '../../utils/utils_exports.dart';
 
 class SingleQuote extends StatefulWidget {
   final String image;
-  const SingleQuote({super.key, required this.image});
+  final String userId;
+  final String postId;
+  const SingleQuote(
+      {super.key,
+      required this.image,
+      required this.userId,
+      required this.postId});
 
   @override
   State<SingleQuote> createState() => _SingleQuoteState();
@@ -16,59 +26,20 @@ class SingleQuote extends StatefulWidget {
 class _SingleQuoteState extends State<SingleQuote> {
   bool isLiked = false;
   bool isHeartAnimating = false;
+  late String userId;
+  @override
+  void initState() {
+    super.initState();
+    _getUserId();
+  }
+
+  _getUserId() async {
+    final prefs = await SharedPreferences.getInstance();
+    userId = prefs.getString('user_id')!;
+  }
+
   @override
   Widget build(BuildContext context) {
-    List<Widget> listTile = <Widget>[
-      Padding(
-        padding: const EdgeInsets.all(4),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(15),
-          child: Image.network(
-              "https://i.pinimg.com/236x/85/25/80/8525803a3bc75602b03ede2b011b5067.jpg"),
-        ),
-      ),
-      Padding(
-        padding: const EdgeInsets.all(4),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(15),
-          child: Image.network(
-              "https://i.pinimg.com/474x/8b/57/a8/8b57a85616fcad535ecd85ee1b87b129.jpg"),
-        ),
-      ),
-      Padding(
-        padding: const EdgeInsets.all(4),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(15),
-          child: Image.network(
-              "https://img.freepik.com/free-vector/calligraphic-background-motivational-quote_52683-16294.jpg?w=2000"),
-        ),
-      ),
-      Padding(
-        padding: const EdgeInsets.all(4),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(15),
-          child: Image.network(
-              "https://i0.wp.com/avemateiu.com/wp-content/uploads/2019/05/quote-271.png?fit=1080%2C1080&ssl=1"),
-        ),
-      ),
-      Padding(
-        padding: const EdgeInsets.all(4),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(15),
-          child: Image.network(
-              "https://i0.wp.com/avemateiu.com/wp-content/uploads/2019/05/quote-271.png?fit=1080%2C1080&ssl=1"),
-        ),
-      ),
-      Padding(
-        padding: const EdgeInsets.all(4),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(15),
-          child: Image.network(
-              "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTSTqlJevy58P-lkO7dj6kNB1zelqDpgVfHCA&usqp=CAU"),
-        ),
-      ),
-    ];
-
     return Scaffold(
       body: SafeArea(
           child: SingleChildScrollView(
@@ -98,6 +69,8 @@ class _SingleQuoteState extends State<SingleQuote> {
                                 topLeft: Radius.circular(20),
                                 topRight: Radius.circular(20)),
                             child: CachedNetworkImage(
+                                width: double.maxFinite,
+                                fit: BoxFit.cover,
                                 placeholder: (context, url) => const Center(
                                       child: CircularProgressIndicator(),
                                     ),
@@ -126,124 +99,114 @@ class _SingleQuoteState extends State<SingleQuote> {
                                     ))),
                           ),
                         ),
+                        Positioned(
+                          right: 10,
+                          top: 10,
+                          child: InkWell(
+                            onTap: _showBottomSheet,
+                            child: Container(
+                                width: 45,
+                                height: 45,
+                                decoration: BoxDecoration(
+                                    color: Colors.black.withOpacity(0.4),
+                                    borderRadius: BorderRadius.circular(50)),
+                                child: const Icon(
+                                  Icons.more_vert,
+                                  color: Colors.white,
+                                  size: 28,
+                                )),
+                          ),
+                        ),
                       ],
                     ),
                   ),
                   const SizedBox(
                     height: 10,
                   ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Column(
-                                children: [
-                                  SvgPicture.asset(
-                                    isLiked ? lovedIcon : loveIcon,
-                                    height: 45,
+                  FutureBuilder(
+                      future: UserServices.userById(widget.userId),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const SizedBox();
+                        }
+                        return ListTile(
+                          leading: GestureDetector(
+                            onTap: () {
+                              Get.to(
+                                  userId != widget.userId
+                                      ? UserProfileScreen(
+                                          userId: widget.userId,
+                                          userName: snapshot.data['username'],
+                                        )
+                                      : const ProfileScreen(),
+                                  transition: Transition.cupertino);
+                            },
+                            child: Container(
+                              width: 45,
+                              height: 45,
+                              decoration: BoxDecoration(
+                                  color:
+                                      const Color.fromARGB(255, 236, 184, 202),
+                                  borderRadius: BorderRadius.circular(60)),
+                              child: CachedNetworkImage(
+                                imageUrl: snapshot.data['profilePic'],
+                                placeholder: (context, url) => Center(
+                                  child: Text(
+                                    snapshot.data['username']
+                                        .substring(0, 1)
+                                        .toUpperCase(),
+                                    style: const TextStyle(fontSize: 24),
                                   ),
-                                  const Text(
-                                    '20',
-                                    style: TextStyle(color: whiteColor),
-                                  )
-                                ],
+                                ),
+                                errorWidget: (context, url, error) => Center(
+                                  child: Text(
+                                    snapshot.data['username']
+                                        .substring(0, 1)
+                                        .toUpperCase(),
+                                    style: const TextStyle(fontSize: 24),
+                                  ),
+                                ),
                               ),
                             ),
-                            // Padding(
-                            //   padding: const EdgeInsets.all(8.0),
-                            //   child: Column(
-                            //     children: [
-                            //       Image.asset(
-                            //         chatIcon,
-                            //         scale: 14,
-                            //       ),
-                            //       const Text(
-                            //         '20',
-                            //         style: TextStyle(color: whiteColor),
-                            //       )
-                            //     ],
-                            //   ),
-                            // ),
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Column(
-                                children: [
-                                  Image.asset(
-                                    sendIcon,
-                                    scale: 14,
-                                  ),
-                                  const Text(
-                                    '',
-                                    style: TextStyle(color: whiteColor),
-                                  )
-                                ],
+                          ),
+                          title: GestureDetector(
+                            onTap: () => Get.to(
+                                UserProfileScreen(
+                                  userId: widget.userId,
+                                  userName: snapshot.data['username'],
+                                ),
+                                transition: Transition.cupertino),
+                            child: Text(
+                              snapshot.data['username'] ?? '',
+                              maxLines: 1,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                overflow: TextOverflow.ellipsis,
+                                fontWeight: FontWeight.w800,
                               ),
-                            )
-                          ],
-                        ),
-                        const Column(
-                          children: [
-                           Icon(Icons.download),
-                            Text(
-                              '',
-                              style: TextStyle(color: whiteColor),
-                            )
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                  ListTile(
-                    leading: Container(
-                      height: 45,
-                      width: 45,
-                      decoration: BoxDecoration(
-                          color: textFieldColor,
-                          borderRadius: BorderRadius.circular(60),
-                          image: const DecorationImage(
-                              image: NetworkImage(
-                                  'https://i.pinimg.com/280x280_RS/7f/13/be/7f13be39c851d992863c412e9ee1c7a5.jpg'))),
-                    ),
-                    title: const Text(
-                      'Sai kumar Kusangi',
-                      maxLines: 1,
-                      style: TextStyle(
-                          color: Colors.white,
-                          overflow: TextOverflow.ellipsis,
-                          fontWeight: FontWeight.w800),
-                    ),
-                    subtitle: const Text(
-                      '25 follwers',
-                      maxLines: 1,
-                      style: TextStyle(
-                        color: Colors.white,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    trailing: Container(
-                      width: 80,
-                      height: 40,
-                      decoration: BoxDecoration(
-                          color: blueColor,
-                          borderRadius: BorderRadius.circular(40)),
-                      child: const Center(
-                        child: Text(
-                          'Follow',
-                          maxLines: 1,
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 15,
-                              overflow: TextOverflow.ellipsis,
-                              fontWeight: FontWeight.w400),
-                        ),
-                      ),
-                    ),
-                  ),
+                            ),
+                          ),
+                          trailing: Container(
+                            width: 80,
+                            height: 40,
+                            decoration: BoxDecoration(
+                                color: blueColor,
+                                borderRadius: BorderRadius.circular(40)),
+                            child: const Center(
+                              child: Text(
+                                'Follow',
+                                maxLines: 1,
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 15,
+                                    overflow: TextOverflow.ellipsis,
+                                    fontWeight: FontWeight.w400),
+                              ),
+                            ),
+                          ),
+                        );
+                      })
                 ],
               ),
             ),
@@ -254,10 +217,139 @@ class _SingleQuoteState extends State<SingleQuote> {
                 style: TextStyle(color: Colors.white, fontSize: 23),
               ),
             ),
-            StaggeredGridTemplete(listTile: listTile)
           ],
         ),
       )),
     );
+  }
+
+  void _showBottomSheet() {
+    showModalBottomSheet(
+        context: context,
+        showDragHandle: true,
+        constraints: const BoxConstraints(maxHeight: 275),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        backgroundColor: const Color.fromARGB(255, 48, 47, 47),
+        builder: (context) {
+          return Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              ListTile(
+                leading: Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                        color: Colors.blue.shade200,
+                        borderRadius: BorderRadius.circular(40)),
+                    child: const Icon(
+                      Icons.share,
+                      color: Colors.black,
+                    )),
+                title: const Text(
+                  'Share',
+                  style: TextStyle(color: Colors.white, fontSize: 24),
+                ),
+              ),
+              ListTile(
+                leading: Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                        color: Colors.purple.shade200,
+                        borderRadius: BorderRadius.circular(40)),
+                    child: const Icon(
+                      Icons.download,
+                      color: Colors.white,
+                    )),
+                title: const Text(
+                  'Download',
+                  style: TextStyle(color: Colors.white, fontSize: 24),
+                ),
+              ),
+              ListTile(
+                leading: Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                        color: Colors.redAccent.shade200,
+                        borderRadius: BorderRadius.circular(40)),
+                    child: const Icon(
+                      Icons.report,
+                      color: Colors.white,
+                    )),
+                title: const Text(
+                  'Report',
+                  style: TextStyle(color: Colors.white, fontSize: 24),
+                ),
+              ),
+              widget.userId == userId
+                  ? ListTile(
+                      onTap: () async {
+                        Get.back();
+                        final result = await showDialog<bool>(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            backgroundColor:
+                                const Color.fromARGB(255, 46, 45, 45),
+                            title: const Text(
+                              'Are you sure?',
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                            content: const Text(
+                              'This action will permanently delete this post',
+                              style:
+                                  TextStyle(color: Colors.white, fontSize: 18),
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(context, false),
+                                child: const Text(
+                                  'Cancel',
+                                  style:
+                                      TextStyle(color: blueColor, fontSize: 18),
+                                ),
+                              ),
+                              TextButton(
+                                onPressed: () => Navigator.pop(context, true),
+                                child: const Text(
+                                  'Delete',
+                                  style: TextStyle(
+                                      color: Colors.red, fontSize: 18),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+
+                        if (result == null || !result) {
+                          return;
+                        } else {
+                          final res =
+                              await QuoteService().deleteQuotes(widget.postId);
+                          if (res) {
+                            showSnackbar('Success', 'Post Deleted Sucessfully');
+                          } else {
+                            showSnackbar('Failed', 'Something went wrong');
+                          }
+                        }
+                      },
+                      leading: Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                              color: Colors.red.shade200,
+                              borderRadius: BorderRadius.circular(40)),
+                          child: const Icon(
+                            Icons.delete,
+                            color: Colors.white,
+                          )),
+                      title: const Text(
+                        'Delete',
+                        style: TextStyle(color: Colors.white, fontSize: 24),
+                      ),
+                    )
+                  : const SizedBox()
+            ],
+          );
+        });
   }
 }

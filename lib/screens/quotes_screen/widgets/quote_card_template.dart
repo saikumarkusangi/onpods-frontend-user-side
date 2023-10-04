@@ -64,11 +64,8 @@ class QuoteCardTemplate extends StatelessWidget {
               child: ClipRRect(
                   borderRadius: BorderRadius.circular(10),
                   child: InkWell(
-                      onTap: () => Get.to(
-                          SingleQuote(
-                            image: data[index],
-                          ),
-                          transition: Transition.cupertino),
+                      onTap: (){},
+                        
                       child: CacheImage(image: data[index]))),
             ),
           ),

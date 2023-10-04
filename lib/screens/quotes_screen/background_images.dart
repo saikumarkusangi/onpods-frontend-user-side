@@ -22,9 +22,10 @@ class _BackGroundImagesState extends State<BackGroundImages> {
 
     return SafeArea(
       child: Scaffold(
+        backgroundColor: Colors.black,
         appBar: AppBar(
           toolbarHeight: 80,
-          backgroundColor: scaffoldBackgroundColor,
+          backgroundColor: Colors.black,
           automaticallyImplyLeading: false,
           title: CustomTextFormField(
             onSubmit: (query) {

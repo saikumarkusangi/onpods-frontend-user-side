@@ -44,6 +44,8 @@ class AuthProvider with ChangeNotifier {
     notifyListeners();
   }
 
+
+
   // ---------------------------- Sign UP -----------------------------------------
 
   Future<void> signUp(String name, String email, String password) async {

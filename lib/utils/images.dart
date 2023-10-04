@@ -32,4 +32,4 @@ const searchIconImage = '$imagebaseUrl/search_icon.png';
 const mailSent = '$imagebaseUrl/mail_sent.svg';
 const emailImage = '$imagebaseUrl/email_image.png';
 const connectionErrorImage = '$imagebaseUrl/no_internet.svg';
-const emptyImage = '$imagebaseUrl/empty.png';
+const emptyImage = '$imagebaseUrl/empty.webp';

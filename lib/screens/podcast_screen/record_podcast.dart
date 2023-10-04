@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_sound_lite/flutter_sound.dart';
@@ -8,6 +9,8 @@ import 'package:just_audio/just_audio.dart';
 import 'package:onpods/providers/bg_audio_provider.dart';
 import 'package:onpods/providers/ui_providers/timer_provider.dart';
 import 'package:onpods/screens/podcast_screen/bg_add.dart';
+import 'package:onpods/screens/podcast_screen/sound_effect_add.dart';
+import 'package:onpods/screens/podcast_screen/upload_podcast.dart';
 import 'package:onpods/utils/utils_exports.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
@@ -31,9 +34,13 @@ class _RecordPodcastState extends State<RecordPodcast> {
   bool _isPlaying = false;
 
   final AudioPlayer _player1 = AudioPlayer();
+  final AudioPlayer _player2 = AudioPlayer();
   late String _audioFilePath;
   ValueNotifier<double> musicVolume = ValueNotifier<double>(0.5);
   ValueNotifier<int> currentBg = ValueNotifier<int>(0);
+   ValueNotifier<double> soundEffectVolume = ValueNotifier<double>(0.5);
+  ValueNotifier<int> currentSoundEffect = ValueNotifier<int>(0);
+  
   @override
   void initState() {
     super.initState();
@@ -74,7 +81,7 @@ class _RecordPodcastState extends State<RecordPodcast> {
       await _audioRecorder.stopRecorder();
       _timer.cancel();
       _player1.stop();
-
+      _player2.stop();
       context
           .read<RecordingDurationProvider>()
           .updateRecordingDuration(Duration.zero);
@@ -164,6 +171,7 @@ class _RecordPodcastState extends State<RecordPodcast> {
   @override
   void dispose() {
     _player1.dispose();
+    _player2.dispose();
     _audioPlayer.closeAudioSession();
     _audioRecorder.closeAudioSession();
     _deleteAudioFile();
@@ -327,19 +335,19 @@ class _RecordPodcastState extends State<RecordPodcast> {
                           ))
                       : null),
             ),
-            !_isStoped
-                ? const Align(
-                    alignment: Alignment.bottomCenter,
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(vertical: 5),
-                      child: Text(
-                        'Use headphones for better quality',
-                        style: TextStyle(
-                            color: Color.fromARGB(255, 255, 255, 255)),
-                      ),
-                    ),
-                  )
-                : const SizedBox(),
+            // !_isStoped
+            //     ? const Align(
+            //         alignment: Alignment.bottomCenter,
+            //         child: Padding(
+            //           padding: EdgeInsets.symmetric(vertical: 5),
+            //           child: Text(
+            //             'Use headphones for better quality',
+            //             style: TextStyle(
+            //                 color: Color.fromARGB(255, 255, 255, 255)),
+            //           ),
+            //         ),
+            //       )
+            //     : const SizedBox(),
             _isStoped
                 ? Align(
                     alignment: Alignment.center,
@@ -376,220 +384,472 @@ class _RecordPodcastState extends State<RecordPodcast> {
                       ),
                     )
                   : const SizedBox(),
-              !_isStoped
-                  ? Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        const Icon(
-                          Icons.volume_up_rounded,
-                          color: Colors.white,
-                        ),
-                        SizedBox(
-                          width: MediaQuery.of(context).size.width * 0.75,
-                          child: ValueListenableBuilder<double>(
-                            valueListenable: musicVolume,
-                            builder: (context, volume, child) {
-                              return Slider(
-                                activeColor: blueColor,
-                                value: volume,
-                                onChanged: (value) {
-                                  musicVolume.value = value;
-                                  _player1.setVolume(value);
-                                },
-                              );
-                            },
-                          ),
-                        ),
-                        ValueListenableBuilder<double>(
-                            valueListenable: musicVolume,
-                            builder: (context, volume, child) {
-                              return Text(
-                                '${(volume * 100).toStringAsFixed(0)}%',
-                                style: const TextStyle(color: Colors.white),
-                              );
-                            })
-                      ],
-                    )
-                  : const SizedBox(),
-              SizedBox(
-                height: MediaQuery.of(context).size.height * 0.68,
             
-                child: DefaultTabController(
-                    length: 2,
-                    child: Column(
-                                   mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                      const TabBar(
-                        labelColor: Colors.white,
-                        indicatorColor: blueColor,
-                        dividerColor: Colors.black,
-                        unselectedLabelColor: Colors.white60,
-                              tabs: [
-                                Tab(
-                                  icon: Icon(Icons.music_note),
-                                  text: 'Music',
+              !_isStoped
+                  ? SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.68,
+                      child: DefaultTabController(
+                          length: 2,
+                          child: Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                const TabBar(
+                                  indicatorSize: TabBarIndicatorSize.tab,
+                                  labelColor: Colors.white,
+                                  indicatorColor: Colors.white,
+                                  dividerColor: Colors.black,
+                                  unselectedLabelColor: Colors.white60,
+                                  tabs: [
+                                    Tab(
+                                      icon: Icon(Icons.music_note),
+                                      text: 'Music',
+                                    ),
+                                    Tab(
+                                      icon: Icon(Icons.spatial_audio),
+                                      text: 'Sound Effects',
+                                    )
+                                  ],
                                 ),
-                                Tab(
-                                  icon: Icon(Icons.spatial_audio),
-                                  text: 'Sound Effects',
-                                )
-                              ],
-                            ),
-                      Flexible(
-                        child: TabBarView(
-                           
-                            children: [
-                               Container(
-                                child:Text('sss',style: TextStyle(color: Colors.white),) ,
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 4),
-                                child: GridView.builder(
-                                  gridDelegate:
-                                      const SliverGridDelegateWithFixedCrossAxisCount(
-                                          crossAxisCount: 4,
-                                          childAspectRatio: 0.8,               
-                                         mainAxisSpacing: 0.0),
-                                  shrinkWrap: true,
-                                  itemCount: provider.selectedBg.length + 1,
-                                  itemBuilder: (context, index) {
-                                    final data =
-                                        index < provider.selectedBg.length
-                                            ? provider.selectedBg[index]
-                                            : null;
-                                    if (index >= provider.selectedBg.length) {
-                                      return Column(
-                                        children: [
-                                          GestureDetector(
-                                            onTap: () {
-                                              _player1.stop();
-                                              Get.to(const BgAdd());
-                                            },
-                                            child: Container(
-                                              width: 55,
-                                              height: 55,
-                                              decoration: BoxDecoration(
-                                                  color: const Color.fromARGB(
-                                                      255, 44, 41, 41),
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          100)),
-                                              child: const Center(
-                                                  child: Icon(
-                                                Icons.add,
-                                                size: 32,
-                                                color: Colors.white,
-                                              )),
-                                            ),
-                                          ),
-                                        ],
-                                      );
-                                    } else {
-                                      return Column(
-                                        mainAxisAlignment: MainAxisAlignment.start,
-                                        children: [
-                                          GestureDetector(
-                                              onTap: () async {
-                                                final audioUrl =
-                                                    data!['audiourl'];
-                                
-                                                if (audioUrl != null) {
-                                                  final audioSource =
-                                                      AudioSource.uri(
-                                                          Uri.parse(audioUrl));
-                                                  await _player1.setAudioSource(
-                                                      audioSource);
-                                                  if (_player1.playing &&
-                                                      currentBg.value ==
-                                                          index) {
-                                                    _player1.stop();
-                                                  } else {
-                                                    _player1.play();
-                                                    currentBg.value = index;
-                                                  }
-                                                }
-                                              },
-                                              child: Stack(
-                                                children: [
-                                                  Container(
-                                                    width: 50,
-                                                    height: 50,
-                                                    decoration: BoxDecoration(
-                                                      color:
-                                                          const Color.fromARGB(
-                                                              255, 44, 41, 41),
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              100),
-                                                    ),
-                                                    child: const Center(
-                                                      child: Icon(
-                                                        Icons.music_note,
-                                                        color: Colors.white,
-                                                        size: 32,
+                                Flexible(
+                                  child: TabBarView(
+                                  
+                                    children: [
+                                   
+                                    Stack(
+                                      children: [
+                                       
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 4),
+                                          child: GridView.builder(
+                                            gridDelegate:
+                                                const SliverGridDelegateWithFixedCrossAxisCount(
+                                                    crossAxisCount: 4,
+                                                    childAspectRatio: 0.8,
+                                                    mainAxisSpacing: 0.0),
+                                            shrinkWrap: true,
+                                            itemCount:
+                                                provider.selectedBg.length + 1,
+                                            itemBuilder: (context, index) {
+                                              final data = index <
+                                                      provider.selectedBg.length
+                                                  ? provider.selectedBg[index]
+                                                  : null;
+                                              if (index >=
+                                                  provider.selectedBg.length) {
+                                                return Column(
+                                                  children: [
+                                                    GestureDetector(
+                                                      onTap: () {
+                                                        _player1.stop();
+                                                        Get.to(const BgAdd());
+                                                      },
+                                                      child: Container(
+                                                        width: 55,
+                                                        height: 55,
+                                                        decoration: BoxDecoration(
+                                                            color: const Color
+                                                                .fromARGB(255,
+                                                                44, 41, 41),
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        100)),
+                                                        child: const Center(
+                                                            child: Icon(
+                                                          Icons.add,
+                                                          size: 32,
+                                                          color: Colors.white,
+                                                        )),
                                                       ),
                                                     ),
-                                                  ),
-                                                  Positioned.fill(
-                                                    child:
-                                                        StreamBuilder<Duration>(
-                                                      stream: _player1
-                                                          .positionStream, // Stream of audio playback position
-                                                      builder:
-                                                          (context, snapshot) {
-                                                        final position = snapshot
-                                                                .data ??
-                                                            Duration
-                                                                .zero; // Current playback position
-                                                        return CircularProgressIndicator(
-                                                          value: currentBg
-                                                                      .value ==
-                                                                  index
-                                                              ? position
-                                                                      .inMilliseconds /
-                                                                  (_player1
-                                                                          .duration
-                                                                          ?.inMilliseconds ??
-                                                                      1)
-                                                              : 0,
-                                                          backgroundColor:
-                                                              const Color
-                                                                  .fromARGB(
-                                                                  255,
-                                                                  107,
-                                                                  106,
-                                                                  106),
-                                                          valueColor:
-                                                              const AlwaysStoppedAnimation<
-                                                                      Color>(
-                                                                  Colors.white),
-                                                        );
-                                                      },
+                                                  ],
+                                                );
+                                              } else {
+                                                return Column(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.start,
+                                                  children: [
+                                                    GestureDetector(
+                                                        onTap: () async {
+                                                          final audioUrl =
+                                                              data!['audiourl'];
+
+                                                          if (audioUrl !=
+                                                              null) {
+                                                            final audioSource =
+                                                                AudioSource.uri(
+                                                                    Uri.parse(
+                                                                        audioUrl));
+                                                            await _player1
+                                                                .setAudioSource(
+                                                                    audioSource);
+                                                            if (_player1
+                                                                    .playing &&
+                                                                currentBg
+                                                                        .value ==
+                                                                    index) {
+                                                              _player1.stop();
+                                                            } else {
+                                                              _player1.play();
+                                                              currentBg.value =
+                                                                  index;
+                                                            }
+                                                          }
+                                                        },
+                                                        child: Stack(
+                                                          children: [
+                                                            Container(
+                                                              width: 50,
+                                                              height: 50,
+                                                              decoration:
+                                                                  BoxDecoration(
+                                                                color: const Color
+                                                                    .fromARGB(
+                                                                    255,
+                                                                    44,
+                                                                    41,
+                                                                    41),
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            100),
+                                                              ),
+                                                              child:
+                                                                  const Center(
+                                                                child: Icon(
+                                                                  Icons
+                                                                      .music_note,
+                                                                  color: Colors
+                                                                      .white,
+                                                                  size: 32,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                            Positioned.fill(
+                                                              child:
+                                                                  StreamBuilder<
+                                                                      Duration>(
+                                                                stream: _player1
+                                                                    .positionStream, // Stream of audio playback position
+                                                                builder: (context,
+                                                                    snapshot) {
+                                                                  final position = snapshot
+                                                                          .data ??
+                                                                      Duration
+                                                                          .zero; // Current playback position
+                                                                  return CircularProgressIndicator(
+                                                                    value: currentBg.value ==
+                                                                            index
+                                                                        ? position.inMilliseconds /
+                                                                            (_player1.duration?.inMilliseconds ??
+                                                                                1)
+                                                                        : 0,
+                                                                    backgroundColor:
+                                                                        const Color
+                                                                            .fromARGB(
+                                                                            255,
+                                                                            107,
+                                                                            106,
+                                                                            106),
+                                                                    valueColor: const AlwaysStoppedAnimation<
+                                                                            Color>(
+                                                                        Colors
+                                                                            .white),
+                                                                  );
+                                                                },
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        )),
+                                                    const SizedBox(
+                                                      height: 6,
                                                     ),
-                                                  ),
-                                                ],
-                                              )),
-                                          const SizedBox(
-                                            height: 6,
+                                                    Text(
+                                                      data!['name'] ??
+                                                          'undefined',
+                                                      maxLines: 1,
+                                                      style: const TextStyle(
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                          color: Colors.white,
+                                                          fontSize: 14),
+                                                    ),
+                                                  ],
+                                                );
+                                              }
+                                            },
                                           ),
-                                          Text(
-                                            data!['name'] ?? 'undefined',
-                                            maxLines: 1,
-                                            style: const TextStyle(
-                                                overflow: TextOverflow.ellipsis,
+                                        ),
+                                         Positioned(
+                                        top: 20,
+                                        left: 20,
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              const Icon(
+                                                Icons.volume_up_rounded,
                                                 color: Colors.white,
-                                                fontSize: 14),
+                                              ),
+                                              SizedBox(
+                                                width: MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    0.75,
+                                                child: ValueListenableBuilder<
+                                                    double>(
+                                                  valueListenable: musicVolume,
+                                                  builder:
+                                                      (context, volume, child) {
+                                                    return Slider(
+                                                      activeColor: blueColor,
+                                                      value: volume,
+                                                      onChanged: (value) {
+                                                        musicVolume.value = value;
+                                                        _player1.setVolume(value);
+                                                      },
+                                                    );
+                                                  },
+                                                ),
+                                              ),
+                                              ValueListenableBuilder<double>(
+                                                  valueListenable: musicVolume,
+                                                  builder:
+                                                      (context, volume, child) {
+                                                    return Text(
+                                                      '${(volume * 100).toStringAsFixed(0)}%',
+                                                      style: const TextStyle(
+                                                          color: Colors.white),
+                                                    );
+                                                  })
+                                            ],
                                           ),
-                                        ],
-                                      );
-                                    }
-                                  },
-                                ),
-                              )
-                            ]),
-                      )
-                    ])),
-              )
+                                        ),
+                                      ],
+                                    ),
+                                    Stack(
+                                      children: [
+                                       
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 4),
+                                          child: GridView.builder(
+                                            gridDelegate:
+                                                const SliverGridDelegateWithFixedCrossAxisCount(
+                                                    crossAxisCount: 4,
+                                                    childAspectRatio: 0.8,
+                                                    mainAxisSpacing: 0.0),
+                                            shrinkWrap: true,
+                                            itemCount:
+                                                provider.selectedSoundEffects.length + 1,
+                                            itemBuilder: (context, index) {
+                                              final data = index <
+                                                      provider.selectedSoundEffects.length
+                                                  ? provider.selectedSoundEffects[index]
+                                                  : null;
+                                              if (index >=
+                                                  provider.selectedSoundEffects.length) {
+                                                return Column(
+                                                  children: [
+                                                    GestureDetector(
+                                                      onTap: () {
+                                                        _player2.stop();
+                                                        Get.to(const SoundEffectAdd());
+                                                      },
+                                                      child: Container(
+                                                        width: 55,
+                                                        height: 55,
+                                                        decoration: BoxDecoration(
+                                                            color: const Color
+                                                                .fromARGB(255,
+                                                                44, 41, 41),
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        100)),
+                                                        child: const Center(
+                                                            child: Icon(
+                                                          Icons.add,
+                                                          size: 32,
+                                                          color: Colors.white,
+                                                        )),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                );
+                                              } else {
+                                                return Column(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.start,
+                                                  children: [
+                                                    GestureDetector(
+                                                        onTap: () async {
+                                                          final audioUrl =
+                                                              data!['sound'];
+
+                                                          if (audioUrl !=
+                                                              null) {
+                                                            final audioSource =
+                                                                AudioSource.uri(
+                                                                    Uri.parse(
+                                                                        audioUrl));
+                                                            await _player2
+                                                                .setAudioSource(
+                                                                    audioSource);
+                                                            if (_player2
+                                                                    .playing &&
+                                                                currentSoundEffect
+                                                                        .value ==
+                                                                    index) {
+                                                              _player2.stop();
+                                                            } else {
+                                                              _player2.play();
+                                                              currentSoundEffect.value =
+                                                                  index;
+                                                            }
+                                                          }
+                                                        },
+                                                        child: Stack(
+                                                          children: [
+                                                            Container(
+                                                              width: 50,
+                                                              height: 50,
+                                                              decoration:
+                                                                  BoxDecoration(
+                                                                color: const Color
+                                                                    .fromARGB(
+                                                                    255,
+                                                                    44,
+                                                                    41,
+                                                                    41),
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            100),
+                                                              ),
+                                                              child:
+                                                                   Center(
+                                                                child: Padding(
+                                                                  padding: const EdgeInsets.all(8.0),
+                                                                  child: CachedNetworkImage(
+                                                                  imageUrl:  data!['icon'] ?? '',
+                                                                    color: Colors.white,
+                                                                    errorWidget: (context, url, error) => const Icon(Icons.music_note,
+                                                                    color:Colors.white,  size: 32,),
+                                                                  ),
+                                                                )
+                                                              ),
+                                                            ),
+                                                            Positioned.fill(
+                                                              child:
+                                                                  StreamBuilder<
+                                                                      Duration>(
+                                                                stream: _player2
+                                                                    .positionStream, // Stream of audio playback position
+                                                                builder: (context,
+                                                                    snapshot) {
+                                                                  final position = snapshot
+                                                                          .data ??
+                                                                      Duration
+                                                                          .zero; // Current playback position
+                                                                  return CircularProgressIndicator(
+                                                                    value: currentSoundEffect.value ==
+                                                                            index
+                                                                        ? position.inMilliseconds /
+                                                                            (_player2.duration?.inMilliseconds ??
+                                                                                1)
+                                                                        : 0,
+                                                                    backgroundColor:
+                                                                        const Color
+                                                                            .fromARGB(
+                                                                            255,
+                                                                            107,
+                                                                            106,
+                                                                            106),
+                                                                    valueColor: const AlwaysStoppedAnimation<
+                                                                            Color>(
+                                                                        Colors
+                                                                            .white),
+                                                                  );
+                                                                },
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        )),
+                                                    const SizedBox(
+                                                      height: 6,
+                                                    ),
+                                                    Text(
+                                                      data!['name'] ??
+                                                          'undefined',
+                                                      maxLines: 1,
+                                                      style: const TextStyle(
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                          color: Colors.white,
+                                                          fontSize: 14),
+                                                    ),
+                                                  ],
+                                                );
+                                              }
+                                            },
+                                          ),
+                                        ),
+                                         Positioned(
+                                        top: 20,
+                                        left: 20,
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              const Icon(
+                                                Icons.volume_up_rounded,
+                                                color: Colors.white,
+                                              ),
+                                              SizedBox(
+                                                width: MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    0.75,
+                                                child: ValueListenableBuilder<
+                                                    double>(
+                                                  valueListenable: soundEffectVolume,
+                                                  builder:
+                                                      (context, volume, child) {
+                                                    return Slider(
+                                                      activeColor: blueColor,
+                                                      value: volume,
+                                                      onChanged: (value) {
+                                                        soundEffectVolume.value = value;
+                                                        _player2.setVolume(value);
+                                                      },
+                                                    );
+                                                  },
+                                                ),
+                                              ),
+                                              ValueListenableBuilder<double>(
+                                                  valueListenable: soundEffectVolume,
+                                                  builder:
+                                                      (context, volume, child) {
+                                                    return Text(
+                                                      '${(volume * 100).toStringAsFixed(0)}%',
+                                                      style: const TextStyle(
+                                                          color: Colors.white),
+                                                    );
+                                                  })
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    )
+                                 
+                                  
+                                  ]),
+                                )
+                              ])),
+                    )
+                  : const SizedBox()
             ]),
             Align(
               alignment: Alignment.bottomLeft,
@@ -665,8 +925,8 @@ class _RecordPodcastState extends State<RecordPodcast> {
                     ),
                   )
                 : const SizedBox(),
-            Align(
-              alignment: Alignment.bottomRight,
+                  Align(
+              alignment: Alignment.bottomCenter,
               child: Padding(
                 padding: const EdgeInsets.only(bottom: 20, right: 20),
                 child: _isStoped
@@ -675,6 +935,30 @@ class _RecordPodcastState extends State<RecordPodcast> {
                           _stopPlayback();
                           // Get.to(() => BgAdd(filePath: _audioFilePath),
                           //     transition: Transition.cupertino);
+                        },
+                        icon: const CircleAvatar(
+                          backgroundColor: Colors.lightBlue,
+                          radius: 28,
+                          child: Icon(
+                            Icons.save,
+                            color: Colors.white,
+                            size: 38,
+                          ),
+                        ),
+                      )
+                    : const SizedBox(),
+              ),
+            ),
+            Align(
+              alignment: Alignment.bottomRight,
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 20, right: 20),
+                child: _isStoped
+                    ? IconButton(
+                        onPressed: () {
+                          _stopPlayback();
+                          Get.to(() => const PodcastUploadPage(),
+                              transition: Transition.cupertino);
                         },
                         icon: const CircleAvatar(
                           backgroundColor: Colors.green,

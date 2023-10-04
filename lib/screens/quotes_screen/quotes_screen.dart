@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:onpods/models/models_exports.dart';
 import 'package:onpods/providers/providers_exports.dart';
-import 'package:onpods/screens/quotes_screen/create_quote.dart';
-import 'package:onpods/screens/quotes_screen/widgets/browse_all_quotes.dart';
 import 'package:onpods/screens/quotes_screen/widgets/quote_card_template.dart';
 import 'package:provider/provider.dart';
 import '../../utils/utils_exports.dart';
@@ -13,50 +12,74 @@ class QuotesScreen extends StatefulWidget {
   State<QuotesScreen> createState() => _QuotesScreenState();
 }
 
-class _QuotesScreenState extends State<QuotesScreen> {
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   fetchData();
-  // }
+class _QuotesScreenState extends State<QuotesScreen>
+    with SingleTickerProviderStateMixin {
+  late TabController _tabController;
 
-  // Future<void> fetchData() async {
-  //   final quoteProvider = Provider.of<QuoteProvider>(context, listen: false);
-  //   await quoteProvider.fetchCategories();
-  // }
+  @override
+  void initState() {
+    super.initState();
+    fetchCategoriesAndQuotes();
+  }
+
+  fetchCategoriesAndQuotes() async {
+    final quoteProvider = Provider.of<QuoteProvider>(context, listen: false);
+    await quoteProvider.fetchCategories();
+    _tabController = TabController(
+      length: quoteProvider.quotesCategories.length,
+      vsync: this,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
+    final quoteCategoryProvider = Provider.of<QuoteProvider>(context);
 
     return Scaffold(
-        appBar: AppBar(
-          automaticallyImplyLeading: false,
-          backgroundColor: Colors.black,
-          flexibleSpace: const Padding(
-            padding: EdgeInsets.only(top: 60),
-            child: BrowseAllQuotes(),
+      appBar: AppBar(
+        backgroundColor: Colors.black,
+        bottom:
+        quoteCategoryProvider.isLoading ?
+        const PreferredSize(
+           preferredSize: Size(0, 0),
+          child: QuotesCategorySkeleton()):
+         PreferredSize(
+          preferredSize: const Size(0, 0),
+          child: TabBar(
+            controller: _tabController,
+            indicatorColor: blueColor,
+            dividerColor: Colors.transparent,
+            unselectedLabelColor: Colors.white,
+            indicatorWeight: 5,
+            indicatorPadding: const EdgeInsets.only(top: 10),
+            labelColor: Colors.white,
+            isScrollable: true,
+            tabs: List.generate(quoteCategoryProvider.quotesCategories.length,
+                (index) {
+              return Text(
+                quoteCategoryProvider.quotesCategories[index].name,
+                style: const TextStyle(fontSize: 20),
+              );
+            }),
           ),
         ),
-        body: const SafeArea(
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(
-                  height: 10,
-                ),
-                QuoteCardTemplate(
-                  categoryTitle: 'Popular Quotes',
-                ),
-                SizedBox(
-                  height: 10,
-                ),
-                QuoteCardTemplate(
-                  categoryTitle: 'You May Like',
-                ),
-              ],
-            ),
-          ),
-        ));
+      ),
+      body:  quoteCategoryProvider.isLoading ?
+      const QuotesSkeleton():
+       TabBarView(
+        controller: _tabController,
+        children: List.generate(
+          quoteCategoryProvider.quotesCategories.length,
+          (index) {
+            final categoryId = quoteCategoryProvider.quotesCategories[index].id;
+            return RefreshIndicator(
+                onRefresh: () async {
+                 await quoteCategoryProvider.fetchQuotesByCategory(categoryId,1);
+                },
+                child: StaggeredGridTemplate(categoryId: categoryId));
+          },
+        ),
+      ),
+    );
   }
 }

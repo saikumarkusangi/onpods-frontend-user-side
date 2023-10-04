@@ -13,6 +13,8 @@ import 'package:onpods/widgets/connection_error.dart';
 import 'package:provider/provider.dart';
 import 'providers/providers_exports.dart';
 import 'utils/utils_exports.dart';
+import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -30,6 +32,7 @@ Future<void> main() async {
       Get.to(const NoConnection());
     }
   });
+  await Hive.initFlutter();
   await FlutterDownloader.initialize(debug: true);
 
   runApp(const MyApp());

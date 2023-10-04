@@ -5,9 +5,11 @@ import 'package:just_audio/just_audio.dart';
 import 'package:onpods/providers/providers_exports.dart';
 import 'package:onpods/screens/podcast_screen/upload_podcast.dart';
 import 'package:onpods/utils/colors.dart';
+import 'package:onpods/widgets/floating_action_button.dart';
 import 'package:provider/provider.dart';
-
+import 'package:file_picker/file_picker.dart';
 import '../../utils/utils_exports.dart';
+import '../../widgets/widgets_exports.dart';
 
 class BgAdd extends StatefulWidget {
   const BgAdd({Key? key}) : super(key: key);
@@ -77,12 +79,41 @@ class _BgAddState extends State<BgAdd> with AutomaticKeepAliveClientMixin {
     Colors.indigoAccent,
     Colors.deepOrangeAccent
   ];
+   Future<void> _pickAudio() async {
+    final provider = Provider.of<BgAudioProvider>(context,listen: false);
+    try {
+    
+      await FilePicker.platform.pickFiles(
+        type: FileType.audio,
+        allowMultiple: false,
+      ).then((result) {
+        if (result != null) {
+          final  data = {
+            'name':result.files.single.name,
+            "audiourl":result.files.single.path!
+          };
+          provider.addSelectedBg(data);
+          Get.back();
+          return result.files.single.path;
+        }
+        return null;
+      });
+    } catch (e) {
+      print('Error picking or playing audio: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
 
     final provider = Provider.of<BgAudioProvider>(context);
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: blueColor,
+        onPressed: _pickAudio,
+      child: const Icon(Icons.add,color: Colors.white,),
+      ),
       appBar: AppBar(
         iconTheme: const IconThemeData(color: Colors.white),
         backgroundColor: Colors.black,
@@ -115,7 +146,7 @@ class _BgAddState extends State<BgAdd> with AutomaticKeepAliveClientMixin {
               ),
             )
           : provider.bgCategories.isEmpty
-              ? Center(child: Image.asset(emptyImage))
+              ? const EmptyPlaceHiolder(message: 'Audios',)
               : ListView.builder(
                   shrinkWrap: true,
                   itemCount: provider.bgCategories.length,

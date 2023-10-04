@@ -47,7 +47,7 @@ class _LayoutState extends State<Layout> {
 
   void _showBottomSheet() {
   showModalBottomSheet<void>(
-    backgroundColor: Color.fromARGB(255, 34, 33, 33),
+    backgroundColor: const Color.fromARGB(255, 34, 33, 33),
     context: context,
     shape:const RoundedRectangleBorder(borderRadius: BorderRadius.only(topLeft: Radius.circular(10),
     topRight: Radius.circular(10))),
@@ -161,7 +161,7 @@ Widget _buildListTile(String leadingIcon, String title, Widget pageToNavigate) {
           return PersistentTabView(
             context,
             controller: _controller,
-            screens:  const [
+            screens:   const [
               HomeScreen(),
               QuotesScreen(),
               SizedBox(),

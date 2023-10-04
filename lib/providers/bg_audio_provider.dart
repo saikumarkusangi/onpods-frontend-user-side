@@ -9,6 +9,8 @@ class BgAudioProvider with ChangeNotifier {
   List<BgModel> get bgCategories => _bgCategories;
   List<Map<String, String>> _selectedBg = [];
 List<Map<String, String>> get selectedBg => _selectedBg;
+  List<Map<String, dynamic>> _selectedSoundEffects = [];
+List<Map<String, dynamic>> get selectedSoundEffects => _selectedSoundEffects;
 
   bool _isLoading = false;
   bool get isLoading => _isLoading;
@@ -39,5 +41,15 @@ removeSelectedBg(Map<String, String> data) {
   notifyListeners();
 }
 
+addSoundEffect(Map<String, dynamic> data) {
+    _selectedSoundEffects.add(data);
+  notifyListeners();
+}
+
+removeSoundEffect(Map<String, dynamic> data) {
+  _selectedSoundEffects.removeWhere((item) =>
+      item['name'] == data['name']);
+  notifyListeners();
+}
 
 }

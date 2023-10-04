@@ -66,7 +66,7 @@ class _DownloadsPageState extends State<DownloadsPage> {
       body: downloadItems.isEmpty
           ? Column(
             children: [
-              Image.asset(emptyImage),
+            Image.asset(emptyImage,scale:2.5),
               const Center(
                 child: Text(
                   'No Downloads Available.',

@@ -7,6 +7,7 @@ import 'package:get/get.dart';
 import 'package:palette_generator/palette_generator.dart';
 import 'package:provider/provider.dart';
 import '../../utils/utils_exports.dart';
+import '../../widgets/widgets_exports.dart';
 import '../player/player_screen.dart';
 
 class DetailedPodcast extends StatefulWidget {
@@ -123,8 +124,10 @@ class _DetailedPodcastState extends State<DetailedPodcast> {
                             height: 150,
                             width: 0.4.sw,
                             fit: BoxFit.cover,
-                            placeholder: (context, url) => Image.asset(podcastPlaceHolder),
-                            errorWidget: (context, url, error) =>Image.asset(podcastPlaceHolder) ,
+                            placeholder: (context, url) =>
+                                Image.asset(podcastPlaceHolder),
+                            errorWidget: (context, url, error) =>
+                                Image.asset(podcastPlaceHolder),
                           ),
                         ),
                         const SizedBox(
@@ -226,12 +229,8 @@ class _DetailedPodcastState extends State<DetailedPodcast> {
             ]),
           ),
           if (widget.episodes.isEmpty)
-            SliverToBoxAdapter(
-              child: Center(
-                child: Image.asset(
-                 emptyImage,
-                ),
-              ),
+            const SliverToBoxAdapter(
+              child:EmptyPlaceHiolder(message: 'Episode',)
             )
           else
             SliverList.builder(
