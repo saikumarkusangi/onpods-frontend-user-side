@@ -1,14 +1,8 @@
 import 'package:flutter/gestures.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_hud/flutter_hud.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:get/get.dart';
-import 'package:onpods/screens/auth_screen/Forgot_password_screen.dart';
-import 'package:onpods/screens/screens_exports.dart';
-import 'package:onpods/utils/utils_exports.dart';
-import 'package:onpods/widgets/widgets_exports.dart';
-import 'package:provider/provider.dart';
-import '../../providers/providers_exports.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:onpods/utils/exports.dart';
+import 'package:onpods/widgets/google_button.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -21,6 +15,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final ValueNotifier<bool> passwordToggle = ValueNotifier<bool>(false);
   final FocusNode _field1FocusNode = FocusNode();
   final FocusNode _field2FocusNode = FocusNode();
 
@@ -40,6 +35,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void submit() {
+    FocusManager.instance.primaryFocus?.unfocus();
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
       Provider.of<AuthProvider>(context, listen: false)
@@ -50,144 +46,136 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context);
-    final passwordToggle = Provider.of<PasswordToggle>(context);
+  final _googleOauth = GoogleSignIn();
 
     return WidgetHUD(
       showHUD: authProvider.isLoading,
-    hud: HUD(
-            progressIndicator: Image.asset(
-          liveGif,
-          color: blueColor,
-          scale: 3,
-        )),
-      builder:(context, child) =>  Scaffold(
-        body: SingleChildScrollView(
-          reverse: true,
-          child: Column(
-            children: [
-              _buildHeader(),
-              _buildForm(authProvider, passwordToggle),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildHeader() {
-    return Stack(
+      hud: HUD(
+          progressIndicator: Image.asset(
+        liveGif,
+        color: blueColor,
+        scale: 3,
+      )),
+      builder: (context, child) => Scaffold(
+        body: GestureDetector(
+          onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+               Stack(
       children: [
         SizedBox(
-          height: 0.52.sh,
-          child: Image.asset(
-            loginImage,
+          height: 0.5.sh,
+          child: Image.network(
+            'https://podbiblemag.com/wp-content/uploads/2023/07/the-best-new-podcasts-of-2023-summer-this-month.png',
             fit: BoxFit.cover,
           ),
         ),
-        Positioned(
-          bottom: 0,
-          child: Align(
-            alignment: Alignment.center,
-            child: Container(
-              height: 0.25.sh,
-              width: 1.sw,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.bottomCenter,
-                  end: Alignment.topCenter,
-                  colors: [
-                    Colors.black,
-                    Colors.black.withOpacity(0.9),
-                    Colors.black.withOpacity(0.7),
-                    Colors.black.withOpacity(0.5),
-                    Colors.transparent,
-                  ],
-                ),
+        Align(
+          alignment: Alignment.bottomCenter,
+          child: Container(
+            padding: const EdgeInsets.only(left: 20, top: 150, right: 20),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.bottomCenter,
+                end: Alignment.topCenter,
+                colors: [
+                  Colors.black,
+                  Colors.black.withOpacity(0.9),
+                  Colors.black.withOpacity(0.7),
+                ],
               ),
-              child: const Padding(
-                padding: EdgeInsets.only(bottom: 10, left: 20, right: 20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Text(
-                      'Login',
-                      style: TextStyle(
-                          fontSize: 32,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white),
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    Text(
-                      "Welcome back to Onpods, It's time to listen to the music you want and enjoy the music!",
-                      style: TextStyle(fontSize: 14, color: Colors.white),
-                    ),
-                  ],
-                ),
+            ),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'Enjoy Podcasts,\nQuotes and more.',
+                    style: TextStyle(
+                        fontSize: 34,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white),
+                  ),
+                  const SizedBox(
+                    height: 30,
+                  ),
+                  _buildEmailField(),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  _buildPasswordField(),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  CustomElevatedButton(
+                    onTap: submit,
+                    height: 50,
+                    text: 'Login',
+                    buttonTextStyle:
+                        const TextStyle(color: Colors.white, fontSize: 18),
+                    buttonColor: blueColor,
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  _buildForgotPasswordLink(),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        height: 1,
+                        width: 0.35.sw,
+                        color: Colors.white54,
+                      ),
+                      const Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Text(
+                          'OR',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ),
+                      Container(
+                        height: 1,
+                        width: 0.35.sw,
+                        color: Colors.white54,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  customGoogleButton('Login With Google', () async {
+                    final response = await _googleOauth.signIn();
+                    authProvider.login(response!.email, response.id);
+                  }),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  _buildSignUpLink()
+                ],
               ),
             ),
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildForm(AuthProvider authProvider, PasswordToggle passwordToggle) {
-    return SizedBox(
-      height: MediaQuery.of(context).size.shortestSide - 25,
-      child: Form(
-        key: _formKey,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              _buildEmailField(),
-              _buildPasswordField(passwordToggle),
-              CustomElevatedButton(
-                onTap: submit,
-                height: 42,
-                text: 'Login',
-                buttonTextStyle: const TextStyle(color: Colors.white, fontSize: 18),
-                buttonStyle: ButtonStyle(
-                  shape: MaterialStateProperty.all(
-                    RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                  fixedSize: MaterialStateProperty.resolveWith<Size?>(
-                    (Set<MaterialState> states) {
-                      if (states.contains(MaterialState.disabled)) {
-                        return Size(1.sw, 40); 
-                      }
-                      return Size(1.sw, 40); 
-                    },
-                  ),
-                  backgroundColor: MaterialStateProperty.resolveWith<Color?>(
-                    (Set<MaterialState> states) {
-                      if (states.contains(MaterialState.disabled)) {
-                        return Colors.grey; 
-                      }
-                      return Colors.blue; 
-                    },
-                  ),
-                ),
-              ),
-              _buildForgotPasswordLink(),
-              const Text(
-                '( OR )',
-                style: TextStyle(color: Colors.white),
-              ),
-              _buildGoogleLoginButton(),
-              _buildSignUpLink(),
-            ],
+    )
+  
+              ],
+            ),
           ),
         ),
       ),
     );
   }
+
+
+
 
   Widget _buildEmailField() {
     return CustomTextFormField(
@@ -197,7 +185,7 @@ class _LoginScreenState extends State<LoginScreen> {
       radius: 10,
       hintText: "Email Address",
       vertical: 16,
-      fillColor: textFieldColor,
+      fillColor: darktextFieldColor,
       hintStyle: const TextStyle(color: Colors.grey),
       textStyle: const TextStyle(color: Colors.white),
       validator: (value) {
@@ -209,41 +197,44 @@ class _LoginScreenState extends State<LoginScreen> {
         }
         return null;
       },
+      onSubmit: (String data) {},
     );
   }
 
-  Widget _buildPasswordField(PasswordToggle passwordToggle) {
-    return CustomTextFormField(
-      controller: _passwordController,
-      focusNode: _field2FocusNode,
-      autofocus: false,
-      radius: 10,
-      hintText: "Password",
-      obscureText: !passwordToggle.isPasswordVisible,
-      vertical: 16,
-      suffix: IconButton(
-        color: Colors.white,
-        icon: Icon(
-          passwordToggle.isPasswordVisible
-              ? Icons.visibility
-              : Icons.visibility_off,
-        ),
-        onPressed: () {
-          passwordToggle.togglePasswordVisibility();
+  Widget _buildPasswordField() {
+    return ValueListenableBuilder(
+      valueListenable: passwordToggle,
+      builder: (context, value, child) => CustomTextFormField(
+        focusNode: _field2FocusNode,
+        controller: _passwordController,
+        autofocus: false,
+        radius: 10,
+        hintText: "Password",
+        obscureText: !value,
+        vertical: 16,
+        validator: (value) {
+          if (value!.isEmpty) {
+            return 'Please enter password';
+          }
+          if (value.length < 6) {
+            return 'Password must be at least 6 characters long';
+          }
+          return null;
         },
+        suffix: IconButton(
+          color: Colors.white,
+          icon: Icon(
+            value ? Icons.visibility : Icons.visibility_off,
+          ),
+          onPressed: () {
+            passwordToggle.value = !passwordToggle.value;
+          },
+        ),
+        fillColor: darktextFieldColor,
+        hintStyle: const TextStyle(color: Colors.grey),
+        textStyle: const TextStyle(color: Colors.white),
+        onSubmit: (String data) {},
       ),
-      fillColor: textFieldColor,
-      hintStyle: const TextStyle(color: Colors.grey),
-      textStyle: const TextStyle(color: Colors.white),
-      validator: (value) {
-        if (value!.isEmpty) {
-          return 'Please enter password';
-        }
-        if (value.length < 6) {
-          return 'Password must be at least 6 characters long';
-        }
-        return null;
-      },
     );
   }
 
@@ -255,53 +246,8 @@ class _LoginScreenState extends State<LoginScreen> {
         alignment: Alignment.centerRight,
         child: Text(
           'Forgot Password?',
-          style: TextStyle(color: blueColor),
+          style: TextStyle(color: blueColor, fontSize: 16),
         ),
-      ),
-    );
-  }
-
-  Widget _buildGoogleLoginButton() {
-    return OutlinedButton(
-      style: ButtonStyle(
-        shape: MaterialStateProperty.all(
-          RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-        ),
-        fixedSize: MaterialStateProperty.resolveWith<Size?>(
-          (Set<MaterialState> states) {
-            if (states.contains(MaterialState.disabled)) {
-              return Size(1.sw, 40); 
-            }
-            return Size(1.sw, 40); 
-          },
-        ),
-        backgroundColor: MaterialStateProperty.resolveWith<Color?>(
-          (Set<MaterialState> states) {
-            if (states.contains(MaterialState.disabled)) {
-              return Colors.grey; 
-            }
-            return Colors.white; 
-          },
-        ),
-      ),
-      onPressed: () {},
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Image.asset(
-            googleLogo,
-            height: 20,
-          ),
-          const SizedBox(
-            width: 20,
-          ),
-          const Text(
-            'Login With Google',
-            style: TextStyle(color: blueColor),
-          ),
-        ],
       ),
     );
   }
@@ -315,11 +261,10 @@ class _LoginScreenState extends State<LoginScreen> {
           TextSpan(
             recognizer: TapGestureRecognizer()
               ..onTap = () {
-                Get.to(const SignUpScreen(),
-                    transition: Transition.cupertino);
+                Get.to(const SignUpScreen(), transition: Transition.rightToLeftWithFade);
               },
             text: ' Sign up',
-            style: const TextStyle(color: blueColor),
+            style: const TextStyle(color: blueColor, fontSize: 16),
           ),
         ],
       ),

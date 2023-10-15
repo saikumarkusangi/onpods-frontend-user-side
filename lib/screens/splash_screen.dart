@@ -1,9 +1,6 @@
-import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:onpods/screens/layout_screen.dart';
-import 'package:onpods/screens/screens_exports.dart';
-import 'package:onpods/utils/images.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+
+
+import 'package:onpods/utils/exports.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});

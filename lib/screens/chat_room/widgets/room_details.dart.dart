@@ -1,8 +1,5 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:onpods/screens/chat_room/widgets/user_avatar.dart';
-import 'package:onpods/utils/utils_exports.dart';
-import 'package:onpods/widgets/custom_button.dart';
+
+import 'package:onpods/utils/exports.dart';
 
 showRoomDetails(context, title) {
   showModalBottomSheet(
@@ -31,7 +28,7 @@ showRoomDetails(context, title) {
                       child: Center(
                         child: Container(
                           decoration: BoxDecoration(
-                              color: textFieldColor,
+                              color: darktextFieldColor,
                               borderRadius: BorderRadius.circular(10)),
                           width: 40,
                           height: 6,
@@ -128,17 +125,7 @@ showRoomDetails(context, title) {
                               height: 40,
                               buttonTextStyle: const TextStyle(
                                   color: Colors.white, fontSize: 18),
-                              buttonStyle: ButtonStyle(backgroundColor:
-                                  MaterialStateProperty.resolveWith<Color?>(
-                                (Set<MaterialState> states) {
-                                  if (states.contains(MaterialState.disabled)) {
-                                    return Colors
-                                        .grey; // Color for disabled state
-                                  }
-                                  return Colors
-                                      .blue; // Default color for enabled state
-                                },
-                              )),
+                            buttonColor: blueColor,
                               text: 'Join Room')),
                     ),
                   ],

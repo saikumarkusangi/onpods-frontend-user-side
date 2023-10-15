@@ -1,9 +1,7 @@
-import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:onpods/utils/utils_exports.dart';
+import 'package:onpods/utils/exports.dart';
 
-class ChatRoomService {
   // --------------------------------- Create New Chat Room--------------------------------------------------
 
   Future<Map<String, dynamic>> createRoom(chatTopic, roomType, ownerId) async {
@@ -37,4 +35,4 @@ class ChatRoomService {
       throw Exception('Error: $e');
     }
   }
-}
+

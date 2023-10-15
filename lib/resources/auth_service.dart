@@ -1,12 +1,9 @@
-import 'dart:async';
+
 import 'dart:convert';
-import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
-import 'package:onpods/providers/auth_provider.dart';
-import 'package:onpods/screens/auth_screen/otp_verify_screen.dart';
-import 'package:onpods/screens/layout_screen.dart';
-import 'package:onpods/screens/screens_exports.dart';
-import 'package:onpods/utils/utils_exports.dart';
+import 'package:onpods/utils/exports.dart';
+
+
 
 class AuthService {
   final AuthProvider authProvider;
@@ -92,6 +89,9 @@ class AuthService {
     }
   }
 
+
+
+
   // --------------------------------- Forgot Password --------------------------------------------------
 
   Future<Map<String, dynamic>> forgotPassword(String email) async {
@@ -137,7 +137,7 @@ class AuthService {
     }
   }
 
-  // --------------------------------- Login--------------------------------------------------
+  // --------------------------------- resetPassword--------------------------------------------------
 
   Future<Map<String, dynamic>> resetPassword(
       String email, String password) async {

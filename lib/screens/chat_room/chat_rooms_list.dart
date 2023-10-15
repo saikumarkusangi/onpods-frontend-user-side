@@ -1,11 +1,6 @@
-import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:onpods/utils/colors.dart';
-import 'package:onpods/utils/images.dart';
-import 'package:onpods/widgets/custom_text_field.dart';
-import 'widgets/chat_room_card.dart';
-import 'widgets/chat_room_skeleton.dart';
-import 'widgets/room_details.dart.dart';
+
+
+import 'package:onpods/utils/exports.dart';
 
 class ChatRoomList extends StatefulWidget {
   const ChatRoomList({super.key});
@@ -28,21 +23,21 @@ class _ChatRoomListState extends State<ChatRoomList> {
         child: Scaffold(
           appBar: AppBar(
             backgroundColor: Colors.black,
-            flexibleSpace: const Padding(
-                padding: EdgeInsets.only(top: 50, left: 10, right: 10),
+            flexibleSpace:  Padding(
+                padding: const EdgeInsets.only(top: 50, left: 10, right: 10),
                 child: CustomTextFormField(
                   autofocus: false,
                   radius: 10,
-                  prefix: Icon(
+                  prefix: const Icon(
                     Icons.search_rounded,
                     color: Colors.grey,
                     size: 26,
                   ),
                   hintText: "Search author,category & more...",
                   vertical: 16,
-                  fillColor: textFieldColor,
-                  hintStyle: TextStyle(color: Colors.grey, fontSize: 14),
-                  textStyle: TextStyle(color: Colors.white),
+                  fillColor: darktextFieldColor,
+                  hintStyle: const TextStyle(color: Colors.grey, fontSize: 14),
+                  textStyle: const TextStyle(color: Colors.white), onSubmit: (String data) {  },
                 )),
             bottom: const PreferredSize(
                 preferredSize: Size(0, 80),

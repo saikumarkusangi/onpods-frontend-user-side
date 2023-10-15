@@ -1,9 +1,6 @@
 import 'dart:io';
-import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:onpods/utils/colors.dart';
-import 'package:onpods/widgets/custom_button.dart';
+import 'package:onpods/utils/exports.dart';
+
 
 class PodcastUploadPage extends StatefulWidget {
   const PodcastUploadPage({super.key});
@@ -105,10 +102,10 @@ class FinalUploadPage extends StatefulWidget {
   const FinalUploadPage({super.key, required this.poster});
   final String poster;
   @override
-  _FinalUploadPageState createState() => _FinalUploadPageState();
+  FinalUploadPageState createState() => FinalUploadPageState();
 }
 
-class _FinalUploadPageState extends State<FinalUploadPage> {
+class FinalUploadPageState extends State<FinalUploadPage> {
   TextEditingController titleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
 String imagePath = '';

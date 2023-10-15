@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:onpods/models/models_exports.dart';
+import 'package:onpods/models/dummy_data.dart';
 import 'package:onpods/resources/dummy_service.dart';
 
 class DummyProvider with ChangeNotifier {

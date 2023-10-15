@@ -1,14 +1,5 @@
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:onpods/resources/users_service.dart';
-import 'package:onpods/screens/profile_screen/profile_screen.dart';
-import 'package:onpods/screens/user_profile_screen.dart';
-import 'package:onpods/utils/colors.dart';
-import 'package:onpods/utils/images.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:onpods/utils/exports.dart';
 
-import '../../widgets/widgets_exports.dart';
 
 class FollowersScreen extends StatefulWidget {
   final String title;
@@ -33,7 +24,7 @@ class _FollowersScreenState extends State<FollowersScreen> {
     setState(() {
       loading = true;
     });
-    final response = await UserServices.userFollowers(
+    final response = await UserServices().userFollowers(
         widget.userId, 1, widget.title.toLowerCase());
 
     setState(() {
@@ -65,7 +56,7 @@ class _FollowersScreenState extends State<FollowersScreen> {
             });
 
             final userQuotes =
-                await UserServices.userQuotes(widget.userId, data['page'] + 1);
+                await UserServices().userQuotes(widget.userId, data['page'] + 1);
             setState(() {
               data['page'] = userQuotes['page'];
               data['data'].addAll(userQuotes['data']);
@@ -154,28 +145,31 @@ class _FollowersScreenState extends State<FollowersScreen> {
                                   color:
                                       const Color.fromARGB(255, 236, 184, 202),
                                   borderRadius: BorderRadius.circular(60)),
-                              child: CachedNetworkImage(
-                                imageUrl: '',
-                                placeholder: (context, url) => Center(
-                                  child: Text(
-                                    (user['userName'] != null &&
-                                            user['userName'].isNotEmpty)
-                                        ? user['userName']
-                                            .substring(0, 1)
-                                            .toUpperCase()
-                                        : 'U',
-                                    style: const TextStyle(fontSize: 24),
+                              child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(60),
+                                child: CachedNetworkImage(
+                                  imageUrl: 'https://onpods.s3.amazonaws.com/profile-pics/${user['userId']}.jpg',
+                                  placeholder: (context, url) => Center(
+                                    child: Text(
+                                      (user['userName'] != null &&
+                                              user['userName'].isNotEmpty)
+                                          ? user['userName']
+                                              .substring(0, 1)
+                                              .toUpperCase()
+                                          : 'U',
+                                      style: const TextStyle(fontSize: 24),
+                                    ),
                                   ),
-                                ),
-                                errorWidget: (context, url, error) => Center(
-                                  child: Text(
-                                    (user['userName'] != null &&
-                                            user['userName'].isNotEmpty)
-                                        ? user['userName']
-                                            .substring(0, 1)
-                                            .toUpperCase()
-                                        : 'U',
-                                    style: const TextStyle(fontSize: 24),
+                                  errorWidget: (context, url, error) => Center(
+                                    child: Text(
+                                      (user['userName'] != null &&
+                                              user['userName'].isNotEmpty)
+                                          ? user['userName']
+                                              .substring(0, 1)
+                                              .toUpperCase()
+                                          : 'U',
+                                      style: const TextStyle(fontSize: 24),
+                                    ),
                                   ),
                                 ),
                               ),

@@ -20,7 +20,7 @@ class HomeSkeleton extends StatelessWidget {
       height: 0.18.sh,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
-        color: primaryColor,
+        color: Colors.grey,
       ),
     ),
   );
@@ -61,7 +61,7 @@ class RecommendationSkeleton extends StatelessWidget {
           height: 0.12.sh,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10),
-            color: primaryColor,
+            color: Colors.grey,
           ),
         ),
       ],
@@ -101,7 +101,7 @@ class OurPodcastsSkeleton extends StatelessWidget {
           height: 0.16.sh,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10),
-            color: primaryColor,
+            color: Colors.grey,
           ),
         ),
       ],
@@ -150,7 +150,7 @@ class ProfileQuotesSkeleton extends StatelessWidget {
                   height: 100,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
-                    color: primaryColor,
+                    color: Colors.grey,
                   ),
                 ),
               ),
@@ -175,7 +175,7 @@ class ProfileSkeleton extends StatelessWidget {
             height: 100,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(60),
-              color: primaryColor,
+              color: Colors.grey,
             ),
           ),
           const SizedBox(
@@ -186,7 +186,7 @@ class ProfileSkeleton extends StatelessWidget {
             height: 20,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
-              color: primaryColor,
+              color: Colors.grey,
             ),
           ),
           const SizedBox(
@@ -197,7 +197,7 @@ class ProfileSkeleton extends StatelessWidget {
             height: 40,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(60),
-              color: primaryColor,
+              color: Colors.grey,
             ),
           ),
           const SizedBox(
@@ -229,7 +229,7 @@ Widget buildShimmerContainer({
       height: height,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
-        color: primaryColor,
+        color: Colors.grey,
       ),
     ),
   );
@@ -281,7 +281,7 @@ class QuotesCategorySkeleton extends StatelessWidget {
                   height: 10,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
-                    color: primaryColor,
+                    color: Colors.grey,
                   ),
                 ),
               );
@@ -311,7 +311,7 @@ class QuotesSkeleton extends StatelessWidget {
                   height: 250,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
-                    color: primaryColor,
+                    color: Colors.grey,
                   ),
                 ),
               ),
@@ -322,7 +322,7 @@ class QuotesSkeleton extends StatelessWidget {
                   height: 150,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
-                    color: primaryColor,
+                    color: Colors.grey,
                   ),
                 ),
               ),
@@ -333,7 +333,7 @@ class QuotesSkeleton extends StatelessWidget {
                   height: 160,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
-                    color: primaryColor,
+                    color: Colors.grey,
                   ),
                 ),
               ),
@@ -344,7 +344,7 @@ class QuotesSkeleton extends StatelessWidget {
                   height: 250,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
-                    color: primaryColor,
+                    color: Colors.grey,
                   ),
                 ),
               ),
@@ -355,7 +355,29 @@ class QuotesSkeleton extends StatelessWidget {
                   height: 200,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
-                    color: primaryColor,
+                    color: Colors.grey,
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  width: MediaQuery.of(context).size.width * 0.4,
+                  height: 150,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    color: Colors.grey,
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  width: MediaQuery.of(context).size.width * 0.4,
+                  height: 150,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    color: Colors.grey,
                   ),
                 ),
               ),

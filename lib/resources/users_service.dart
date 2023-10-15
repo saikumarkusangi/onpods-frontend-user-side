@@ -1,16 +1,14 @@
 import 'dart:convert';
-import 'package:onpods/constants/constants.dart';
-import 'package:onpods/models/models_exports.dart';
+import 'dart:io';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:onpods/utils/exports.dart';
 
 class UserServices {
-
+ final userId = UserSession.getUserId();
   // ------------------------------ User By Id -------------------------------------0
 
- static Future userById(id) async {
-    final preps = await SharedPreferences.getInstance();
-    final userId = preps.getString('user_id');
+  Future userById(id) async {
+  
       print('calling api user by id : @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@');
     try {
       final response =
@@ -34,9 +32,8 @@ class UserServices {
 
  // ------------------------------ User Quotes -------------------------------------
 
- static Future userQuotes(id,page) async {
-    final preps = await SharedPreferences.getInstance();
-    final userId = preps.getString('user_id');
+  Future userQuotes(id,page) async {
+    
       print('calling api user quotes : @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@');
     try {
       final response =
@@ -59,9 +56,8 @@ class UserServices {
 
   // ------------------------------ User Followers -------------------------------------
 
- static Future userFollowers(id,page,title) async {
-    final preps = await SharedPreferences.getInstance();
-    final userId = preps.getString('user_id');
+  Future userFollowers(id,page,title) async {
+   
       print('calling api user Followers : @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@');
     try {
       final response =
@@ -84,9 +80,8 @@ class UserServices {
 
 // ------------------------ Follow user -----------------------
 
-   static Future FollowUser(id) async {
-    final preps = await SharedPreferences.getInstance();
-    final userId = preps.getString('user_id');
+    Future followUser(id) async {
+   
       print('calling api user Followers : @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@');
     try {
       final response =
@@ -108,9 +103,8 @@ class UserServices {
 
   // ------------------------ Follow user -----------------------
 
-   static Future UnFollowUser(id) async {
-    final preps = await SharedPreferences.getInstance();
-    final userId = preps.getString('user_id');
+    Future unFollowUser(id) async {
+   
       print('calling api user Followers : @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@');
     try {
       final response =
@@ -125,6 +119,40 @@ class UserServices {
       } else {
         throw Exception('Failed to load data');
       }
+    } catch (e) {
+      throw Exception(e);
+    }
+  }
+
+
+ // ------------------------ Update User -----------------------
+
+    Future updateUser(File profilePic,String userName) async {
+   
+      print('calling api user update : @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@');
+    
+      try {
+      final request = http.MultipartRequest(
+        'PUT',
+        Uri.parse('$baseUrl/user/update'),
+      );
+      request.headers['Authorization'] = userId!;
+
+      // Add the file to the request
+      request.files.add(
+        await http.MultipartFile.fromPath(
+          'file',
+          profilePic.path,
+        ),
+      );
+
+      // Add other form data, if needed
+      request.fields['username'] = userName;
+
+      final response = await request.send();
+      final responseString = await response.stream.bytesToString();
+        
+         print(responseString);
     } catch (e) {
       throw Exception(e);
     }

@@ -1,11 +1,7 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
+
+
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:get/get.dart';
-import 'package:onpods/screens/podcast_screen/record_podcast.dart';
-import 'package:onpods/widgets/custom_button.dart';
-import '../../utils/utils_exports.dart';
+import 'package:onpods/utils/exports.dart';
 
 class RecordPodcastBoarding extends StatefulWidget {
   const RecordPodcastBoarding({super.key});
@@ -48,35 +44,13 @@ class _RecordPodcastBoardingState extends State<RecordPodcastBoarding> {
             ).animate().fadeIn(),
             CustomElevatedButton(
               width: 0.6.sw,
-              onTap: () => Get.to(  RecordPodcast(),
+              onTap: () => Get.to(  const RecordPodcast(),
                   transition: Transition.cupertinoDialog),
               height: 42,
               text: 'Record Audio',
               buttonTextStyle:
                   const TextStyle(color: Colors.white, fontSize: 18),
-              buttonStyle: ButtonStyle(
-                shape: MaterialStateProperty.all(
-                  RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-                fixedSize: MaterialStateProperty.resolveWith<Size?>(
-                  (Set<MaterialState> states) {
-                    if (states.contains(MaterialState.disabled)) {
-                      return Size(0.6.sw, 40);
-                    }
-                    return Size(0.6.sw, 40);
-                  },
-                ),
-                backgroundColor: MaterialStateProperty.resolveWith<Color?>(
-                  (Set<MaterialState> states) {
-                    if (states.contains(MaterialState.disabled)) {
-                      return Colors.grey;
-                    }
-                    return blueColor;
-                  },
-                ),
-              ),
+              buttonColor: blueColor,
             ).animate().fadeIn(),
             const SizedBox(
               height: 20,
@@ -95,29 +69,7 @@ class _RecordPodcastBoardingState extends State<RecordPodcastBoarding> {
               text: 'Upload Audio',
               buttonTextStyle:
                   const TextStyle(color: Colors.white, fontSize: 18),
-              buttonStyle: ButtonStyle(
-                shape: MaterialStateProperty.all(
-                  RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-                fixedSize: MaterialStateProperty.resolveWith<Size?>(
-                  (Set<MaterialState> states) {
-                    if (states.contains(MaterialState.disabled)) {
-                      return Size(0.6.sw, 40);
-                    }
-                    return Size(0.6.sw, 40);
-                  },
-                ),
-                backgroundColor: MaterialStateProperty.resolveWith<Color?>(
-                  (Set<MaterialState> states) {
-                    if (states.contains(MaterialState.disabled)) {
-                      return Colors.grey;
-                    }
-                    return blueColor;
-                  },
-                ),
-              ),
+             buttonColor: blueColor,
             ).animate().fade(),
           ],
         ),

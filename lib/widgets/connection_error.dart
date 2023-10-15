@@ -1,10 +1,5 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:get/get.dart';
-import 'package:onpods/utils/colors.dart';
-import 'package:onpods/utils/images.dart';
 
-import '../screens/screens_exports.dart';
+import 'package:onpods/utils/exports.dart';
 
 class NoConnection extends StatelessWidget {
   const NoConnection({Key? key}) : super(key: key);

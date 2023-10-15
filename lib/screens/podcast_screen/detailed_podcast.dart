@@ -1,14 +1,7 @@
-import 'package:cached_network_image/cached_network_image.dart';
+
 import 'package:flutter/gestures.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:get/get.dart';
-import 'package:palette_generator/palette_generator.dart';
-import 'package:provider/provider.dart';
-import '../../utils/utils_exports.dart';
-import '../../widgets/widgets_exports.dart';
-import '../player/player_screen.dart';
+import 'package:onpods/utils/exports.dart';
+
 
 class DetailedPodcast extends StatefulWidget {
   final String image;
@@ -103,7 +96,7 @@ class _DetailedPodcastState extends State<DetailedPodcast> {
                           _paletteGenerator?.dominantColor?.color
                                   .withOpacity(1) ??
                               Colors.transparent,
-                          scaffoldBackgroundColor
+                          darkscaffoldBackgroundColor
                         ],
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,

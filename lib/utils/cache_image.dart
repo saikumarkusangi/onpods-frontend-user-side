@@ -1,9 +1,4 @@
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:shimmer/shimmer.dart';
-
-import 'utils_exports.dart';
+import 'package:onpods/utils/exports.dart';
 
 class CacheImage extends StatelessWidget {
   final String image;
@@ -22,7 +17,7 @@ class CacheImage extends StatelessWidget {
                 height: 0.2.sh,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10),
-                  color: primaryColor,
+                  color: Colors.grey,
                 ),
               ),
             ),

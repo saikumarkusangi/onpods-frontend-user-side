@@ -1,11 +1,5 @@
-import 'dart:math';
-import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:get/get.dart';
-import 'package:onpods/providers/providers_exports.dart';
-import 'package:onpods/widgets/custom_text_field.dart';
-import 'package:provider/provider.dart';
-import '../../utils/utils_exports.dart';
+import 'package:onpods/utils/exports.dart';
+
 
 class BackGroundImages extends StatefulWidget {
   const BackGroundImages({Key? key}) : super(key: key);
@@ -40,7 +34,7 @@ class _BackGroundImagesState extends State<BackGroundImages> {
             ),
             hintText: "Search category, name & more...",
             vertical: 16,
-            fillColor: textFieldColor,
+            fillColor: darktextFieldColor,
             hintStyle: const TextStyle(color: Colors.grey, fontSize: 14),
             textStyle: const TextStyle(color: Colors.white),
           ),

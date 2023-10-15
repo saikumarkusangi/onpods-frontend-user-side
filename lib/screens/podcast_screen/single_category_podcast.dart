@@ -1,12 +1,6 @@
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:onpods/providers/dummy_provider.dart';
-import 'package:onpods/screens/podcast_screen/detailed_podcast.dart';
-import 'package:onpods/widgets/skeleton.dart';
-import 'package:provider/provider.dart';
-import '../../utils/utils_exports.dart';
-import '../../widgets/widgets_exports.dart';
+
+
+import 'package:onpods/utils/exports.dart';
 
 class SinglePodcastCategory extends StatefulWidget {
   final String title;

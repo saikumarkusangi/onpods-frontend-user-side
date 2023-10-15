@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:onpods/utils/colors.dart';
 
 class NotificationsPage extends StatelessWidget {
-  NotificationsPage({Key? key});
+  NotificationsPage({super.key});
 
   // Example list of notifications
   final List<NotificationItem> notifications = [

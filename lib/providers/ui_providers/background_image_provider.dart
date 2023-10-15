@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:flutter/material.dart';
-import '../../models/models_exports.dart';
-import '../../resources/pexel_service.dart';
+
+import 'package:onpods/utils/exports.dart';
+
 
 class BackGroundProvider with ChangeNotifier {
   Color _backgroundColor = Colors.white;

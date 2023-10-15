@@ -1,36 +1,18 @@
-import 'package:uuid/uuid.dart';
-
-import 'package:flutter/material.dart';
-import 'package:flutter_sound_lite/flutter_sound.dart';
-import 'package:get/get.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:onpods/providers/providers_exports.dart';
-import 'package:onpods/screens/podcast_screen/upload_podcast.dart';
-import 'package:onpods/utils/colors.dart';
-import 'package:onpods/widgets/floating_action_button.dart';
-import 'package:provider/provider.dart';
-import 'package:file_picker/file_picker.dart';
-import '../../utils/utils_exports.dart';
+import 'package:onpods/utils/exports.dart';
 
 class SoundEffectAdd extends StatefulWidget {
   const SoundEffectAdd({Key? key}) : super(key: key);
 
   @override
-  _SoundEffectAddState createState() => _SoundEffectAddState();
+  SoundEffectAddState createState() => SoundEffectAddState();
 }
 
-class _SoundEffectAddState extends State<SoundEffectAdd>
+class SoundEffectAddState extends State<SoundEffectAdd>
     with AutomaticKeepAliveClientMixin {
   final AudioPlayer _player1 = AudioPlayer();
-  bool _isPaused = false;
   bool _isPlaying = false;
   String? currentlyPlayingIndex;
-
-  @override
-  void initState() {
-    super.initState();
-    // fetchData();
-  }
 
   @override
   void dispose() {
@@ -48,7 +30,7 @@ class _SoundEffectAddState extends State<SoundEffectAdd>
         _isPlaying = true;
       });
     } catch (e) {
-      print('Error starting playback: $e');
+      throw Exception(e);
     }
   }
 
@@ -59,28 +41,10 @@ class _SoundEffectAddState extends State<SoundEffectAdd>
         _isPlaying = false;
       });
     } catch (e) {
-      print('Error stopping playback: $e');
+      throw Exception(e);
     }
   }
 
-  // Future<void> fetchData() async {
-  //   final provider = Provider.of<BgAudioProvider>(context, listen: false);
-  //   if (provider.bgCategories.isEmpty) {
-  //     await provider.fetchCategories();
-  //   }
-  // }
-
-  final List<Color> randomColors = [
-    Colors.redAccent,
-    Colors.blueAccent,
-    Colors.greenAccent,
-    Colors.yellowAccent,
-    Colors.orangeAccent,
-    Colors.pinkAccent,
-    Colors.purpleAccent,
-    Colors.indigoAccent,
-    Colors.deepOrangeAccent
-  ];
   Future<void> _pickAudio() async {
     final provider = Provider.of<BgAudioProvider>(context, listen: false);
     try {
@@ -91,8 +55,8 @@ class _SoundEffectAddState extends State<SoundEffectAdd>
       )
           .then((result) {
         if (result != null) {
-            final uuid = Uuid();
-           String generatedUuid = uuid.v4();
+          final uuid = Random();
+          String generatedUuid = uuid.nextInt(4).toString();
           final data = {
             'name': result.files.single.name,
             "sound": result.files.single.path!,
@@ -105,7 +69,7 @@ class _SoundEffectAddState extends State<SoundEffectAdd>
         return null;
       });
     } catch (e) {
-      print('Error picking or playing audio: $e');
+      throw Exception(e);
     }
   }
 
@@ -130,21 +94,7 @@ class _SoundEffectAddState extends State<SoundEffectAdd>
           "Choose Sound Effect",
           style: TextStyle(fontSize: 20, color: Colors.white),
         ),
-        // actions: [
-        //   Padding(
-        //     padding: const EdgeInsets.only(right: 12),
-        //     child: TextButton(
-        //       onPressed: () => Get.to(const PodcastUploadPage(),transition: Transition.cupertino),
-        //       child: const Text(
-        //         'Next',
-        //         style: TextStyle(
-        //             color: blueColor,
-        //             fontSize: 18,
-        //             fontWeight: FontWeight.w400),
-        //       ),
-        //     ),
-        //   )
-        // ],
+       
       ),
       body: ListView.builder(
         shrinkWrap: true,

@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
-import 'package:onpods/screens/screens_exports.dart';
+
+import 'package:onpods/utils/exports.dart';
 
 class AppRoutes {
   static const String login = '/login';
@@ -16,3 +16,4 @@ class AppRoutes {
     home: (context) => const HomeScreen()
   };
 }
+

@@ -1,39 +1,76 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:get/get.dart';
-import 'package:onpods/screens/layout_screen.dart';
-import 'package:onpods/widgets/widgets_exports.dart';
-import '../../utils/utils_exports.dart';
-import 'widget/chip_item_widget.dart';
+import 'package:onpods/utils/exports.dart';
 
-class ChooseYourInterestScreen extends StatelessWidget {
+class ChooseYourInterestScreen extends StatefulWidget {
   const ChooseYourInterestScreen({super.key});
-  static final List<String> data = [
-    "Biography",
-    "Self-Help",
-    "Science",
-    "Mental Health",
-    "Science Fiction",
-    "Fantasy",
-    "Coding",
-    "Politics",
-    "Culture",
-    "Horror",
-    "News","Technology",
-    "Society",
-    "General Knowledge",
-    "Entertainment",
-    "Education",
-    "Current Affairs",
-  ];
+
+  @override
+  State<ChooseYourInterestScreen> createState() =>
+      _ChooseYourInterestScreenState();
+}
+
+class _ChooseYourInterestScreenState extends State<ChooseYourInterestScreen> {
+  List selectedChipIndex = [];
+  bool loading = false;
+
+
+ @override
+ void initState() {
+   super.initState();
+   init();
+ }
+
+  init() async {
+    final provider = Provider.of<QuoteProvider>(context, listen: false);
+    if (provider.quotesCategories.isEmpty) {
+      await provider.fetchCategories();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final provider = Provider.of<QuoteProvider>(context);
+    List<Widget> chipWidgets =
+        provider.quotesCategories.asMap().entries.map((entry) {
+      final index = entry.value.id;
+      final category = entry.value;
+
+      // Define BorderRadius for the chip
+      BorderRadiusGeometry borderRadius = BorderRadius.circular(40);
+
+      return ChoiceChip(
+        shape: RoundedRectangleBorder(
+          borderRadius: borderRadius, // Use the defined BorderRadius here
+        ),
+        label: Text(category.name),
+        checkmarkColor: Colors.white,
+        selectedColor: blueColor,
+        labelStyle: TextStyle(
+            color: selectedChipIndex.contains(index)
+                ? Colors.white
+                : Colors.black),
+        selected: selectedChipIndex.contains(index),
+        onSelected: (bool selected) {
+          setState(() {
+            if (selected) {
+              if (selectedChipIndex.length < 3) {
+                selectedChipIndex.add(index);
+              } else {
+                Fluttertoast.showToast(msg: 'Max 3 categories are allowed');
+              }
+            } else {
+              selectedChipIndex.remove(index);
+            }
+          });
+        },
+      );
+    }).toList();
+
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
           centerTitle: true,
           automaticallyImplyLeading: false,
-          backgroundColor: scaffoldBackgroundColor,
+          backgroundColor: darkscaffoldBackgroundColor,
           toolbarHeight: 100,
           title: const Column(children: [
             Text(
@@ -42,7 +79,7 @@ class ChooseYourInterestScreen extends StatelessWidget {
             ),
             SizedBox(height: 10),
             Text(
-              'Pick 4 categories of your choice',
+              'Pick 3 categories of your choice',
               style: TextStyle(color: Colors.white, fontSize: 14),
             ),
           ]),
@@ -53,19 +90,26 @@ class ChooseYourInterestScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              SizedBox(
-                height: 0.6.sh,
-                child: Wrap(
-                  spacing: 10,
-                  runSpacing: 10, 
-                  children: data.map((item) {
-                    return ChipItemWidget(text: item);
-                  }).toList(),
-                ),
-              ),
+              provider.isLoading
+                  ? const Center(
+                      child: CircularProgressIndicator(
+                        color: blueColor,
+                      ),
+                    )
+                  : provider.quotesCategories.isEmpty
+                      ? const EmptyPlaceHiolder(message: 'Categories')
+                      : SizedBox(
+                          height: 400,
+                          width: double.maxFinite,
+                          child: Wrap(
+                            spacing: 10,
+                            runSpacing: 10,
+                            children: chipWidgets,
+                          ),
+                        ),
               const Spacer(),
               Container(
-                color: scaffoldBackgroundColor,
+                color: darkscaffoldBackgroundColor,
                 child: Padding(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
@@ -80,12 +124,7 @@ class ChooseYourInterestScreen extends StatelessWidget {
                       const SizedBox(height: 18),
                       CustomElevatedButton(
                         height: 38,
-                        buttonStyle: ButtonStyle(
-                          backgroundColor:
-                              MaterialStateProperty.resolveWith<Color?>(
-                            (Set<MaterialState> states) => Colors.transparent,
-                          ),
-                        ),
+                        buttonColor: Colors.transparent,
                         text: "Skip",
                         onTap: () => onTapSkip(context),
                       ),
@@ -101,10 +140,10 @@ class ChooseYourInterestScreen extends StatelessWidget {
   }
 
   void onTapSkip(BuildContext context) {
-    Get.off(()=>const Layout(), transition: Transition.rightToLeft);
+    Get.off(() => const Layout(), transition: Transition.rightToLeft);
   }
 
   void onTapContinue(BuildContext context) {
-    Get.off(()=>const Layout(), transition: Transition.rightToLeft);
+    Get.off(() => const Layout(), transition: Transition.rightToLeft);
   }
 }

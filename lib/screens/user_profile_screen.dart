@@ -1,20 +1,11 @@
-import 'dart:math';
+import 'package:onpods/utils/exports.dart';
 
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-import 'package:get/get.dart';
-import 'package:onpods/resources/users_service.dart';
-import 'package:onpods/screens/profile_screen/followers_screen.dart';
-import 'package:onpods/screens/quotes_screen/single_quote.dart';
-import '../../utils/utils_exports.dart';
-import '../widgets/widgets_exports.dart';
 
 class UserProfileScreen extends StatefulWidget {
   final String userId;
   final String userName;
 
-  UserProfileScreen({
+  const UserProfileScreen({
     super.key,
     required this.userId,
     this.userName = 'User',
@@ -53,11 +44,11 @@ class _UserProfileScreenState extends State<UserProfileScreen>
     profileLoading.value = true;
     loading.value = true;
 
-    _userDataFuture = UserServices.userById(widget.userId).whenComplete(() {
+    _userDataFuture = UserServices().userById(widget.userId).whenComplete(() {
       profileLoading.value = false;
     });
 
-    final userQuotes = await UserServices.userQuotes(widget.userId, 1);
+    final userQuotes = await UserServices().userQuotes(widget.userId, 1);
 
     setState(() {
       quotes.addAll(userQuotes);
@@ -77,7 +68,7 @@ class _UserProfileScreenState extends State<UserProfileScreen>
               _isLoadingMore.value = true;
             });
 
-            final userQuotes = await UserServices.userQuotes(
+            final userQuotes = await UserServices().userQuotes(
                 widget.userId, quotes['page'] + 1);
             setState(() {
               quotes['page'] = userQuotes['page'];
@@ -142,7 +133,6 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                           },
                           onSelected: (String value) {
                             // Handle the selected option here
-                            print('Selected: $value');
                           },
                         )
                       ],
@@ -192,25 +182,28 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                                               255, 236, 184, 202),
                                           borderRadius:
                                               BorderRadius.circular(60)),
-                                      child: CachedNetworkImage(
-                                        imageUrl: snapshot.data['profilePic'],
-                                        placeholder: (context, url) => Center(
-                                          child: Text(
-                                            snapshot.data['username']
-                                                .substring(0, 1)
-                                                .toUpperCase(),
-                                            style:
-                                                const TextStyle(fontSize: 32),
+                                      child: ClipRRect(
+                                          borderRadius: BorderRadius.circular(60),
+                                        child: CachedNetworkImage(
+                                          imageUrl: snapshot.data['profilePic'],
+                                          placeholder: (context, url) => Center(
+                                            child: Text(
+                                              snapshot.data['username']
+                                                  .substring(0, 1)
+                                                  .toUpperCase(),
+                                              style:
+                                                  const TextStyle(fontSize: 32),
+                                            ),
                                           ),
-                                        ),
-                                        errorWidget: (context, url, error) =>
-                                            Center(
-                                          child: Text(
-                                            snapshot.data['username']
-                                                .substring(0, 1)
-                                                .toUpperCase(),
-                                            style:
-                                                const TextStyle(fontSize: 32),
+                                          errorWidget: (context, url, error) =>
+                                              Center(
+                                            child: Text(
+                                              snapshot.data['username']
+                                                  .substring(0, 1)
+                                                  .toUpperCase(),
+                                              style:
+                                                  const TextStyle(fontSize: 32),
+                                            ),
                                           ),
                                         ),
                                       ),
@@ -258,13 +251,13 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                                           if (followed.value) {
                                                followersCount.value =
                                                 followersCount.value + 1;
-                                           await UserServices.FollowUser(
+                                           await UserServices().followUser(
                                                 widget.userId);
 
                                           } else {
                                              followersCount.value =
                                                 followersCount.value - 1;
-                                           await UserServices.UnFollowUser(
+                                           await UserServices().unFollowUser(
                                                 widget.userId);
 
                                            

@@ -1,14 +1,5 @@
-import 'package:connectivity/connectivity.dart';
-import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:get/get.dart';
-import 'package:onpods/screens/podcast_screen/record_podcast_onboarding.dart';
-import 'package:onpods/screens/quotes_screen/create_quote.dart';
+import 'package:onpods/utils/exports.dart';
 import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
-
-import '../utils/utils_exports.dart';
-import '../widgets/widgets_exports.dart';
-import 'screens_exports.dart';
 
 class Layout extends StatefulWidget {
   const Layout({Key? key}) : super(key: key);
@@ -177,7 +168,7 @@ Widget _buildListTile(String leadingIcon, String title, Widget pageToNavigate) {
             hideNavigationBarWhenKeyboardShows: false,
             decoration: NavBarDecoration(
               borderRadius: BorderRadius.circular(10.0),
-              colorBehindNavBar: scaffoldBackgroundColor,
+              colorBehindNavBar: darkscaffoldBackgroundColor,
             ),
             popAllScreensOnTapOfSelectedTab: true,
             popActionScreens: PopActionScreensType.all,

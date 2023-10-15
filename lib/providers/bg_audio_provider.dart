@@ -1,16 +1,12 @@
-import 'package:flutter/material.dart';
-import 'package:onpods/models/bg_audio_model.dart';
-import 'package:onpods/models/models_exports.dart';
-import 'package:onpods/resources/bg_audio_service.dart';
-import 'package:onpods/resources/quote_service.dart';
+import 'package:onpods/utils/exports.dart';
 
 class BgAudioProvider with ChangeNotifier {
   List<BgModel> _bgCategories = [];
   List<BgModel> get bgCategories => _bgCategories;
   List<Map<String, String>> _selectedBg = [];
-List<Map<String, String>> get selectedBg => _selectedBg;
+  List<Map<String, String>> get selectedBg => _selectedBg;
   List<Map<String, dynamic>> _selectedSoundEffects = [];
-List<Map<String, dynamic>> get selectedSoundEffects => _selectedSoundEffects;
+  List<Map<String, dynamic>> get selectedSoundEffects => _selectedSoundEffects;
 
   bool _isLoading = false;
   bool get isLoading => _isLoading;
@@ -22,7 +18,6 @@ List<Map<String, dynamic>> get selectedSoundEffects => _selectedSoundEffects;
       _bgCategories = await BgAudioService().fetch();
       _isLoading = false;
     } catch (e) {
-     
       throw Exception(e);
     } finally {
       _isLoading = false;
@@ -30,26 +25,23 @@ List<Map<String, dynamic>> get selectedSoundEffects => _selectedSoundEffects;
     }
   }
 
-addSelectedBg(Map<String, String> data) {
+  addSelectedBg(Map<String, String> data) {
     _selectedBg.add(data);
-  notifyListeners();
-}
+    notifyListeners();
+  }
 
-removeSelectedBg(Map<String, String> data) {
-  _selectedBg.removeWhere((item) =>
-      item['name'] == data['name']);
-  notifyListeners();
-}
+  removeSelectedBg(Map<String, String> data) {
+    _selectedBg.removeWhere((item) => item['name'] == data['name']);
+    notifyListeners();
+  }
 
-addSoundEffect(Map<String, dynamic> data) {
+  addSoundEffect(Map<String, dynamic> data) {
     _selectedSoundEffects.add(data);
-  notifyListeners();
-}
+    notifyListeners();
+  }
 
-removeSoundEffect(Map<String, dynamic> data) {
-  _selectedSoundEffects.removeWhere((item) =>
-      item['name'] == data['name']);
-  notifyListeners();
-}
-
+  removeSoundEffect(Map<String, dynamic> data) {
+    _selectedSoundEffects.removeWhere((item) => item['name'] == data['name']);
+    notifyListeners();
+  }
 }

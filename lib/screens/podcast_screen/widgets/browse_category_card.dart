@@ -1,7 +1,6 @@
-import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:onpods/screens/podcast_screen/single_category_podcast.dart';
-import 'package:onpods/utils/colors.dart';
+
+
+import 'package:onpods/utils/exports.dart';
 
 class BrowseAllCard extends StatefulWidget {
   const BrowseAllCard({super.key});

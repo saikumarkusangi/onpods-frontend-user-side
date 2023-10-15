@@ -1,8 +1,6 @@
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:carousel_slider/carousel_slider.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
-import '../../../utils/utils_exports.dart';
+
+import 'package:onpods/utils/exports.dart';
+
 
 class BannerCarsouel extends StatefulWidget {
   const BannerCarsouel({super.key});
@@ -31,7 +29,7 @@ class _BannerCarsouelState extends State<BannerCarsouel> {
           "https://i.pinimg.com/564x/75/a5/e1/75a5e13176189eaa14f9c930d605d3d3.jpg",
       "title": "All in the spotlight",
       "des":
-          "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
+          "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
     },
     {
       "title": "Campus Diaries",

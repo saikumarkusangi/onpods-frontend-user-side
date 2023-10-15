@@ -14,7 +14,7 @@ class ChartRoomCard extends StatelessWidget {
         height: 180,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
-          color: chatCard,
+          color: darktextFieldColor,
         ),
         child: Padding(
           padding: const EdgeInsets.all(14),

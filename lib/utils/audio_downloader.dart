@@ -1,16 +1,12 @@
-import 'dart:async';
-import 'dart:typed_data';
 import 'dart:io';
 import 'package:http/http.dart' as http;
-import 'package:permission_handler/permission_handler.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:path_provider/path_provider.dart';
+import 'package:onpods/utils/exports.dart';
 
-enum DownloadStatus { NotStarted, Started, Downloading, Completed }
+enum DownloadStatus { notStarted, started, downloading, completed }
 
 class FileDownloaderProvider with ChangeNotifier {
   late StreamSubscription _downloadSubscription;
-  DownloadStatus _downloadStatus = DownloadStatus.NotStarted;
+  DownloadStatus _downloadStatus = DownloadStatus.notStarted;
   int _downloadPercentage = 0;
   String _downloadedFile = "";
 
@@ -19,13 +15,13 @@ class FileDownloaderProvider with ChangeNotifier {
   String get downloadedFile => _downloadedFile;
 
   Future<void> downloadFile(String url, String filename) async {
-    bool _permissionReady = await _checkPermission();
+    bool permissionReady = await _checkPermission();
     final Completer<void> completer = Completer<void>();
 
-    if (!_permissionReady) {
+    if (!permissionReady) {
       print('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@m');
       _checkPermission().then((hasGranted) {
-        _permissionReady = hasGranted;
+        permissionReady = hasGranted;
       });
     } else {
       print('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@');
@@ -40,10 +36,10 @@ class FileDownloaderProvider with ChangeNotifier {
       List<List<int>> chunks = <List<int>>[];
       int downloaded = 0;
 
-      updateDownloadStatus(DownloadStatus.Started);
+      updateDownloadStatus(DownloadStatus.started);
 
       _downloadSubscription = response.stream.listen((List<int> chunk) async {
-        updateDownloadStatus(DownloadStatus.Downloading);
+        updateDownloadStatus(DownloadStatus.downloading);
         // Display percentage of completion
         print('downloadPercentage onListen: $_downloadPercentage');
 
@@ -72,8 +68,8 @@ class FileDownloaderProvider with ChangeNotifier {
         }
         await file.writeAsBytes(bytes);
 
-        updateDownloadStatus(DownloadStatus.Completed);
-        _downloadSubscription?.cancel();
+        updateDownloadStatus(DownloadStatus.completed);
+        _downloadSubscription.cancel();
         _downloadPercentage = 0;
 
         notifyListeners();

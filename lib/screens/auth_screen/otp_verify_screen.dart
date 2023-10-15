@@ -1,10 +1,6 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
-import 'package:get/get.dart';
-import 'package:onpods/screens/auth_screen/reset_password_screen.dart';
-import 'package:pinput/pinput.dart';
 
-import '../../utils/utils_exports.dart';
+import 'package:onpods/utils/exports.dart';
+import 'package:pinput/pinput.dart';
 
 class OtpVerifyScreen extends StatefulWidget {
   final String otp;
@@ -105,7 +101,7 @@ class _OtpVerifyScreenState extends State<OtpVerifyScreen> {
                   },
                   onCompleted: (value) {
                     if (value == widget.otp) {
-                      Get.to(ResetPassword(),transition: Transition.rightToLeft);
+                      Get.to(const ResetPassword(),transition: Transition.rightToLeft);
                     }
                   },
                   showCursor: true,

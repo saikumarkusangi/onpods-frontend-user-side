@@ -17,7 +17,7 @@ class ChatRoomListkeleton extends StatelessWidget {
       height: 180,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
-        color: primaryColor,
+        color: Colors.grey,
       ),
     ),
   );

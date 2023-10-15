@@ -1,35 +1,60 @@
 import 'package:flutter/material.dart';
 
-const Color scaffoldBackgroundColor = Color(0xFF0A121D);
-const Color textFieldColor = Color.fromARGB(255, 44, 44, 44);
+
+// Dark Theme Colors
+const Color darkscaffoldBackgroundColor = Colors.black;
+const Color darktextFieldColor = Color.fromARGB(255, 44, 44, 44);
 const Color bottomSheetColor = Color.fromARGB(255, 39, 46, 60);
-const Color chatCard = Color.fromARGB(173, 49, 62, 85);
-const Color bottomNavColor = Color(0xFF070D15);
-const Color darkBackgroundColor = Color(0xFF181C1E);
-const Color darkCardColor = Color(0xFF262F34);
-const Color darkLightColor = Color(0xFF656D77);
-const Color lightBackgroundColor = Colors.white;
+const Color darkchatCard = Color.fromARGB(173, 49, 62, 85);
+const Color darkbottomNavColor = Color(0xFF070D15);
+const Color primaryColor = Colors.grey;
+
+ThemeData darkTheme = ThemeData(
+  useMaterial3: true,
+  scaffoldBackgroundColor: Colors.black,
+  bottomSheetTheme: const BottomSheetThemeData(
+    backgroundColor: Color.fromARGB(255, 39, 46, 60)
+  ),
+  bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+    backgroundColor: Color(0xFF070D15)
+  )
+);
+
+// Light Theme Colors
+const Color lightscaffoldBackgroundColor = Colors.white;
 const Color blueColor = Color(0xFF3369FF);
-const Color lightCardColor = Color(0xFFF4F8FA);
-const Color paymentBtnColor = Color(0xFF138EC3);
-const Color primaryColor = Color(0xFF0A121D);
-const Color secondaryColor = Color(0xFFB9EDFF);
-const Color whiteColor = Color(0xFFFFFFFF);
-const Color unselectedItemColor = Color(0xFF787878);
-const Color errorColor = Color(0xFFD73A49);
-const Color btnColor = Color(0xFF26B3F0);
-const Color lightTextColor = Color(0xFFF4F8FA);
-const Color fieldTextColor = Color(0xFFF2F2F2);
-const Color unselectedDarkColor = Color(0xFF808080);
-const Color greyTextColor = Color(0xFFC8C8C8);
-const Color blackColor = Color(0xFF000000);
-const Color boxShadowColor = Color(0x1F000000);
-const Color splashColor = Color(0x1F000000);
-const Color conButton = Color(0xFF1DDFC8);
-const Color arabicColor = Color(0xFF005371);
-const Color yellowColor = Color(0xFFFFB501);
-const Color searchIcon = Color(0xFF005371);
-const Color greenColor = Color(0xFF05CC61);
-const Color searchColor = Color(0xFF50D2FF);
-const Color borderColor = Color(0xffB9EDFF);
-const Color followerFollowingButtonColor = Color(0xff3369FF);
+
+ThemeData lightTheme = ThemeData(
+  scaffoldBackgroundColor: Colors.white,
+  bottomSheetTheme: const BottomSheetThemeData(
+    backgroundColor: Color.fromARGB(255, 39, 46, 60)
+  ),
+  bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+    backgroundColor: Colors.white
+  )
+);
+
+
+// Image PlaceHolder Colors
+final List<Color> placeholderColors = [
+  Colors.red.shade200,
+  Colors.blue.shade200,
+  Colors.green.shade200,
+  Colors.yellow.shade200,
+  Colors.orange.shade200,
+  Colors.purple.shade200,
+  Colors.pink.shade200,
+];
+
+// ListTile Colors
+final List<Color> randomColors = [
+  Colors.redAccent,
+  Colors.blueAccent,
+  Colors.greenAccent,
+  Colors.yellowAccent,
+  Colors.orangeAccent,
+  Colors.pinkAccent,
+  Colors.purpleAccent,
+  Colors.indigoAccent,
+  Colors.deepOrangeAccent
+];

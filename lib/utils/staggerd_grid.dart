@@ -1,16 +1,4 @@
-import 'dart:math';
-
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-import 'package:get/get.dart';
-import 'package:onpods/providers/providers_exports.dart';
-import 'package:onpods/screens/quotes_screen/single_quote.dart';
-import 'package:onpods/widgets/widgets_exports.dart';
-import 'package:provider/provider.dart';
-
-import 'utils_exports.dart';
+import 'package:onpods/utils/exports.dart';
 
 class StaggeredGridTemplate extends StatefulWidget {
   final String categoryId;
@@ -47,10 +35,8 @@ class _StaggeredGridTemplateState extends State<StaggeredGridTemplate> {
             setState(() {
               _isLoadingMore = true;
             });
-            print('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ current page :' +
-                provider.quotes[i].page.toString());
-            print('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ total page :' +
-                provider.quotes[i].totalPages.toString());
+            print('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ current page :${provider.quotes[i].page}');
+            print('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ total page :${provider.quotes[i].totalPages}');
             await provider.fetchQuotesByCategory(
                 widget.categoryId, provider.quotes[i].page + 1);
           }

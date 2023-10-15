@@ -1,19 +1,7 @@
-import 'dart:async';
 import 'dart:io';
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
-import 'package:flutter_sound_lite/flutter_sound.dart';
-import 'package:get/get.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:onpods/providers/bg_audio_provider.dart';
-import 'package:onpods/providers/ui_providers/timer_provider.dart';
-import 'package:onpods/screens/podcast_screen/bg_add.dart';
-import 'package:onpods/screens/podcast_screen/sound_effect_add.dart';
-import 'package:onpods/screens/podcast_screen/upload_podcast.dart';
-import 'package:onpods/utils/utils_exports.dart';
-import 'package:permission_handler/permission_handler.dart';
-import 'package:provider/provider.dart';
+import 'package:onpods/utils/exports.dart';
+export 'package:flutter_sound_lite/flutter_sound.dart';
 
 class RecordPodcast extends StatefulWidget {
   const RecordPodcast({super.key});

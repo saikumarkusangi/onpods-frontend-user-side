@@ -1,17 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_hud/flutter_hud.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:get/get.dart';
-import 'package:onpods/screens/auth_screen/otp_verify_screen.dart';
-import 'package:onpods/utils/colors.dart';
-import 'package:onpods/utils/images.dart';
-import 'package:onpods/widgets/custom_text_field.dart';
-import 'package:pinput/pinput.dart';
-import 'package:provider/provider.dart';
-
-import '../../providers/auth_provider.dart';
-import '../../widgets/widgets_exports.dart';
+import 'package:onpods/utils/exports.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
@@ -111,7 +99,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                         hintText: "Enter your Email",
                         obscureText: false,
                         vertical: 16,
-                        fillColor: textFieldColor,
+                        fillColor: darktextFieldColor,
                         hintStyle: const TextStyle(color: Colors.grey),
                         textStyle: const TextStyle(color: Colors.white),
                         validator: (value) {
@@ -122,7 +110,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                             return 'Please enter a valid email address';
                           }
                           return null;
-                        },
+                        }, onSubmit: (String data) {  },
                       ),
                     ),
                     const SizedBox(
@@ -136,33 +124,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                         text: 'Send',
                         buttonTextStyle:
                             const TextStyle(color: Colors.white, fontSize: 18),
-                        buttonStyle: ButtonStyle(
-                          shape: MaterialStateProperty.all(
-                            RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          ),
-                          fixedSize: MaterialStateProperty.resolveWith<Size?>(
-                            (Set<MaterialState> states) {
-                              if (states.contains(MaterialState.disabled)) {
-                                return Size(
-                                    1.sw, 40); // Size for disabled state
-                              }
-                              return Size(
-                                  1.sw, 40); // Default size for enabled state
-                            },
-                          ),
-                          backgroundColor:
-                              MaterialStateProperty.resolveWith<Color?>(
-                            (Set<MaterialState> states) {
-                              if (states.contains(MaterialState.disabled)) {
-                                return Colors.grey; // Color for disabled state
-                              }
-                              return Colors
-                                  .blue; // Default color for enabled state
-                            },
-                          ),
-                        ),
+                        buttonColor:Colors.blue
                       ),
                     ),
                   ]),

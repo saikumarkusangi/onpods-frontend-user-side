@@ -1,32 +1,15 @@
-import 'dart:async';
 import 'dart:io';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_colorpicker/flutter_colorpicker.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:get/get.dart';
-import 'package:image_cropper/image_cropper.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:onpods/screens/quotes_screen/background_images.dart';
-import 'package:onpods/screens/quotes_screen/upload_quote.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:photo_view/photo_view.dart';
-import 'package:provider/provider.dart';
-import 'package:screenshot/screenshot.dart';
-import 'package:share_plus/share_plus.dart';
-import 'package:text_editor/text_editor.dart';
-import 'package:image_gallery_saver/image_gallery_saver.dart';
-import '../../providers/providers_exports.dart';
-import '../../utils/utils_exports.dart';
+import 'package:onpods/utils/exports.dart';
+
 
 class CreateQuote extends StatefulWidget {
   const CreateQuote({Key? key}) : super(key: key);
 
   @override
-  _CreateQuoteState createState() => _CreateQuoteState();
+  CreateQuoteState createState() => CreateQuoteState();
 }
 
-class _CreateQuoteState extends State<CreateQuote> {
+class CreateQuoteState extends State<CreateQuote> {
   ScreenshotController screenshotController = ScreenshotController();
   List searchResults = [];
 
@@ -514,14 +497,14 @@ class _CreateQuoteState extends State<CreateQuote> {
                                   ),
                                   IconButton(
                                     onPressed: () async {
-                                      String? ImageFromInternet =
+                                      String? imageFromInternet =
                                           await Get.to<String>(
                                               const BackGroundImages(),
                                               transition: Transition.downToUp);
-                                      ImageFromInternet != null
+                                      imageFromInternet != null
                                           ? bgProvider
                                               .updateBgImageFromInternet(
-                                                  ImageFromInternet)
+                                                  imageFromInternet)
                                           : '';
                                     },
                                     icon: Image.asset(

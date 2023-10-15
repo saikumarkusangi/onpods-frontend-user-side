@@ -1,11 +1,5 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:onpods/widgets/custom_button.dart';
-import 'package:onpods/widgets/custom_text_field.dart';
-import 'package:provider/provider.dart';
 
-import '../../providers/auth_provider.dart';
-import '../../utils/utils_exports.dart';
+import 'package:onpods/utils/exports.dart';
 
 class ResetPassword extends StatefulWidget {
   const ResetPassword({super.key});
@@ -31,7 +25,6 @@ class _ResetPasswordState extends State<ResetPassword> {
 
   @override
   Widget build(BuildContext context) {
-    final authProvider = Provider.of<AuthProvider>(context);
     void submit() {
       if (_formKey.currentState!.validate()) {
         _formKey.currentState!.save();
@@ -62,7 +55,7 @@ class _ResetPasswordState extends State<ResetPassword> {
               hintText: "Enter new password",
               obscureText: false,
               vertical: 16,
-              fillColor: textFieldColor,
+              fillColor: darktextFieldColor,
               hintStyle: const TextStyle(color: Colors.grey),
               textStyle: const TextStyle(color: Colors.white),
               validator: (value) {
@@ -73,7 +66,7 @@ class _ResetPasswordState extends State<ResetPassword> {
                   return 'Password must atleast length of 6';
                 }
                 return null;
-              },
+              }, onSubmit: (String data) {  },
             ),
           ),
           const SizedBox(
@@ -89,7 +82,7 @@ class _ResetPasswordState extends State<ResetPassword> {
               hintText: "Confirm password",
               obscureText: false,
               vertical: 16,
-              fillColor: textFieldColor,
+              fillColor: darktextFieldColor,
               hintStyle: const TextStyle(color: Colors.grey),
               textStyle: const TextStyle(color: Colors.white),
               validator: (value) {
@@ -100,7 +93,7 @@ class _ResetPasswordState extends State<ResetPassword> {
                   return 'Password must be match';
                 }
                 return null;
-              },
+              }, onSubmit: (String data) {  },
             ),
           ),
           const SizedBox(
@@ -114,29 +107,7 @@ class _ResetPasswordState extends State<ResetPassword> {
               text: 'Reset Password',
               buttonTextStyle:
                   const TextStyle(color: Colors.white, fontSize: 18),
-              buttonStyle: ButtonStyle(
-                shape: MaterialStateProperty.all(
-                  RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-                fixedSize: MaterialStateProperty.resolveWith<Size?>(
-                  (Set<MaterialState> states) {
-                    if (states.contains(MaterialState.disabled)) {
-                      return Size(1.sw, 40); // Size for disabled state
-                    }
-                    return Size(1.sw, 40); // Default size for enabled state
-                  },
-                ),
-                backgroundColor: MaterialStateProperty.resolveWith<Color?>(
-                  (Set<MaterialState> states) {
-                    if (states.contains(MaterialState.disabled)) {
-                      return Colors.grey; // Color for disabled state
-                    }
-                    return blueColor; // Default color for enabled state
-                  },
-                ),
-              ),
+           buttonColor: blueColor,
             ),
           ),
         ]),

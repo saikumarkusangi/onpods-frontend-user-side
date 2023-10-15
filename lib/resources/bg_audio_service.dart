@@ -1,9 +1,6 @@
 import 'dart:convert';
-import 'package:onpods/constants/constants.dart';
-import 'package:onpods/models/models_exports.dart';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
-import '../models/bg_audio_model.dart';
+import 'package:onpods/utils/exports.dart';
 
 class BgAudioService {
   Future<List<BgModel>> fetch() async {

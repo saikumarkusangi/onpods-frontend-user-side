@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:onpods/models/user.dart';
 import 'package:onpods/resources/auth_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthProvider with ChangeNotifier {
+  final _googleOauth = GoogleSignIn();
   bool _isLoading = false;
-  UserModel? _user;
   AuthService? _authService;
-
+  String userId = '';
   AuthProvider() {
     _authService = AuthService(this);
   }
 
   bool get isLoading => _isLoading;
-  UserModel? get user => _user;
 
   // ---------------------------- Login -----------------------------------------
 
@@ -24,6 +24,7 @@ class AuthProvider with ChangeNotifier {
       final userData = await _authService!.login(email, password);
       storeUserData(userData);
     } catch (error) {
+      await _googleOauth.signOut();
       throw Exception(error);
     } finally {
       _isLoading = false;
@@ -35,16 +36,12 @@ class AuthProvider with ChangeNotifier {
 
   void storeUserData(Map<String, dynamic> userData) async {
     final user = UserModel.fromJson(userData);
-    _user = user;
     final prefs = await SharedPreferences.getInstance();
     prefs.setBool('isUserLoggedIn', true);
     prefs.setString('user_id', user.data.id);
-    // prefs.setString('user_email', user.data.email);
-    prefs.setString('user_name', user.data.username);
+
     notifyListeners();
   }
-
-
 
   // ---------------------------- Sign UP -----------------------------------------
 
@@ -53,8 +50,10 @@ class AuthProvider with ChangeNotifier {
     notifyListeners();
     try {
       final userData = await _authService!.signup(name, email, password);
+
       storeUserData(userData);
     } catch (error) {
+      await _googleOauth.signOut();
       throw Exception(error);
     } finally {
       _isLoading = false;
@@ -83,7 +82,7 @@ class AuthProvider with ChangeNotifier {
   Future<void> logout() async {
     final prefs = await SharedPreferences.getInstance();
     prefs.clear();
-    _user = null;
+    await _googleOauth.signOut();
     notifyListeners();
   }
 }

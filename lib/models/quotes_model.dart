@@ -1,20 +1,16 @@
-// To parse this JSON data, do
-//
-//     final QuotesModel = QuotesModelFromJson(jsonString);
-
 import 'dart:convert';
 
-List<QuotesModel> QuotesModelFromJson(String str) => List<QuotesModel>.from(
+List<QuotesModel> quotesModelFromJson(String str) => List<QuotesModel>.from(
     json.decode(str).map((x) => QuotesModel.fromJson(x)));
 
-String QuotesModelToJson(List<QuotesModel> data) =>
+String quotesModelToJson(List<QuotesModel> data) =>
     json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
 
 class QuotesModel {
   int count;
   int totalPages;
   int page;
-  List<data> datas;
+  List<Data> datas;
 
   QuotesModel({
     required this.count,
@@ -27,7 +23,7 @@ class QuotesModel {
         count: json["count"],
         totalPages: json["totalPages"],
         page: json["page"],
-        datas: List<data>.from(json["data"].map((x) => data.fromJson(x))),
+        datas: List<Data>.from(json["data"].map((x) => Data.fromJson(x))),
       );
 
   Map<String, dynamic> toJson() => {
@@ -38,21 +34,21 @@ class QuotesModel {
       };
 }
 
-class data {
+class Data {
   String userId;
   String imageUrl;
   String category;
   String createdAt;
   String id;
 
-  data(
+  Data(
       {required this.id,
       required this.userId,
       required this.imageUrl,
       required this.category,
       required this.createdAt});
 
-  factory data.fromJson(Map<String, dynamic> json) => data(
+  factory Data.fromJson(Map<String, dynamic> json) => Data(
       id: json["_id"] ?? '',
       userId: json["userId"] ?? '',
       imageUrl: json["imageUrl"] ?? '',

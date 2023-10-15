@@ -1,10 +1,4 @@
-import 'package:flutter/material.dart';
-import 'package:onpods/models/models_exports.dart';
-import 'package:onpods/providers/providers_exports.dart';
-import 'package:onpods/screens/quotes_screen/widgets/quote_card_template.dart';
-import 'package:provider/provider.dart';
-import '../../utils/utils_exports.dart';
-import '../../widgets/widgets_exports.dart';
+import 'package:onpods/utils/exports.dart';
 
 class QuotesScreen extends StatefulWidget {
   const QuotesScreen({super.key});
@@ -74,6 +68,7 @@ class _QuotesScreenState extends State<QuotesScreen>
             final categoryId = quoteCategoryProvider.quotesCategories[index].id;
             return RefreshIndicator(
                 onRefresh: () async {
+                  quoteCategoryProvider.quotes.clear();
                  await quoteCategoryProvider.fetchQuotesByCategory(categoryId,1);
                 },
                 child: StaggeredGridTemplate(categoryId: categoryId));

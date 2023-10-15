@@ -1,26 +1,17 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_sound_lite/flutter_sound.dart';
-import 'package:get/get.dart';
+
+
 import 'package:just_audio/just_audio.dart';
-import 'package:onpods/providers/providers_exports.dart';
-import 'package:onpods/screens/podcast_screen/upload_podcast.dart';
-import 'package:onpods/utils/colors.dart';
-import 'package:onpods/widgets/floating_action_button.dart';
-import 'package:provider/provider.dart';
-import 'package:file_picker/file_picker.dart';
-import '../../utils/utils_exports.dart';
-import '../../widgets/widgets_exports.dart';
+import 'package:onpods/utils/exports.dart';
 
 class BgAdd extends StatefulWidget {
   const BgAdd({Key? key}) : super(key: key);
 
   @override
-  _BgAddState createState() => _BgAddState();
+  BgAddState createState() => BgAddState();
 }
 
-class _BgAddState extends State<BgAdd> with AutomaticKeepAliveClientMixin {
+class BgAddState extends State<BgAdd> with AutomaticKeepAliveClientMixin {
   final AudioPlayer _player1 = AudioPlayer();
-  bool _isPaused = false;
   bool _isPlaying = false;
   String? currentlyPlayingIndex;
 
@@ -46,7 +37,7 @@ class _BgAddState extends State<BgAdd> with AutomaticKeepAliveClientMixin {
         _isPlaying = true;
       });
     } catch (e) {
-      print('Error starting playback: $e');
+      throw Exception(e);
     }
   }
 
@@ -57,7 +48,7 @@ class _BgAddState extends State<BgAdd> with AutomaticKeepAliveClientMixin {
         _isPlaying = false;
       });
     } catch (e) {
-      print('Error stopping playback: $e');
+      throw Exception(e);
     }
   }
 
@@ -99,7 +90,7 @@ class _BgAddState extends State<BgAdd> with AutomaticKeepAliveClientMixin {
         return null;
       });
     } catch (e) {
-      print('Error picking or playing audio: $e');
+      throw Exception(e);
     }
   }
 

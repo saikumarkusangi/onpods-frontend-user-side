@@ -6,7 +6,7 @@ class BaseButton extends StatelessWidget {
     Key? key,
     required this.text,
     this.onTap,
-    this.buttonStyle,
+    this.buttonColor,
     this.buttonTextStyle,
     this.isDisabled,
     this.height,
@@ -21,7 +21,7 @@ class BaseButton extends StatelessWidget {
 
   final VoidCallback? onTap;
 
-  final ButtonStyle? buttonStyle;
+  final Color? buttonColor;
 
   final TextStyle? buttonTextStyle;
 

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:onpods/utils/exports.dart';
 import 'package:onpods/utils/images.dart';
 
 class DownloadItem {
@@ -21,10 +22,10 @@ class DownloadsPage extends StatefulWidget {
   const DownloadsPage({super.key});
 
   @override
-  _DownloadsPageState createState() => _DownloadsPageState();
+  DownloadsPageState createState() => DownloadsPageState();
 }
 
-class _DownloadsPageState extends State<DownloadsPage> {
+class DownloadsPageState extends State<DownloadsPage> {
   List<DownloadItem> downloadItems = [];
 
   @override
@@ -66,16 +67,10 @@ class _DownloadsPageState extends State<DownloadsPage> {
       body: downloadItems.isEmpty
           ? Column(
             children: [
-            Image.asset(emptyImage,scale:2.5),
-              const Center(
-                child: Text(
-                  'No Downloads Available.',
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold),
-                ),
+               const SizedBox(
+                height: 40,
               ),
+           const EmptyPlaceHiolder(message: 'Downloads'),
               const SizedBox(
                 height: 10,
               ),

@@ -1,13 +1,4 @@
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:get/get.dart';
-import 'package:onpods/resources/quote_service.dart';
-import 'package:onpods/screens/profile_screen/profile_screen.dart';
-import 'package:onpods/screens/user_profile_screen.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import '../../resources/users_service.dart';
-import '../../utils/utils_exports.dart';
+import 'package:onpods/utils/exports.dart';
 
 class SingleQuote extends StatefulWidget {
   final String image;
@@ -75,10 +66,6 @@ class _SingleQuoteState extends State<SingleQuote> {
                                       child: CircularProgressIndicator(),
                                     ),
                                 imageUrl: widget.image)),
-                        SvgPicture.asset(
-                          isLiked ? lovedIcon : '',
-                          width: 100,
-                        ),
                         Positioned(
                           left: 10,
                           top: 10,
@@ -124,7 +111,7 @@ class _SingleQuoteState extends State<SingleQuote> {
                     height: 10,
                   ),
                   FutureBuilder(
-                      future: UserServices.userById(widget.userId),
+                      future: UserServices().userById(widget.userId),
                       builder: (context, snapshot) {
                         if (snapshot.connectionState ==
                             ConnectionState.waiting) {
@@ -149,22 +136,25 @@ class _SingleQuoteState extends State<SingleQuote> {
                                   color:
                                       const Color.fromARGB(255, 236, 184, 202),
                                   borderRadius: BorderRadius.circular(60)),
-                              child: CachedNetworkImage(
-                                imageUrl: snapshot.data['profilePic'],
-                                placeholder: (context, url) => Center(
-                                  child: Text(
-                                    snapshot.data['username']
-                                        .substring(0, 1)
-                                        .toUpperCase(),
-                                    style: const TextStyle(fontSize: 24),
+                              child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(60),
+                                child: CachedNetworkImage(
+                                  imageUrl: snapshot.data['profilePic'],
+                                  placeholder: (context, url) => Center(
+                                    child: Text(
+                                      snapshot.data['username']
+                                          .substring(0, 1)
+                                          .toUpperCase(),
+                                      style: const TextStyle(fontSize: 24),
+                                    ),
                                   ),
-                                ),
-                                errorWidget: (context, url, error) => Center(
-                                  child: Text(
-                                    snapshot.data['username']
-                                        .substring(0, 1)
-                                        .toUpperCase(),
-                                    style: const TextStyle(fontSize: 24),
+                                  errorWidget: (context, url, error) => Center(
+                                    child: Text(
+                                      snapshot.data['username']
+                                          .substring(0, 1)
+                                          .toUpperCase(),
+                                      style: const TextStyle(fontSize: 24),
+                                    ),
                                   ),
                                 ),
                               ),

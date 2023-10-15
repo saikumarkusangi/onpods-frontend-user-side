@@ -1,17 +1,4 @@
-import 'dart:math';
-
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-import 'package:get/get.dart';
-import 'package:onpods/resources/users_service.dart';
-import 'package:onpods/screens/profile_screen/followers_screen.dart';
-import 'package:onpods/screens/profile_screen/widgets/profile_action_list.dart';
-import 'package:onpods/screens/quotes_screen/single_quote.dart';
-import 'package:onpods/widgets/skeleton.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import '../../utils/utils_exports.dart';
-import '../../widgets/widgets_exports.dart';
+import 'package:onpods/utils/exports.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({
@@ -24,6 +11,7 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen>
     with SingleTickerProviderStateMixin {
+  final userId = UserSession.getUserId();
   Map<dynamic, dynamic> quotes = {};
   bool loading = false;
   bool _isLoadingMore = false;
@@ -39,10 +27,9 @@ class _ProfileScreenState extends State<ProfileScreen>
     setState(() {
       loading = true;
     });
-    final prefs = await SharedPreferences.getInstance();
-    final userId = prefs.getString('user_id');
-    final data = await UserServices.userById(userId);
-    final userQuotes = await UserServices.userQuotes(userId, 1);
+
+    final data = await UserServices().userById(userId);
+    final userQuotes = await UserServices().userQuotes(userId, 1);
 
     setState(() {
       id = userId!;
@@ -79,7 +66,7 @@ class _ProfileScreenState extends State<ProfileScreen>
             });
 
             final userQuotes =
-                await UserServices.userQuotes(id, quotes['page'] + 1);
+                await UserServices().userQuotes(id, quotes['page'] + 1);
             setState(() {
               quotes['page'] = userQuotes['page'];
               quotes['data'].addAll(userQuotes['data']);
@@ -112,68 +99,67 @@ class _ProfileScreenState extends State<ProfileScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       extendBodyBehindAppBar: true,
-      body: RefreshIndicator(
-         onRefresh: () async {
-        _getUserData();
-      },
-        child: DefaultTabController(
-            length: 2,
-            child: CustomScrollView(
-              controller: _scrollController,
-              slivers: [
-                loading
-                    ? const SliverToBoxAdapter(child: ProfileSkeleton())
-                    : SliverAppBar.large(
-                        pinned: true,
-                        iconTheme:
-                            const IconThemeData(color: Colors.white, size: 26),
-                        expandedHeight: 300,
-                        backgroundColor: const Color.fromRGBO(0, 0, 0, 1),
-                        actions: [
-                          IconButton(
-                              onPressed: () => _showBottomSheet(context),
-                              icon: const Icon(
-                                Icons.menu,
-                              ))
+      body: DefaultTabController(
+          length: 2,
+          child: CustomScrollView(
+            controller: _scrollController,
+            slivers: [
+              loading
+                  ? const SliverToBoxAdapter(child: ProfileSkeleton())
+                  : SliverAppBar.large(
+                      pinned: true,
+                      iconTheme:
+                          const IconThemeData(color: Colors.white, size: 26),
+                      expandedHeight: 300,
+                      backgroundColor: const Color.fromRGBO(0, 0, 0, 1),
+                      actions: [
+                        IconButton(
+                            onPressed: () => _showBottomSheet(context),
+                            icon: const Icon(
+                              Icons.menu,
+                            ))
+                      ],
+                      title: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Text(
+                            userName,
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                          const SizedBox(
+                            width: 5,
+                          ),
+                          verified
+                              ? const Icon(
+                                  Icons.verified,
+                                  color: blueColor,
+                                  size: 20,
+                                )
+                              : const SizedBox()
                         ],
-                        title: Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
+                      ),
+                      flexibleSpace: FlexibleSpaceBar(
+                        collapseMode: CollapseMode.none,
+                        background: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            Text(
-                              userName,
-                              style: const TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
-                            ),
-                            const SizedBox(
-                              width: 5,
-                            ),
-                            verified
-                                ? const Icon(
-                                    Icons.verified,
-                                    color: blueColor,
-                                    size: 20,
-                                  )
-                                : const SizedBox()
-                          ],
-                        ),
-                        flexibleSpace: FlexibleSpaceBar(
-                          collapseMode: CollapseMode.none,
-                          background: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              const SizedBox(height: 80),
-                              Container(
-                                width: 100,
-                                height: 100,
-                                decoration: BoxDecoration(
-                                    color: const Color.fromARGB(
-                                        255, 236, 184, 202),
-                                    borderRadius: BorderRadius.circular(60)),
+                            const SizedBox(height: 80),
+                            Container(
+                              width: 100,
+                              height: 100,
+                              decoration: BoxDecoration(
+                                  color:
+                                      const Color.fromARGB(255, 236, 184, 202),
+                                  borderRadius: BorderRadius.circular(60)),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(60),
                                 child: CachedNetworkImage(
-                                  imageUrl: userProfileImage,
+                                  imageUrl:
+                                      'https://onpods.s3.ap-south-1.amazonaws.com/profile-pics/$id.jpg',
                                   placeholder: (context, url) => Center(
                                     child: Text(
                                       userName.substring(0, 1).toUpperCase(),
@@ -188,215 +174,217 @@ class _ProfileScreenState extends State<ProfileScreen>
                                   ),
                                 ),
                               ),
-                              const SizedBox(height: 10),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    userName,
-                                    style: const TextStyle(
-                                      fontSize: 26,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                    ),
+                            ),
+                            const SizedBox(height: 10),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  userName,
+                                  style: const TextStyle(
+                                    fontSize: 26,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
                                   ),
-                                  const SizedBox(
-                                    width: 5,
-                                  ),
-                                  verified
-                                      ? const Icon(
-                                          Icons.verified,
-                                          color: blueColor,
-                                          size: 20,
-                                        )
-                                      : const SizedBox()
-                                ],
-                              ),
-                              // Text(
-                              //   userEmail,
-                              //   style: const TextStyle(
-                              //     fontSize: 18,
-                              //     color: Colors.grey,
-                              //   ),
-                              // ),
-                              const SizedBox(height: 10),
-      
-                              Padding(
-                                padding: const EdgeInsets.only(
-                                    left: 50, right: 50, top: 10, bottom: 10),
-                                child: Container(
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 10),
-                                  width: double.maxFinite,
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(10),
-                                      color: blueColor),
-                                  child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        GestureDetector(
-                                          onTap: () => Get.to(
-                                              FollowersScreen(
-                                                count: followersCount,
-                                                title: 'Followers',
-                                                userId: id,
-                                              ),
-                                              transition: Transition.cupertino),
-                                          child: RichText(
-                                            textAlign: TextAlign.center,
-                                            text: TextSpan(
-                                              text: '$followersCount\n',
-                                              style: const TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 25),
-                                              children: const [
-                                                TextSpan(
-                                                  text: 'Followers',
-                                                  style: TextStyle(
-                                                      color: Colors.white,
-                                                      fontSize: 16),
-                                                )
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 20),
-                                          child: Container(
-                                            color: Colors.white,
-                                            height: 50,
-                                            width: 1,
-                                          ),
-                                        ),
-                                        GestureDetector(
-                                          onTap: () => Get.to(
-                                              FollowersScreen(
-                                                count: followingCount,
-                                                title: 'Following',
-                                                userId: id,
-                                              ),
-                                              transition: Transition.cupertino),
-                                          child: RichText(
-                                            textAlign: TextAlign.center,
-                                            text: TextSpan(
-                                              text: '$followingCount\n',
-                                              style: const TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 25),
-                                              children: const [
-                                                TextSpan(
-                                                  text: 'Following',
-                                                  style: TextStyle(
-                                                      color: Colors.white,
-                                                      fontSize: 16),
-                                                )
-                                              ],
-                                            ),
-                                          ),
-                                        )
-                                      ]),
                                 ),
+                                const SizedBox(
+                                  width: 5,
+                                ),
+                                verified
+                                    ? const Icon(
+                                        Icons.verified,
+                                        color: blueColor,
+                                        size: 20,
+                                      )
+                                    : const SizedBox()
+                              ],
+                            ),
+                            // Text(
+                            //   userEmail,
+                            //   style: const TextStyle(
+                            //     fontSize: 18,
+                            //     color: Colors.grey,
+                            //   ),
+                            // ),
+                            const SizedBox(height: 10),
+
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                  left: 50, right: 50, top: 10, bottom: 10),
+                              child: Container(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 10),
+                                width: double.maxFinite,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10),
+                                    color: blueColor),
+                                child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      GestureDetector(
+                                        onTap: () => Get.to(
+                                            FollowersScreen(
+                                              count: followersCount,
+                                              title: 'Followers',
+                                              userId: id,
+                                            ),
+                                            transition: Transition.cupertino),
+                                        child: RichText(
+                                          textAlign: TextAlign.center,
+                                          text: TextSpan(
+                                            text: '$followersCount\n',
+                                            style: const TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 25),
+                                            children: const [
+                                              TextSpan(
+                                                text: 'Followers',
+                                                style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize: 16),
+                                              )
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 20),
+                                        child: Container(
+                                          color: Colors.white,
+                                          height: 50,
+                                          width: 1,
+                                        ),
+                                      ),
+                                      GestureDetector(
+                                        onTap: () => Get.to(
+                                            FollowersScreen(
+                                              count: followingCount,
+                                              title: 'Following',
+                                              userId: id,
+                                            ),
+                                            transition: Transition.cupertino),
+                                        child: RichText(
+                                          textAlign: TextAlign.center,
+                                          text: TextSpan(
+                                            text: '$followingCount\n',
+                                            style: const TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 25),
+                                            children: const [
+                                              TextSpan(
+                                                text: 'Following',
+                                                style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize: 16),
+                                              )
+                                            ],
+                                          ),
+                                        ),
+                                      )
+                                    ]),
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
                       ),
-                SliverToBoxAdapter(
-                  child: Center(
-                    child: TabBar(
-                      controller: _tabController,
-                      onTap: (value) {
-                        _tabController.index = value;
-                        setState(() {});
-                      },
-                      tabAlignment: TabAlignment.center,
-                      dividerColor: Colors.black,
-                      unselectedLabelColor: Colors.white,
-                      labelColor: blueColor,
-                      indicatorColor: blueColor,
-                      labelStyle: const TextStyle(fontSize: 18),
-                      tabs: const [
-                        Tab(
-                          text: 'Quotes',
-                        ),
-                        Tab(
-                          text: 'Podcasts',
-                        )
-                      ],
                     ),
+              SliverToBoxAdapter(
+                child: Center(
+                  child: TabBar(
+                    controller: _tabController,
+                    onTap: (value) {
+                      _tabController.index = value;
+                      setState(() {});
+                    },
+                    tabAlignment: TabAlignment.center,
+                    dividerColor: Colors.black,
+                    unselectedLabelColor: Colors.white,
+                    labelColor: blueColor,
+                    indicatorColor: blueColor,
+                    labelStyle: const TextStyle(fontSize: 18),
+                    tabs: const [
+                      Tab(
+                        text: 'Quotes',
+                      ),
+                      Tab(
+                        text: 'Podcasts',
+                      )
+                    ],
                   ),
                 ),
-                _tabController.index == 0
-                    ? loading
-                        ? const SliverToBoxAdapter(
-                            child: ProfileQuotesSkeleton())
-                        : SliverToBoxAdapter(
-                            child: quotes['data'].length == 0
-                                ? const EmptyPlaceHiolder(message: 'Quotes',)
-                                : Padding(
-                                    padding: const EdgeInsets.only(
-                                        left: 10, right: 10, top: 40),
-                                    child: StaggeredGrid.count(
-                                      crossAxisCount: 3,
-                                      mainAxisSpacing: 14.0,
-                                      crossAxisSpacing: 10.0,
-                                      children: List.generate(
-                                          quotes['data'].length, (index) {
-                                        var item = quotes['data'][index];
-      
-                                        return GestureDetector(
-                                          onTap: () => Get.to(
-                                              SingleQuote(
-                                                postId: item['id'],
-                                                image: item['imageUrl'],
-                                                userId: id,
-                                              ),
-                                              transition: Transition.cupertino),
-                                          child: ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                            child: CachedNetworkImage(
-                                              imageUrl: item['imageUrl'],
-                                              placeholder: (context, url) =>
-                                                  Center(
-                                                child: Container(
-                                                  decoration: BoxDecoration(
-                                                    color: getRandomColor(),
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            10),
-                                                  ),
-                                                  width: 100,
-                                                  height: 100,
-                                                ),
-                                              ),
-                                              errorWidget: (context, url,
-                                                      error) =>
-                                                  Image.asset(imagePlaceHolder),
+              ),
+              _tabController.index == 0
+                  ? loading
+                      ? const SliverToBoxAdapter(child: ProfileQuotesSkeleton())
+                      : SliverToBoxAdapter(
+                          child: quotes['data'].length == 0
+                              ? const EmptyPlaceHiolder(
+                                  message: 'Quotes',
+                                )
+                              : Padding(
+                                  padding: const EdgeInsets.only(
+                                      left: 10, right: 10, top: 40),
+                                  child: StaggeredGrid.count(
+                                    crossAxisCount: 3,
+                                    mainAxisSpacing: 14.0,
+                                    crossAxisSpacing: 10.0,
+                                    children: List.generate(
+                                        quotes['data'].length, (index) {
+                                      var item = quotes['data'][index];
+
+                                      return GestureDetector(
+                                        onTap: () => Get.to(
+                                            SingleQuote(
+                                              postId: item['_id'],
+                                              image: item['imageUrl'],
+                                              userId: id,
                                             ),
+                                            transition: Transition.cupertino),
+                                        child: ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          child: CachedNetworkImage(
+                                            imageUrl: item['imageUrl'],
+                                            placeholder: (context, url) =>
+                                                Center(
+                                              child: Container(
+                                                decoration: BoxDecoration(
+                                                  color: getRandomColor(),
+                                                  borderRadius:
+                                                      BorderRadius.circular(10),
+                                                ),
+                                                width: 100,
+                                                height: 100,
+                                              ),
+                                            ),
+                                            errorWidget: (context, url,
+                                                    error) =>
+                                                Image.asset(imagePlaceHolder),
                                           ),
-                                        );
-                                      }),
-                                    )),
-                          )
-                    :
-      
-                    // Podcasts Tab Content
-                    const SliverToBoxAdapter(
-                        child: EmptyPlaceHiolder(message: 'Podcasts',)),
-                _isLoadingMore
-                    ? const SliverToBoxAdapter(
-                        child: Center(
-                          child: CircularProgressIndicator(),
-                        ),
-                      )
-                    : const SliverToBoxAdapter()
-              ],
-            )),
-      ),
+                                        ),
+                                      );
+                                    }),
+                                  )),
+                        )
+                  :
+
+                  // Podcasts Tab Content
+                  const SliverToBoxAdapter(
+                      child: EmptyPlaceHiolder(
+                      message: 'Podcasts',
+                    )),
+              _isLoadingMore
+                  ? const SliverToBoxAdapter(
+                      child: Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                    )
+                  : const SliverToBoxAdapter()
+            ],
+          )),
     );
+    ;
   }
 
   void _showBottomSheet(BuildContext context) {
@@ -410,7 +398,11 @@ class _ProfileScreenState extends State<ProfileScreen>
       builder: (context) => DraggableScrollableSheet(
           initialChildSize: 1,
           expand: true,
-          builder: (context, controller) => const ProfileActionList()),
+          builder: (context, controller) => ProfileActionList(
+                profilePic: userProfileImage,
+                userName: userName,
+                userId: id,
+              )),
     );
   }
 }

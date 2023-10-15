@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:onpods/screens/podcast_screen/detailed_podcast.dart';
-import 'package:onpods/screens/view_all_screen.dart';
+import 'package:onpods/screens/podcast_screen/widgets/view_all_screen.dart';
 import 'package:onpods/utils/colors.dart';
 import '../../../constants/constants.dart';
 
@@ -49,20 +49,20 @@ class PodcastCardTemplate extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 10),
-          Padding(
-            padding: const EdgeInsets.only(top: 8, left: 8, bottom: 8),
-            child: SizedBox(
-              height: 170,
-              child: ListView.builder(
-                shrinkWrap: true,
-                scrollDirection: Axis.horizontal,
-                itemCount: data.length,
-                itemBuilder: (context, index) {
-                  return _buildPodcastItem(data[index]);
-                },
-              ),
-            ),
-          ),
+          // Padding(
+          //   padding: const EdgeInsets.only(top: 8, left: 8, bottom: 8),
+          //   child: SizedBox(
+          //     height: 170,
+          //     child: ListView.builder(
+          //       shrinkWrap: true,
+          //       scrollDirection: Axis.horizontal,
+          //       itemCount: data.length,
+          //       itemBuilder: (context, index) {
+          //         return _buildPodcastItem(data[index]);
+          //       },
+          //     ),
+          //   ),
+          // ),
         ],
       ),
     );
@@ -80,7 +80,7 @@ class PodcastCardTemplate extends StatelessWidget {
             image: itemData['image'] ?? '',
              title: itemData['title'] ?? '', 
              description: itemData['des'] ?? '',
-              episodes: [],
+              episodes: const [],
                rating:4),
                transition: Transition.cupertino
                ),
@@ -91,7 +91,7 @@ class PodcastCardTemplate extends StatelessWidget {
                 height: 140,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10),
-                  color: primaryColor,
+                  color: Colors.grey,
                   image: DecorationImage(
                     image: NetworkImage(itemData['image']!),
                     fit: BoxFit.cover,

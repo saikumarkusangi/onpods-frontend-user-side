@@ -5,13 +5,11 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/route_manager.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
+import 'package:onpods/utils/colors.dart';
+import 'package:onpods/utils/images.dart';
 import 'package:palette_generator/palette_generator.dart';
-import 'package:provider/provider.dart';
 import '../../models/audio_model.dart';
-import '../../providers/audio_player_provider.dart';
-import '../../utils/utils_exports.dart';
 import 'package:rxdart/rxdart.dart';
-import 'package:audio_service/audio_service.dart';
 
 class Episode {
   final String audioUrl;
@@ -86,7 +84,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
   }
 
   Future<void> _init() async {
-    final _playList = ConcatenatingAudioSource(
+    final playList = ConcatenatingAudioSource(
       children: widget.playlist.map((e) {
         return AudioSource.uri(
           Uri.parse(e.songUrl),
@@ -101,16 +99,10 @@ class _PlayerScreenState extends State<PlayerScreen> {
       }).toList(),
     );
 
-    @override
-    void dispose() {
-      super.dispose();
-      _player.dispose();
-    }
 
-    final audioProvider =
-        Provider.of<CurrentAudioProvider>(context, listen: false);
-    debugPrint('@@@@@@@@@@@@@@@@@@@@@@@@@@@' + _player.currentIndex.toString());
-    final currentMediaItem = _playList.sequence[_player.currentIndex ?? 0];
+   
+    print('@@@@@@@@@@@@@@@@@@@@@@@@@@@${_player.currentIndex}');
+    final currentMediaItem = playList.sequence[_player.currentIndex ?? 0];
 
 // Get the title from the current MediaItem's tag
     final currentAudioTitle = currentMediaItem.tag.title ?? "Unknown Title";
@@ -124,8 +116,8 @@ class _PlayerScreenState extends State<PlayerScreen> {
 
     // Use the provider to set the current audio
 
-    audioProvider.setAudio(currentAudio);
-    await _player.setAudioSource(_playList);
+  
+    await _player.setAudioSource(playList);
     _player.play();
   }
 
@@ -137,23 +129,9 @@ class _PlayerScreenState extends State<PlayerScreen> {
           (position, bufferPosition, duration) => PositionData(
               position, bufferPosition, duration ?? Duration.zero));
 
-  final _playList = ConcatenatingAudioSource(children: [
-    AudioSource.uri(
-        Uri.parse(
-            'https://s3.amazonaws.com/scifri-episodes/scifri20181123-episode.mp3'),
-        tag: MediaItem(
-          id: '1',
-          album: "Science Friday ",
-          title: "A Salute To Head-Scratching Science",
-          artist: "Science Friday and WNYC Studios",
-          artUri: Uri.parse(
-              'https://media.wnyc.org/i/1400/1400/l/80/1/ScienceFriday_WNYCStudios_1400.jpg'),
-        )),
-  ]);
 
   @override
   Widget build(BuildContext context) {
-    final audioProvider = Provider.of<CurrentAudioProvider>(context);
     return Scaffold(
       body: Stack(
         children: [
@@ -165,7 +143,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                 colors: [
                   _paletteGenerator?.dominantColor?.color.withOpacity(1) ??
                       Colors.transparent,
-                  scaffoldBackgroundColor,
+                  darkscaffoldBackgroundColor,
                 ],
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,

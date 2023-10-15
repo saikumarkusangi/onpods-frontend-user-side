@@ -1,16 +1,15 @@
-import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:onpods/screens/screens_exports.dart';
 
-import '../utils/utils_exports.dart';
+import 'package:onpods/utils/exports.dart';
+
+
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final ValueNotifier<double> appBarOpacity;
 
-  CustomAppBar({required this.appBarOpacity});
+  const CustomAppBar({super.key, required this.appBarOpacity});
 
   @override
-  Size get preferredSize => Size.fromHeight(60); // Set the desired height
+  Size get preferredSize => const Size.fromHeight(60); 
 
   @override
   Widget build(BuildContext context) {

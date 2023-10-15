@@ -1,7 +1,6 @@
 import 'dart:convert';
-
-import 'package:onpods/models/models_exports.dart';
 import 'package:http/http.dart' as http;
+import 'package:onpods/models/dummy_data.dart';
 
 class DummyService {
   

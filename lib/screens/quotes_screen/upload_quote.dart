@@ -4,11 +4,10 @@ import 'package:flutter_hud/flutter_hud.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
-import 'package:onpods/providers/providers_exports.dart';
+import 'package:onpods/providers/quotes_provider.dart';
 import 'package:onpods/resources/quote_service.dart';
 import 'package:onpods/utils/colors.dart';
 import 'package:provider/provider.dart';
-
 import '../layout_screen.dart';
 
 class UploadQuotes extends StatefulWidget {
@@ -130,8 +129,8 @@ class _UploadQuotesState extends State<UploadQuotes> {
                 ),
               ),
               Wrap(
-                spacing: 10, // Adjust spacing as needed
-                runSpacing: 10, // Adjust runSpacing as needed
+                spacing: 10, 
+                runSpacing: 10, 
                 children: chipWidgets,
               ),
             ],

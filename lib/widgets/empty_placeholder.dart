@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
-import 'package:onpods/utils/images.dart';
+
+import 'package:onpods/utils/exports.dart';
 
 class EmptyPlaceHiolder extends StatelessWidget {
   final String message;
@@ -15,8 +15,8 @@ class EmptyPlaceHiolder extends StatelessWidget {
           height: 30,
         ),
         Image.asset(emptyImage, scale: 2.5),
-         Text(
-          'No ${message} Yet',
+        Text(
+          'No $message Yet',
           style: const TextStyle(
               color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
         )

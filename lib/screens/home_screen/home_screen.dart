@@ -1,7 +1,5 @@
-import 'package:flutter/material.dart';
-import '../../widgets/widgets_exports.dart';
-import 'widgets/banner_carsouel.dart';
-import '../podcast_screen/widgets/podcast_card_template.dart';
+import 'package:onpods/utils/exports.dart';
+
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});

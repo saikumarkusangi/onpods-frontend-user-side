@@ -1,25 +1,25 @@
-import 'package:flutter/material.dart';
-import 'widgets_exports.dart';
+
+import 'package:onpods/utils/exports.dart';
 
 class CustomElevatedButton extends BaseButton {
-  const CustomElevatedButton({
+  const CustomElevatedButton( {
     super.key,
     this.decoration,
     this.leftIcon,
     this.rightIcon,
     EdgeInsets? margin,
     VoidCallback? onTap,
-    ButtonStyle? buttonStyle,
     Alignment? alignment,
     TextStyle? buttonTextStyle,
     bool? isDisabled,
     double? height,
     double? width,
+    Color? buttonColor,
     required String text,
   }) : super(
           text: text,
           onTap: onTap,
-          buttonStyle: buttonStyle,
+          buttonColor: buttonColor,
           isDisabled: isDisabled,
           buttonTextStyle: buttonTextStyle,
           height: height,
@@ -29,7 +29,6 @@ class CustomElevatedButton extends BaseButton {
         );
 
   final BoxDecoration? decoration;
-
   final Widget? leftIcon;
 
   final Widget? rightIcon;
@@ -50,7 +49,29 @@ class CustomElevatedButton extends BaseButton {
         margin: margin,
         decoration: decoration,
         child: ElevatedButton(
-          style: buttonStyle,
+          style:  ButtonStyle(
+                  shape: MaterialStateProperty.all(
+                    RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  fixedSize: MaterialStateProperty.resolveWith<Size?>(
+                    (Set<MaterialState> states) {
+                      if (states.contains(MaterialState.disabled)) {
+                        return Size(1.sw, 40);
+                      }
+                      return Size(1.sw, 40);
+                    },
+                  ),
+                  backgroundColor: MaterialStateProperty.resolveWith<Color?>(
+                    (Set<MaterialState> states) {
+                      if (states.contains(MaterialState.disabled)) {
+                        return Colors.grey;
+                      }
+                      return buttonColor;
+                    },
+                  ),
+                ),
           onPressed: isDisabled ?? false ? null : onTap ?? () {},
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
