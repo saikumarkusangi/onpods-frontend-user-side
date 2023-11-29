@@ -15,8 +15,7 @@ class SingleQuote extends StatefulWidget {
 }
 
 class _SingleQuoteState extends State<SingleQuote> {
-  bool isLiked = false;
-  bool isHeartAnimating = false;
+
   late String userId;
   @override
   void initState() {
@@ -46,12 +45,7 @@ class _SingleQuoteState extends State<SingleQuote> {
               child: Column(
                 children: [
                   InkWell(
-                    onDoubleTap: () {
-                      setState(() {
-                        isHeartAnimating = true;
-                        isLiked = true;
-                      });
-                    },
+                   
                     child: Stack(
                       alignment: Alignment.center,
                       children: [

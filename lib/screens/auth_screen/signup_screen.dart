@@ -69,8 +69,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       Stack(children: [
                         SizedBox(
                           height: 0.5.sh,
-                          child: Image.network(
-                            'https://podbiblemag.com/wp-content/uploads/2022/12/10-of-the-most-popular-podcasts-in-the-UK-right-now-400x240.png',
+                          child: Image.asset
+                          (
+                            signupimage,
                             fit: BoxFit.cover,
                           ),
                         ),
@@ -238,7 +239,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                 const SizedBox(
                                   height: 10,
                                 ),
-                                customGoogleButton('Signup With Google',
+                                customGoogleButton('Signup with Google',
                                     () async {
                                   final response = await _googleOauth.signIn();
                                   authProvider.signUp(

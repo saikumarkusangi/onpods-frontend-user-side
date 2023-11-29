@@ -14,9 +14,17 @@ class _PodcastScreenState extends State<PodcastScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         iconTheme: const IconThemeData(color: Colors.white),
           toolbarHeight: 80,
           backgroundColor: Colors.black,
+          leading: Padding(
+            padding: const EdgeInsets.only(top: 24),
+            child: IconButton(
+              icon: const Icon(Icons.arrow_back),
+              onPressed: () => Get.back(),
+            ),
+          ),
           flexibleSpace:   Padding(
               padding: const EdgeInsets.only(top: 50, left: 60, right: 10),
               child: CustomTextFormField(
@@ -27,7 +35,7 @@ class _PodcastScreenState extends State<PodcastScreen> {
                   color: Colors.grey,
                   size: 26,
                 ),
-                hintText: "Search...",
+                hintText: "Search Podcast , Episode , User..",
                 vertical: 16,
                 fillColor: darktextFieldColor,
                 hintStyle: const TextStyle(color: Colors.grey, fontSize: 14),

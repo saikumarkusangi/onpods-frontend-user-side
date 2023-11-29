@@ -20,10 +20,13 @@ class _BrowseCategoriesState extends State<BrowseCategories> {
           Padding(
               padding: EdgeInsets.only(top: 10),
               child: Text(
-                "Browse All",
+                "Podcast Categories",
                 overflow: TextOverflow.ellipsis,
                 textAlign: TextAlign.left,
-                style: TextStyle(color: Colors.white, fontSize: 20,fontWeight: FontWeight.bold),
+                style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold),
               )),
           BrowseAllCard()
         ],

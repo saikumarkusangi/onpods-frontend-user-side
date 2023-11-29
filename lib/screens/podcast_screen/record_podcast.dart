@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:just_audio/just_audio.dart';
 import 'package:onpods/utils/exports.dart';
-export 'package:flutter_sound_lite/flutter_sound.dart';
+import 'package:flutter_sound_lite/flutter_sound.dart';
 
 class RecordPodcast extends StatefulWidget {
   const RecordPodcast({super.key});
@@ -26,9 +26,9 @@ class _RecordPodcastState extends State<RecordPodcast> {
   late String _audioFilePath;
   ValueNotifier<double> musicVolume = ValueNotifier<double>(0.5);
   ValueNotifier<int> currentBg = ValueNotifier<int>(0);
-   ValueNotifier<double> soundEffectVolume = ValueNotifier<double>(0.5);
+  ValueNotifier<double> soundEffectVolume = ValueNotifier<double>(0.5);
   ValueNotifier<int> currentSoundEffect = ValueNotifier<int>(0);
-  
+
   @override
   void initState() {
     super.initState();
@@ -372,7 +372,6 @@ class _RecordPodcastState extends State<RecordPodcast> {
                       ),
                     )
                   : const SizedBox(),
-            
               !_isStoped
                   ? SizedBox(
                       height: MediaQuery.of(context).size.height * 0.68,
@@ -399,13 +398,9 @@ class _RecordPodcastState extends State<RecordPodcast> {
                                   ],
                                 ),
                                 Flexible(
-                                  child: TabBarView(
-                                  
-                                    children: [
-                                   
+                                  child: TabBarView(children: [
                                     Stack(
                                       children: [
-                                       
                                         Padding(
                                           padding: const EdgeInsets.symmetric(
                                               horizontal: 4),
@@ -569,9 +564,9 @@ class _RecordPodcastState extends State<RecordPodcast> {
                                             },
                                           ),
                                         ),
-                                         Positioned(
-                                        top: 20,
-                                        left: 20,
+                                        Positioned(
+                                          top: 20,
+                                          left: 20,
                                           child: Row(
                                             mainAxisAlignment:
                                                 MainAxisAlignment.center,
@@ -594,8 +589,10 @@ class _RecordPodcastState extends State<RecordPodcast> {
                                                       activeColor: blueColor,
                                                       value: volume,
                                                       onChanged: (value) {
-                                                        musicVolume.value = value;
-                                                        _player1.setVolume(value);
+                                                        musicVolume.value =
+                                                            value;
+                                                        _player1
+                                                            .setVolume(value);
                                                       },
                                                     );
                                                   },
@@ -618,7 +615,6 @@ class _RecordPodcastState extends State<RecordPodcast> {
                                     ),
                                     Stack(
                                       children: [
-                                       
                                         Padding(
                                           padding: const EdgeInsets.symmetric(
                                               horizontal: 4),
@@ -629,21 +625,29 @@ class _RecordPodcastState extends State<RecordPodcast> {
                                                     childAspectRatio: 0.8,
                                                     mainAxisSpacing: 0.0),
                                             shrinkWrap: true,
-                                            itemCount:
-                                                provider.selectedSoundEffects.length + 1,
+                                            itemCount: provider
+                                                    .selectedSoundEffects
+                                                    .length +
+                                                1,
                                             itemBuilder: (context, index) {
                                               final data = index <
-                                                      provider.selectedSoundEffects.length
-                                                  ? provider.selectedSoundEffects[index]
+                                                      provider
+                                                          .selectedSoundEffects
+                                                          .length
+                                                  ? provider
+                                                          .selectedSoundEffects[
+                                                      index]
                                                   : null;
                                               if (index >=
-                                                  provider.selectedSoundEffects.length) {
+                                                  provider.selectedSoundEffects
+                                                      .length) {
                                                 return Column(
                                                   children: [
                                                     GestureDetector(
                                                       onTap: () {
                                                         _player2.stop();
-                                                        Get.to(const SoundEffectAdd());
+                                                        Get.to(
+                                                            const SoundEffectAdd());
                                                       },
                                                       child: Container(
                                                         width: 55,
@@ -693,7 +697,8 @@ class _RecordPodcastState extends State<RecordPodcast> {
                                                               _player2.stop();
                                                             } else {
                                                               _player2.play();
-                                                              currentSoundEffect.value =
+                                                              currentSoundEffect
+                                                                      .value =
                                                                   index;
                                                             }
                                                           }
@@ -716,18 +721,32 @@ class _RecordPodcastState extends State<RecordPodcast> {
                                                                         .circular(
                                                                             100),
                                                               ),
-                                                              child:
-                                                                   Center(
-                                                                child: Padding(
-                                                                  padding: const EdgeInsets.all(8.0),
-                                                                  child: CachedNetworkImage(
-                                                                  imageUrl:  data!['icon'] ?? '',
-                                                                    color: Colors.white,
-                                                                    errorWidget: (context, url, error) => const Icon(Icons.music_note,
-                                                                    color:Colors.white,  size: 32,),
+                                                              child: Center(
+                                                                  child:
+                                                                      Padding(
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                        .all(
+                                                                        8.0),
+                                                                child:
+                                                                    CachedNetworkImage(
+                                                                  imageUrl:
+                                                                      data!['icon'] ??
+                                                                          '',
+                                                                  color: Colors
+                                                                      .white,
+                                                                  errorWidget: (context,
+                                                                          url,
+                                                                          error) =>
+                                                                      const Icon(
+                                                                    Icons
+                                                                        .music_note,
+                                                                    color: Colors
+                                                                        .white,
+                                                                    size: 32,
                                                                   ),
-                                                                )
-                                                              ),
+                                                                ),
+                                                              )),
                                                             ),
                                                             Positioned.fill(
                                                               child:
@@ -784,9 +803,9 @@ class _RecordPodcastState extends State<RecordPodcast> {
                                             },
                                           ),
                                         ),
-                                         Positioned(
-                                        top: 20,
-                                        left: 20,
+                                        Positioned(
+                                          top: 20,
+                                          left: 20,
                                           child: Row(
                                             mainAxisAlignment:
                                                 MainAxisAlignment.center,
@@ -802,22 +821,26 @@ class _RecordPodcastState extends State<RecordPodcast> {
                                                     0.75,
                                                 child: ValueListenableBuilder<
                                                     double>(
-                                                  valueListenable: soundEffectVolume,
+                                                  valueListenable:
+                                                      soundEffectVolume,
                                                   builder:
                                                       (context, volume, child) {
                                                     return Slider(
                                                       activeColor: blueColor,
                                                       value: volume,
                                                       onChanged: (value) {
-                                                        soundEffectVolume.value = value;
-                                                        _player2.setVolume(value);
+                                                        soundEffectVolume
+                                                            .value = value;
+                                                        _player2
+                                                            .setVolume(value);
                                                       },
                                                     );
                                                   },
                                                 ),
                                               ),
                                               ValueListenableBuilder<double>(
-                                                  valueListenable: soundEffectVolume,
+                                                  valueListenable:
+                                                      soundEffectVolume,
                                                   builder:
                                                       (context, volume, child) {
                                                     return Text(
@@ -831,8 +854,6 @@ class _RecordPodcastState extends State<RecordPodcast> {
                                         ),
                                       ],
                                     )
-                                 
-                                  
                                   ]),
                                 )
                               ])),
@@ -913,7 +934,45 @@ class _RecordPodcastState extends State<RecordPodcast> {
                     ),
                   )
                 : const SizedBox(),
-                  Align(
+            !_isStoped
+                ? Align(
+                    alignment: Alignment.bottomRight,
+                    child: Padding(
+                      padding: const EdgeInsets.only(bottom: 20, right: 10),
+                      child: IconButton(
+                        onPressed: () async {
+                          final FilePickerResult? result = await FilePicker
+                              .platform
+                              .pickFiles(type: FileType.audio);
+
+                          if (result != null) {
+                            PlatformFile file = result.files.first;
+
+                            // Access file properties
+                            print('File Name: ${file.name}');
+                            print('File Bytes: ${file.bytes}');
+                            print('File Type: ${file.extension}');
+                            print('File Path: ${file.path}');
+                            setState(() {
+                              _audioFilePath = file.path!;
+                              _isStoped = true;
+                            });
+                          }
+                        },
+                        icon: const CircleAvatar(
+                          backgroundColor: Colors.grey,
+                          radius: 28,
+                          child: Icon(
+                            Icons.drive_folder_upload_rounded,
+                            color: Colors.white,
+                            size: 38,
+                          ),
+                        ),
+                      ),
+                    ),
+                  )
+                : const SizedBox(),
+            Align(
               alignment: Alignment.bottomCenter,
               child: Padding(
                 padding: const EdgeInsets.only(bottom: 20, right: 20),

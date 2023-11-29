@@ -28,8 +28,9 @@ class MyApp extends StatelessWidget {
           providers: [
             ChangeNotifierProvider(create: (_) => AuthProvider()),
             ChangeNotifierProvider(create: (_) => BackGroundProvider()),
-            ChangeNotifierProvider(create: (_) => DummyProvider()),
+            ChangeNotifierProvider(create: (_) => PodcastProvider()),
             ChangeNotifierProvider(create: (_) => QuoteProvider()),
+            ChangeNotifierProvider(create: (_) => RecordingDurationProvider()),
             ChangeNotifierProvider(create: (_) => BgAudioProvider()),
             ChangeNotifierProvider(create: (_) => FileDownloaderProvider(),),
             ChangeNotifierProvider(create: (_) => WishlistProvider(),),

@@ -239,10 +239,55 @@ Widget buildShimmerContainer({
 Widget buildShimmerContainerList(int itemCount) {
   return ListView.builder(
     itemCount: itemCount,
+    shrinkWrap: true,
     itemBuilder: (context, index) {
-      return buildShimmerContainer(
-        width: 150,
-        height: 180,
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10,horizontal: 20),
+            child: buildShimmerContainer(
+              width: 150,
+              height: 180,
+            ),
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(top: 15),
+                child: buildShimmerContainer(
+                  width: MediaQuery.of(context).size.width* 0.4,
+                  height: 15,
+                ),
+              ),
+               Padding(
+                 padding: const EdgeInsets.only(top: 20),
+                 child: buildShimmerContainer(
+                  width: MediaQuery.of(context).size.width* 0.4,
+                  height: 10,
+                             ),
+               ),
+               Padding(
+               padding: const EdgeInsets.only(top: 10),
+                 child: buildShimmerContainer(
+                  width: MediaQuery.of(context).size.width* 0.3,
+                  height: 10,
+                             ),
+               ),
+              
+               Padding(
+               padding: const EdgeInsets.only(top: 10),
+                 child: buildShimmerContainer(
+                  width: MediaQuery.of(context).size.width* 0.2,
+                  height: 10,
+                             ),
+               ),
+            ],
+          ),
+        ],
       );
     },
   );

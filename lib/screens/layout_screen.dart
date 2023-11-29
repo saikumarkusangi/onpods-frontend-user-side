@@ -63,11 +63,11 @@ class _LayoutState extends State<Layout> {
               ],
             ),
           ),
-          _buildListTile(podcastIcon, 'Upload Podcast', const RecordPodcastBoarding()),
+          _buildListTile(podcastIcon, 'Upload Podcast', const RecordPodcast()),
           const SizedBox(height: 10),
           _buildListTile(quoteIcon, 'Upload Quote', const CreateQuote()),
           const SizedBox(height: 10),
-          _buildListTile(chatRoomIcon, 'Create Chat Room', const RecordPodcastBoarding()),
+          _buildListTile(chatRoomIcon, 'Create Chat Room', const ChatRoomList()),
         ],
       );
     },

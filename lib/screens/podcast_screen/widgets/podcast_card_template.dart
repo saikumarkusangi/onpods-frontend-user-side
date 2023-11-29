@@ -4,7 +4,6 @@ import 'package:get/get.dart';
 import 'package:onpods/screens/podcast_screen/detailed_podcast.dart';
 import 'package:onpods/screens/podcast_screen/widgets/view_all_screen.dart';
 import 'package:onpods/utils/colors.dart';
-import '../../../constants/constants.dart';
 
 class PodcastCardTemplate extends StatelessWidget {
   final String categoryTitle;

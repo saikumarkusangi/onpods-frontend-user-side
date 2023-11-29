@@ -175,12 +175,12 @@ class _BannerCarsouelState extends State<BannerCarsouel> {
             child: const Column(
               children: [
                 Icon(
-                  Icons.add,
+                  Icons.thumb_up_alt_outlined,
                   color: Colors.white,
                   size: 30,
                 ),
                 Text(
-                  'WishList',
+                  'Liked',
                   style: TextStyle(color: Colors.white),
                 )
               ],

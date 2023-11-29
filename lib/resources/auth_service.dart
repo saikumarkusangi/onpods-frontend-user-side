@@ -1,13 +1,9 @@
-
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:onpods/utils/exports.dart';
 
-
-
 class AuthService {
   final AuthProvider authProvider;
-
   AuthService(this.authProvider);
 
   // --------------------------------- Login--------------------------------------------------
@@ -23,9 +19,7 @@ class AuthService {
       ).timeout(const Duration(seconds: 30));
       if (response.statusCode == 200) {
         final Map<String, dynamic> userData = json.decode(response.body);
-        authProvider.storeUserData(userData);
-        showSnackbar('Successful', 'You are logged in!');
-        Get.offAll(const Layout(), transition: Transition.leftToRight);
+
         return userData;
       } else {
         final Map<String, dynamic> error = json.decode(response.body);
@@ -64,7 +58,7 @@ class AuthService {
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> userData = json.decode(response.body);
-        authProvider.storeUserData(userData);
+       
         showSnackbar('Successful', 'Account Created Successfully!');
         Get.offAll(const ChooseYourInterestScreen(),
             transition: Transition.leftToRight);
@@ -88,9 +82,6 @@ class AuthService {
       throw Exception('Error: $e');
     }
   }
-
-
-
 
   // --------------------------------- Forgot Password --------------------------------------------------
 
@@ -151,8 +142,6 @@ class AuthService {
       ).timeout(const Duration(seconds: 30));
       if (response.statusCode == 200) {
         final Map<String, dynamic> userData = json.decode(response.body);
-        authProvider.storeUserData(userData);
-        showSnackbar('Successful', 'You are logged in!');
         Get.offAll(const Layout(), transition: Transition.leftToRight);
         return userData;
       } else {

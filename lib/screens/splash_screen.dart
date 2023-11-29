@@ -1,5 +1,3 @@
-
-
 import 'package:onpods/utils/exports.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -13,12 +11,14 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
     Future.delayed(const Duration(seconds: 1), () async {
-      final prefs = await SharedPreferences.getInstance();
-      final isUserLoggedIn = prefs.getBool('isUserLoggedIn') ?? false;
-      if (isUserLoggedIn) {
-        Get.off(()=>const Layout(), transition: Transition.circularReveal);
+      final userId = await UserSession.getUserId();
+      print('splash screening checking user' + userId.toString());
+      
+      if (userId != null) {
+        Get.off(() => const Layout(), transition: Transition.circularReveal);
       } else {
-        Get.off(()=>const LoginScreen(), transition: Transition.circularReveal);
+        Get.off(() => const LoginScreen(),
+            transition: Transition.circularReveal);
       }
     });
   }

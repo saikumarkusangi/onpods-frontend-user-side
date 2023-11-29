@@ -1,12 +1,10 @@
-
-
 import 'package:onpods/utils/exports.dart';
 
 class SinglePodcastCategory extends StatefulWidget {
   final String title;
-  final String image;
+  final String categoryId;
   const SinglePodcastCategory(
-      {super.key, required this.title, required this.image});
+      {super.key, required this.title, required this.categoryId});
 
   @override
   State<SinglePodcastCategory> createState() => _SinglePodcastCategoryState();
@@ -16,13 +14,14 @@ class _SinglePodcastCategoryState extends State<SinglePodcastCategory> {
   @override
   void initState() {
     super.initState();
-    final dummyProvider = Provider.of<DummyProvider>(context, listen: false);
-    dummyProvider.fetchData();
+    final podcastProvider =
+        Provider.of<PodcastProvider>(context, listen: false);
+    podcastProvider.fetchPodcastsByCategory(widget.categoryId, 1);
   }
 
   @override
   Widget build(BuildContext context) {
-    final dummyProvider = Provider.of<DummyProvider>(context);
+    final podcastProvider = Provider.of<PodcastProvider>(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -35,28 +34,35 @@ class _SinglePodcastCategoryState extends State<SinglePodcastCategory> {
       ),
       body: RefreshIndicator(
         onRefresh: () async {
-          dummyProvider.fetchData();
+          podcastProvider.fetchPodcastsByCategory(
+             widget.categoryId, 1);
         },
         child: SingleChildScrollView(
           child: Column(children: [
-            if (dummyProvider.isLoading)
+            if (podcastProvider.isLoading)
               const ListSkeleton()
-            else if (dummyProvider.data.isEmpty)
-            const EmptyPlaceHiolder(message: 'Podcasts',)
+            else if (podcastProvider.podcasts[0].count == 0)
+              const Center(
+                child: EmptyPlaceHiolder(
+                  message: 'Podcasts',
+                ),
+              )
             else
               ListView.builder(
                   shrinkWrap: true,
-                  itemCount: dummyProvider.data.length,
+                  itemCount: podcastProvider.podcasts[0].count,
                   itemBuilder: (context, index) {
-                    final dummy = dummyProvider.data[index];
+               
+                    final podcast = podcastProvider.podcasts[0].data![index];
                     return GestureDetector(
                       onTap: () => Get.to(
-                          DetailedPodcast(
-                              description: dummy.description,
-                              image: dummy.posterUrl,
-                              episodes: dummy.episodes,
-                              rating: double.parse(dummy.rating),
-                              title: dummy.title),
+                           DetailedPodcast(
+                              description: podcast.description ?? '',
+                              image: podcast.posterUrl ?? '',
+                              episodes: [],
+                              // rating: double.parse(podcast.rating),
+                              rating: 2,
+                              title: podcast.title ?? ''),
                           transition: Transition.downToUp),
                       child: Container(
                         padding: const EdgeInsets.all(16),
@@ -71,7 +77,7 @@ class _SinglePodcastCategoryState extends State<SinglePodcastCategory> {
                                 child: CachedNetworkImage(
                                     width:
                                         MediaQuery.of(context).size.width * 0.4,
-                                    imageUrl: dummy.posterUrl),
+                                    imageUrl: podcast.posterUrl ?? 'https://media.istockphoto.com/id/1283532997/vector/podcast-concept-thin-line-icon-abstract-icon-abstract-gradient-background-modern-sound-wave.jpg?s=612x612&w=0&k=20&c=YLg7rHeSuYqeIuGRAcvf2a7J8X8Sx-IkmqYHXIJGPYQ='),
                               ),
                             ),
                             SizedBox(
@@ -80,8 +86,8 @@ class _SinglePodcastCategoryState extends State<SinglePodcastCategory> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
-                                    dummy.title,
+                                   Text(
+                                    podcast.title ?? '',
                                     maxLines: 4,
                                     style: const TextStyle(
                                         color: Colors.white,
@@ -93,7 +99,7 @@ class _SinglePodcastCategoryState extends State<SinglePodcastCategory> {
                                     height: 10,
                                   ),
                                   Text(
-                                    dummy.description,
+                                   podcast.description ?? '',
                                     maxLines: 3,
                                     style: TextStyle(
                                         color: Colors.grey.shade400,

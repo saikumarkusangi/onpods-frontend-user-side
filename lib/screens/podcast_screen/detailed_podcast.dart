@@ -1,22 +1,20 @@
-
 import 'package:flutter/gestures.dart';
 import 'package:onpods/utils/exports.dart';
-
 
 class DetailedPodcast extends StatefulWidget {
   final String image;
   final String title;
   final String description;
-  final List episodes;
   final double rating;
+  final episodes = [];
 
-  const DetailedPodcast({
+   DetailedPodcast({
     Key? key,
-    required this.image,
-    required this.title,
-    required this.description,
-    required this.episodes,
-    required this.rating,
+    this.image =
+        'https://media.istockphoto.com/id/1283532997/vector/podcast-concept-thin-line-icon-abstract-icon-abstract-gradient-background-modern-sound-wave.jpg?s=612x612&w=0&k=20&c=YLg7rHeSuYqeIuGRAcvf2a7J8X8Sx-IkmqYHXIJGPYQ=',
+    this.title = '',
+    this.description = '',
+    this.rating = 2, required List episodes,
   }) : super(key: key);
 
   @override
@@ -30,6 +28,7 @@ class _DetailedPodcastState extends State<DetailedPodcast> {
       PaletteGenerator.fromColors([PaletteColor(Colors.black, 2)]);
 
   bool flag = true;
+
   @override
   void initState() {
     generatePalette();
@@ -223,8 +222,9 @@ class _DetailedPodcastState extends State<DetailedPodcast> {
           ),
           if (widget.episodes.isEmpty)
             const SliverToBoxAdapter(
-              child:EmptyPlaceHiolder(message: 'Episode',)
-            )
+                child: EmptyPlaceHiolder(
+              message: 'Episode',
+            ))
           else
             SliverList.builder(
                 itemCount: widget.episodes.length,

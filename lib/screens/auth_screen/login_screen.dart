@@ -66,8 +66,7 @@ class _LoginScreenState extends State<LoginScreen> {
       children: [
         SizedBox(
           height: 0.5.sh,
-          child: Image.network(
-            'https://podbiblemag.com/wp-content/uploads/2023/07/the-best-new-podcasts-of-2023-summer-this-month.png',
+          child: Image.asset(loginImage,
             fit: BoxFit.cover,
           ),
         ),
@@ -150,7 +149,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   const SizedBox(
                     height: 10,
                   ),
-                  customGoogleButton('Login With Google', () async {
+                  customGoogleButton('Login with Google', () async {
                     final response = await _googleOauth.signIn();
                     authProvider.login(response!.email, response.id);
                   }),

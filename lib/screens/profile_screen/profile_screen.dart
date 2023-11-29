@@ -11,7 +11,6 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen>
     with SingleTickerProviderStateMixin {
-  final userId = UserSession.getUserId();
   Map<dynamic, dynamic> quotes = {};
   bool loading = false;
   bool _isLoadingMore = false;
@@ -27,7 +26,8 @@ class _ProfileScreenState extends State<ProfileScreen>
     setState(() {
       loading = true;
     });
-
+    final userId = await UserSession.getUserId();
+  
     final data = await UserServices().userById(userId);
     final userQuotes = await UserServices().userQuotes(userId, 1);
 

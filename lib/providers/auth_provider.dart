@@ -1,8 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:onpods/models/user.dart';
-import 'package:onpods/resources/auth_service.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:onpods/utils/exports.dart';
 
 class AuthProvider with ChangeNotifier {
   final _googleOauth = GoogleSignIn();
@@ -22,7 +19,12 @@ class AuthProvider with ChangeNotifier {
     notifyListeners();
     try {
       final userData = await _authService!.login(email, password);
-      storeUserData(userData);
+      
+      userId = userData['data']['id'];
+      notifyListeners();
+      UserSession.setUserId(userId);
+      showSnackbar('Successful', 'You are logged in!');
+      Get.offAll(const Layout(), transition: Transition.leftToRight);
     } catch (error) {
       await _googleOauth.signOut();
       throw Exception(error);
@@ -32,17 +34,6 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
-// ---------------------------- Store Data ------------------------------------------
-
-  void storeUserData(Map<String, dynamic> userData) async {
-    final user = UserModel.fromJson(userData);
-    final prefs = await SharedPreferences.getInstance();
-    prefs.setBool('isUserLoggedIn', true);
-    prefs.setString('user_id', user.data.id);
-
-    notifyListeners();
-  }
-
   // ---------------------------- Sign UP -----------------------------------------
 
   Future<void> signUp(String name, String email, String password) async {
@@ -50,8 +41,8 @@ class AuthProvider with ChangeNotifier {
     notifyListeners();
     try {
       final userData = await _authService!.signup(name, email, password);
-
-      storeUserData(userData);
+      userId = userData['id'];
+      notifyListeners();
     } catch (error) {
       await _googleOauth.signOut();
       throw Exception(error);

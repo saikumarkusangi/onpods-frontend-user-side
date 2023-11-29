@@ -68,7 +68,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   }
 
   List selectedChipIndex = [];
-  
+
   ValueNotifier<bool> loading = ValueNotifier<bool>(false);
   init() async {
     final provider = Provider.of<QuoteProvider>(context, listen: false);
@@ -115,11 +115,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         },
       );
     }).toList();
-
+    print(widget.profilePic);
     return ValueListenableBuilder(
       valueListenable: loading,
-      builder: (BuildContext context, value, Widget? child) =>
-       WidgetHUD(
+      builder: (BuildContext context, value, Widget? child) => WidgetHUD(
         showHUD: value,
         hud: HUD(
             progressIndicator: const CircularProgressIndicator(
@@ -137,9 +136,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               TextButton(
                   onPressed: () async {
                     loading.value = true;
-                  await UserServices().updateUser(selectedPic!,_userNameController.text);
-                   loading.value = false;
-                   Get.back();
+                    await UserServices()
+                        .updateUser(selectedPic!, _userNameController.text);
+                    loading.value = false;
+                    Get.back();
                   },
                   child: const Text(
                     'SAVE',
@@ -169,8 +169,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                               fit: BoxFit.cover,
                             ))
                         : ClipRRect(
-                          borderRadius: BorderRadius.circular(60),
-                          child: CachedNetworkImage(
+                            borderRadius: BorderRadius.circular(60),
+                            child: CachedNetworkImage(
                               imageUrl: widget.profilePic,
                               placeholder: (context, url) => Center(
                                 child: Text(
@@ -185,7 +185,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                 ),
                               ),
                             ),
-                        ),
+                          ),
                   ),
                 ),
                 const SizedBox(
@@ -194,7 +194,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 Center(
                   child: ElevatedButton(
                       onPressed: () => _showBottomSheet(context),
-                      style: ElevatedButton.styleFrom(backgroundColor: blueColor),
+                      style:
+                          ElevatedButton.styleFrom(backgroundColor: blueColor),
                       child: const Text(
                         'Edit',
                         style: TextStyle(color: Colors.white, fontSize: 18),
@@ -266,7 +267,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 });
               }, Colors.blueAccent),
               buildActionItem(Icons.camera_alt, 'From Camera', () async {
-               Navigator.pop(context);
+                Navigator.pop(context);
                 final XFile? image =
                     await ImagePicker().pickImage(source: ImageSource.camera);
                 CroppedFile? croppedFile = await ImageCropper().cropImage(
