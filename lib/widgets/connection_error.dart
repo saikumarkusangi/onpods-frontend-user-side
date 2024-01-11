@@ -7,6 +7,7 @@ class NoConnection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      
       body: Padding(
         padding: const EdgeInsets.all(8),
         child: SizedBox(
@@ -50,7 +51,7 @@ class NoConnection extends StatelessWidget {
                 height: 40,
               ),
               GestureDetector(
-                onTap: () =>Get.to(const DownloadsPage(),transition: Transition.cupertino),
+                onTap: () =>Get.to( DownloadsPage(),transition: Transition.cupertino),
                 child: Container(
                   height: 50,
                   width: MediaQuery.of(context).size.width / 2,

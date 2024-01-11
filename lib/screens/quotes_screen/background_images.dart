@@ -16,6 +16,7 @@ class _BackGroundImagesState extends State<BackGroundImages> {
 
     return SafeArea(
       child: Scaffold(
+         bottomNavigationBar: const MiniPlayer(),
         backgroundColor: Colors.black,
         appBar: AppBar(
           toolbarHeight: 80,

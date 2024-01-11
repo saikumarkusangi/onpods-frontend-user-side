@@ -30,6 +30,7 @@ class _QuotesScreenState extends State<QuotesScreen>
     final quoteCategoryProvider = Provider.of<QuoteProvider>(context);
 
     return Scaffold(
+       bottomNavigationBar: const MiniPlayer(),
       appBar: AppBar(
         backgroundColor: Colors.black,
         bottom:

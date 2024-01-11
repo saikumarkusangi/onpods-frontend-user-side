@@ -25,9 +25,10 @@ class _RecordPodcastState extends State<RecordPodcast> {
   final AudioPlayer _player2 = AudioPlayer();
   late String _audioFilePath;
   ValueNotifier<double> musicVolume = ValueNotifier<double>(0.5);
-  ValueNotifier<int> currentBg = ValueNotifier<int>(0);
+  ValueNotifier<int> currentBg = ValueNotifier<int>(100);
+  ValueNotifier<bool> currentBgPlaying = ValueNotifier<bool>(false);
   ValueNotifier<double> soundEffectVolume = ValueNotifier<double>(0.5);
-  ValueNotifier<int> currentSoundEffect = ValueNotifier<int>(0);
+  ValueNotifier<int> currentSoundEffect = ValueNotifier<int>(100);
 
   @override
   void initState() {
@@ -43,8 +44,9 @@ class _RecordPodcastState extends State<RecordPodcast> {
       if (status != PermissionStatus.granted) {
         throw 'Microphone permission not granted';
       }
+      final appDocDir = await getApplicationDocumentsDirectory();
+      _audioFilePath = '${appDocDir.path}/recording.aac';
       await _audioRecorder.openAudioSession();
-      _audioFilePath = 'recording.aac'; // Set the file path
       await _audioRecorder.startRecorder(
         toFile: _audioFilePath,
         codec: Codec.aacADTS,
@@ -239,15 +241,19 @@ class _RecordPodcastState extends State<RecordPodcast> {
           backgroundColor: Colors.white,
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-          title: const Text('Stop Recording?'),
-          content: const Text(
-            'Are you sure you want to stop your recording?',
-            style: TextStyle(fontSize: 16),
+          title: Text(_isRecording || _isPaused
+              ? 'Stop Recording?'
+              : 'Cancel Uploading'),
+          content: Text(
+            _isRecording || _isPaused
+                ? "Are you sure you want to stop your recording?"
+                : "Are you sure you want to cancel uploading?",
+            style: const TextStyle(fontSize: 16),
           ),
           actions: <Widget>[
             TextButton(
                 onPressed: () {
-                  Navigator.of(context).pop(false);
+                  Navigator.pop(context);
                 },
                 child: const Text(
                   'No',
@@ -271,8 +277,10 @@ class _RecordPodcastState extends State<RecordPodcast> {
   Widget build(BuildContext context) {
     final provider = Provider.of<BgAudioProvider>(context);
     return Scaffold(
+       bottomNavigationBar: const MiniPlayer(),
       extendBodyBehindAppBar: true,
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         backgroundColor: Colors.transparent,
         iconTheme: const IconThemeData(color: Colors.white),
       ),
@@ -293,6 +301,29 @@ class _RecordPodcastState extends State<RecordPodcast> {
         },
         child: Stack(
           children: [
+            _audioRecorder.isRecording
+                ? const Positioned(
+                    right: 20,
+                    top: 30,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Icon(
+                          Icons.circle,
+                          color: Colors.red,
+                          size: 18,
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(left: 5),
+                          child: Text(
+                            'Rec',
+                            style: TextStyle(color: Colors.red, fontSize: 20),
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                : const SizedBox(),
             Padding(
               padding: const EdgeInsets.only(top: 80),
               child: Align(
@@ -454,6 +485,9 @@ class _RecordPodcastState extends State<RecordPodcast> {
                                                       MainAxisAlignment.start,
                                                   children: [
                                                     GestureDetector(
+                                                        onLongPress: () =>
+                                                            _showBottomSheet(
+                                                                index),
                                                         onTap: () async {
                                                           final audioUrl =
                                                               data!['audiourl'];
@@ -473,10 +507,15 @@ class _RecordPodcastState extends State<RecordPodcast> {
                                                                         .value ==
                                                                     index) {
                                                               _player1.stop();
+                                                              currentBgPlaying
+                                                                      .value =
+                                                                  false;
                                                             } else {
                                                               _player1.play();
                                                               currentBg.value =
                                                                   index;
+                                                              currentBgPlaying
+                                                                  .value = true;
                                                             }
                                                           }
                                                         },
@@ -499,14 +538,40 @@ class _RecordPodcastState extends State<RecordPodcast> {
                                                                             100),
                                                               ),
                                                               child:
-                                                                  const Center(
-                                                                child: Icon(
-                                                                  Icons
-                                                                      .music_note,
-                                                                  color: Colors
-                                                                      .white,
-                                                                  size: 32,
-                                                                ),
+                                                                  ValueListenableBuilder(
+                                                                valueListenable:
+                                                                    currentBg,
+                                                                builder: (context,
+                                                                        value,
+                                                                        child) =>
+                                                                    Center(
+                                                                        child: value !=
+                                                                                index
+                                                                            ? const Icon(
+                                                                                Icons.music_note,
+                                                                                color: Colors.white,
+                                                                                size: 32,
+                                                                              )
+                                                                            : ValueListenableBuilder(
+                                                                                valueListenable: currentBgPlaying,
+                                                                                builder: (context, value, child) => value && _player1.loopMode == LoopMode.off
+                                                                                    ? const Icon(
+                                                                                        Icons.pause,
+                                                                                        size: 32,
+                                                                                        color: Colors.white,
+                                                                                      )
+                                                                                    : value && _player1.loopMode != LoopMode.off
+                                                                                        ? const Icon(
+                                                                                            Icons.loop,
+                                                                                            size: 32,
+                                                                                            color: Colors.white,
+                                                                                          )
+                                                                                        : const Icon(
+                                                                                            Icons.play_arrow,
+                                                                                            size: 32,
+                                                                                            color: Colors.white,
+                                                                                          ),
+                                                                              )),
                                                               ),
                                                             ),
                                                             Positioned.fill(
@@ -523,7 +588,9 @@ class _RecordPodcastState extends State<RecordPodcast> {
                                                                           .zero; // Current playback position
                                                                   return CircularProgressIndicator(
                                                                     value: currentBg.value ==
-                                                                            index
+                                                                                index &&
+                                                                            _player1
+                                                                                .playerState.playing
                                                                         ? position.inMilliseconds /
                                                                             (_player1.duration?.inMilliseconds ??
                                                                                 1)
@@ -571,9 +638,33 @@ class _RecordPodcastState extends State<RecordPodcast> {
                                             mainAxisAlignment:
                                                 MainAxisAlignment.center,
                                             children: [
-                                              const Icon(
-                                                Icons.volume_up_rounded,
-                                                color: Colors.white,
+                                              ValueListenableBuilder(
+                                                valueListenable: musicVolume,
+                                                builder:
+                                                    (context, value, child) =>
+                                                        IconButton(
+                                                  icon: _player1.volume != 0.0
+                                                      ? const Icon(
+                                                          Icons
+                                                              .volume_up_rounded,
+                                                        )
+                                                      : const Icon(
+                                                          Icons.volume_off),
+                                                  color: Colors.white,
+                                                  onPressed: () {
+
+                                                    if (_player1.volume !=
+                                                        0.0) {
+                                                      _player1.setVolume(0.0);
+                                                    } else {
+                                                      musicVolume.value = value;
+                                                      _player1.setVolume(value);
+                                                    }
+                                                    setState(() {
+
+                                                    });
+                                                  },
+                                                ),
                                               ),
                                               SizedBox(
                                                 width: MediaQuery.of(context)
@@ -1004,7 +1095,10 @@ class _RecordPodcastState extends State<RecordPodcast> {
                     ? IconButton(
                         onPressed: () {
                           _stopPlayback();
-                          Get.to(() => const PodcastUploadPage(),
+                          Get.to(
+                              () => PodcastUploadPage(
+                                    audio: _audioFilePath,
+                                  ),
                               transition: Transition.cupertino);
                         },
                         icon: const CircleAvatar(
@@ -1019,6 +1113,86 @@ class _RecordPodcastState extends State<RecordPodcast> {
                       )
                     : const SizedBox(),
               ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showBottomSheet(index) {
+    final provider = Provider.of<BgAudioProvider>(context, listen: false);
+    showModalBottomSheet(
+      showDragHandle: true,
+      barrierColor: const Color.fromARGB(170, 0, 0, 0),
+      constraints: const BoxConstraints(maxHeight: 300),
+      backgroundColor: const Color.fromARGB(255, 34, 33, 33),
+      context: context,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      builder: (context) => Padding(
+        padding: const EdgeInsets.symmetric(vertical: 10),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            ListTile(
+              leading: const Icon(
+                Icons.loop,
+                size: 32,
+                color: Color.fromARGB(255, 158, 156, 156),
+              ),
+              title: Text(
+                _player1.loopMode == LoopMode.off ? 'Loop on' : 'Loop off',
+                style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w600),
+              ),
+              onTap: () {
+                if (_player1.loopMode != LoopMode.one) {
+                  _player1.setLoopMode(LoopMode.one);
+                } else {
+                  _player1.setLoopMode(LoopMode.off);
+                }
+                setState(() {});
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              leading: const Icon(
+                Icons.favorite,
+                size: 32,
+                color: Color.fromARGB(255, 158, 156, 156),
+              ),
+              title: const Text(
+                'Favourite',
+                style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w600),
+              ),
+              onTap: () {},
+            ),
+            ListTile(
+              leading: const Icon(
+                Icons.delete,
+                size: 32,
+                color: Color.fromARGB(255, 158, 156, 156),
+              ),
+              title: const Text(
+                'Delete',
+                style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w600),
+              ),
+              onTap: () async {
+                _player1.stop();
+
+                provider.selectedBg.removeAt(index);
+                currentBg.value = 100;
+                Navigator.pop(context);
+                setState(() {});
+              },
             ),
           ],
         ),

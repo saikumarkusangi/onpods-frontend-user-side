@@ -8,12 +8,14 @@ class EditProfileScreen extends StatefulWidget {
   String profilePic;
   final String userName;
   final String userId;
+  final List intrests;
 
   EditProfileScreen(
       {super.key,
       required this.profilePic,
       required this.userName,
-      required this.userId});
+      required this.userId,
+      required this.intrests});
 
   @override
   State<EditProfileScreen> createState() => _EditProfileScreenState();
@@ -67,21 +69,27 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     );
   }
 
-  List selectedChipIndex = [];
 
-  ValueNotifier<bool> loading = ValueNotifier<bool>(false);
+  bool loading = false;
   init() async {
-    final provider = Provider.of<QuoteProvider>(context, listen: false);
-    if (provider.quotesCategories.isEmpty) {
-      await provider.fetchCategories();
+    final provider = Provider.of<PodcastProvider>(context, listen: false);
+    if (provider.podcastCategories.isEmpty) {
+      setState(() {
+        loading = true;
+      });
+      await provider.fetchCategories().whenComplete(() {
+        setState(() {
+          loading = false;
+        });
+      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final provider = Provider.of<QuoteProvider>(context, listen: false);
+    final provider = Provider.of<PodcastProvider>(context, listen: false);
     List<Widget> chipWidgets =
-        provider.quotesCategories.asMap().entries.map((entry) {
+        provider.podcastCategories.asMap().entries.map((entry) {
       final index = entry.value.id;
       final category = entry.value;
 
@@ -96,139 +104,145 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         checkmarkColor: Colors.white,
         selectedColor: blueColor,
         labelStyle: TextStyle(
-            color: selectedChipIndex.contains(index)
+            color: widget.intrests.contains(index)
                 ? Colors.white
                 : Colors.black),
-        selected: selectedChipIndex.contains(index),
+        selected: widget.intrests.contains(index),
         onSelected: (bool selected) {
           setState(() {
             if (selected) {
-              if (selectedChipIndex.length < 3) {
-                selectedChipIndex.add(index);
+              if (widget.intrests.length < 3) {
+                widget.intrests.add(index);
               } else {
                 Fluttertoast.showToast(msg: 'Max 3 categories are allowed');
               }
             } else {
-              selectedChipIndex.remove(index);
+              widget.intrests.remove(index);
             }
           });
         },
       );
     }).toList();
     print(widget.profilePic);
-    return ValueListenableBuilder(
-      valueListenable: loading,
-      builder: (BuildContext context, value, Widget? child) => WidgetHUD(
-        showHUD: value,
-        hud: HUD(
-            progressIndicator: const CircularProgressIndicator(
-          color: blueColor,
-        )),
-        builder: (context, child) => Scaffold(
-          appBar: AppBar(
-            iconTheme: const IconThemeData(color: Colors.white),
-            backgroundColor: Colors.black,
-            title: const Text(
-              'Edit Profile',
-              style: TextStyle(color: Colors.white),
-            ),
-            actions: [
-              TextButton(
-                  onPressed: () async {
-                    loading.value = true;
-                    await UserServices()
-                        .updateUser(selectedPic!, _userNameController.text);
-                    loading.value = false;
-                    Get.back();
-                  },
-                  child: const Text(
-                    'SAVE',
-                    style: TextStyle(color: blueColor, fontSize: 18),
-                  ))
-            ],
+    return WidgetHUD(
+      showHUD: loading,
+      hud: HUD(
+          progressIndicator: Image.asset(
+        liveGif,
+        color: blueColor,
+        scale: 3,
+      )),
+      builder: (context, child) => Scaffold(
+        bottomNavigationBar: const MiniPlayer(),
+        appBar: AppBar(
+          iconTheme: const IconThemeData(color: Colors.white),
+          backgroundColor: Colors.black,
+          title: const Text(
+            'Edit Profile',
+            style: TextStyle(color: Colors.white),
           ),
-          body: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(
-                  height: 40,
-                ),
-                Center(
-                  child: Container(
-                    width: 120,
-                    height: 120,
-                    decoration: BoxDecoration(
-                        color: const Color.fromARGB(255, 236, 184, 202),
-                        borderRadius: BorderRadius.circular(100)),
-                    child: selectedPic != null
-                        ? ClipRRect(
-                            borderRadius: BorderRadius.circular(100),
-                            child: Image.file(
-                              selectedPic!,
-                              fit: BoxFit.cover,
-                            ))
-                        : ClipRRect(
-                            borderRadius: BorderRadius.circular(60),
-                            child: CachedNetworkImage(
-                              imageUrl: widget.profilePic,
-                              placeholder: (context, url) => Center(
-                                child: Text(
-                                  widget.userName.substring(0, 1).toUpperCase(),
-                                  style: const TextStyle(fontSize: 32),
-                                ),
+          actions: [
+            TextButton(
+                onPressed: () async {
+                  setState(() {
+                    loading = true;
+                  });
+                  await UserServices()
+                      .updateUser(selectedPic == null ? '' : selectedPic!.path,
+                          _userNameController.text, widget.intrests)
+                      .whenComplete(() {
+                    setState(() {
+                      loading = false;
+                    });
+                    Get.back();
+                  });
+                },
+                child: const Text(
+                  'SAVE',
+                  style: TextStyle(color: blueColor, fontSize: 18),
+                ))
+          ],
+        ),
+        body: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(
+                height: 40,
+              ),
+              Center(
+                child: Container(
+                  width: 120,
+                  height: 120,
+                  decoration: BoxDecoration(
+                      color: const Color.fromARGB(255, 236, 184, 202),
+                      borderRadius: BorderRadius.circular(100)),
+                  child: selectedPic != null
+                      ? ClipRRect(
+                          borderRadius: BorderRadius.circular(100),
+                          child: Image.file(
+                            selectedPic!,
+                            fit: BoxFit.cover,
+                          ))
+                      : ClipRRect(
+                          borderRadius: BorderRadius.circular(60),
+                          child: CachedNetworkImage(
+                            imageUrl: widget.profilePic,
+                            placeholder: (context, url) => Center(
+                              child: Text(
+                                widget.userName.substring(0, 1).toUpperCase(),
+                                style: const TextStyle(fontSize: 32),
                               ),
-                              errorWidget: (context, url, error) => Center(
-                                child: Text(
-                                  widget.userName.substring(0, 1).toUpperCase(),
-                                  style: const TextStyle(fontSize: 32),
-                                ),
+                            ),
+                            errorWidget: (context, url, error) => Center(
+                              child: Text(
+                                widget.userName.substring(0, 1).toUpperCase(),
+                                style: const TextStyle(fontSize: 32),
                               ),
                             ),
                           ),
-                  ),
+                        ),
                 ),
-                const SizedBox(
-                  height: 10,
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              Center(
+                child: ElevatedButton(
+                    onPressed: () => _showBottomSheet(context),
+                    style: ElevatedButton.styleFrom(backgroundColor: blueColor),
+                    child: const Text(
+                      'Edit',
+                      style: TextStyle(color: Colors.white, fontSize: 18),
+                    )),
+              ),
+              const SizedBox(
+                height: 40,
+              ),
+              _buildField(_userNameController, 'User Name'),
+              const SizedBox(
+                height: 10,
+              ),
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20),
+                child: Text(
+                  'Your Interests',
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20),
                 ),
-                Center(
-                  child: ElevatedButton(
-                      onPressed: () => _showBottomSheet(context),
-                      style:
-                          ElevatedButton.styleFrom(backgroundColor: blueColor),
-                      child: const Text(
-                        'Edit',
-                        style: TextStyle(color: Colors.white, fontSize: 18),
-                      )),
+              ),
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                child: Wrap(
+                  spacing: 10,
+                  runSpacing: 10,
+                  children: chipWidgets,
                 ),
-                const SizedBox(
-                  height: 40,
-                ),
-                _buildField(_userNameController, 'User Name'),
-                const SizedBox(
-                  height: 10,
-                ),
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20),
-                  child: Text(
-                    'Your Interests',
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 20),
-                  ),
-                ),
-                Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                  child: Wrap(
-                    spacing: 10,
-                    runSpacing: 10,
-                    children: chipWidgets,
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),

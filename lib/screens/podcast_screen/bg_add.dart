@@ -1,5 +1,4 @@
-
-
+import 'package:flutter/rendering.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:onpods/utils/exports.dart';
 
@@ -70,18 +69,19 @@ class BgAddState extends State<BgAdd> with AutomaticKeepAliveClientMixin {
     Colors.indigoAccent,
     Colors.deepOrangeAccent
   ];
-   Future<void> _pickAudio() async {
-    final provider = Provider.of<BgAudioProvider>(context,listen: false);
+  Future<void> _pickAudio() async {
+    final provider = Provider.of<BgAudioProvider>(context, listen: false);
     try {
-    
-      await FilePicker.platform.pickFiles(
+      await FilePicker.platform
+          .pickFiles(
         type: FileType.audio,
         allowMultiple: false,
-      ).then((result) {
+      )
+          .then((result) {
         if (result != null) {
-          final  data = {
-            'name':result.files.single.name,
-            "audiourl":result.files.single.path!
+          final data = {
+            'name': result.files.single.name,
+            "audiourl": result.files.single.path!
           };
           provider.addSelectedBg(data);
           Get.back();
@@ -100,33 +100,22 @@ class BgAddState extends State<BgAdd> with AutomaticKeepAliveClientMixin {
 
     final provider = Provider.of<BgAudioProvider>(context);
     return Scaffold(
+       bottomNavigationBar: const MiniPlayer(),
       floatingActionButton: FloatingActionButton(
         backgroundColor: blueColor,
         onPressed: _pickAudio,
-      child: const Icon(Icons.add,color: Colors.white,),
+        child: const Icon(
+          Icons.add,
+          color: Colors.white,
+        ),
       ),
       appBar: AppBar(
         iconTheme: const IconThemeData(color: Colors.white),
         backgroundColor: Colors.black,
         title: const Text(
-          "Choose Music",
+          "Background music",
           style: TextStyle(fontSize: 20, color: Colors.white),
         ),
-        // actions: [
-        //   Padding(
-        //     padding: const EdgeInsets.only(right: 12),
-        //     child: TextButton(
-        //       onPressed: () => Get.to(const PodcastUploadPage(),transition: Transition.cupertino),
-        //       child: const Text(
-        //         'Next',
-        //         style: TextStyle(
-        //             color: blueColor,
-        //             fontSize: 18,
-        //             fontWeight: FontWeight.w400),
-        //       ),
-        //     ),
-        //   )
-        // ],
       ),
       body: provider.isLoading
           ? Center(
@@ -137,7 +126,10 @@ class BgAddState extends State<BgAdd> with AutomaticKeepAliveClientMixin {
               ),
             )
           : provider.bgCategories.isEmpty
-              ? const EmptyPlaceHiolder(message: 'Audios',)
+              ? const Center(
+                  child: EmptyPlaceHolder(
+                  message: 'Audios',
+                ))
               : ListView.builder(
                   shrinkWrap: true,
                   itemCount: provider.bgCategories.length,
@@ -221,19 +213,26 @@ class BgAddState extends State<BgAdd> with AutomaticKeepAliveClientMixin {
                             color: randomColors[index % randomColors.length],
                             width: double.infinity,
                             child: ExpansionTile(
-                              title: Text(
-                                category.category,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 24,
-                                ),
+                              iconColor: Colors.white,
+                              collapsedIconColor: Colors.white,
+
+                              title: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    category.category,
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 24,
+                                    ),
+                                  ),
+
+                                ],
                               ),
-                              trailing: const Icon(
-                                Icons.keyboard_arrow_down, // Dropdown icon
-                                color: Colors.white,
-                                size: 30,
-                              ),
-                              children: categoryItems, // List of songs
+
+
+                              children: categoryItems.toList(),
                             ),
                           ),
                         ),

@@ -9,7 +9,7 @@ class BgAudioService {
     try {
       final response = await http.get(Uri.parse('$baseUrl/background-audio'),
           headers: {"Authorization": userId!});
-  
+
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(response.body);
 

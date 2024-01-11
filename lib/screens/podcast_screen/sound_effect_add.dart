@@ -79,6 +79,7 @@ class SoundEffectAddState extends State<SoundEffectAdd>
 
     final provider = Provider.of<BgAudioProvider>(context);
     return Scaffold(
+       bottomNavigationBar: const MiniPlayer(),
       floatingActionButton: FloatingActionButton(
         backgroundColor: blueColor,
         onPressed: _pickAudio,
@@ -94,7 +95,6 @@ class SoundEffectAddState extends State<SoundEffectAdd>
           "Choose Sound Effect",
           style: TextStyle(fontSize: 20, color: Colors.white),
         ),
-       
       ),
       body: ListView.builder(
         shrinkWrap: true,

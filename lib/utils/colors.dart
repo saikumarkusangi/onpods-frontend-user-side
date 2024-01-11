@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 // Dark Theme Colors
 const Color darkscaffoldBackgroundColor = Colors.black;
-const Color darktextFieldColor = Color.fromARGB(255, 44, 44, 44);
+const Color darktextFieldColor = Color.fromARGB(255, 39, 46, 60);
 const Color bottomSheetColor = Color.fromARGB(255, 39, 46, 60);
 const Color darkchatCard = Color.fromARGB(173, 49, 62, 85);
 const Color darkbottomNavColor = Color(0xFF070D15);

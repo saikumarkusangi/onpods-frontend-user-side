@@ -35,8 +35,10 @@ class _StaggeredGridTemplateState extends State<StaggeredGridTemplate> {
             setState(() {
               _isLoadingMore = true;
             });
-            print('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ current page :${provider.quotes[i].page}');
-            print('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ total page :${provider.quotes[i].totalPages}');
+            print(
+                '@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ current page :${provider.quotes[i].page}');
+            print(
+                '@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ total page :${provider.quotes[i].totalPages}');
             await provider.fetchQuotesByCategory(
                 widget.categoryId, provider.quotes[i].page + 1);
           }
@@ -73,7 +75,6 @@ class _StaggeredGridTemplateState extends State<StaggeredGridTemplate> {
     Colors.yellow.shade200,
     Colors.orange.shade200,
     Colors.purple.shade200,
-    // Add more colors as needed
   ];
   Color getRandomColor() {
     final random = Random();
@@ -88,9 +89,10 @@ class _StaggeredGridTemplateState extends State<StaggeredGridTemplate> {
     final count = i > -1 ? provider.quotes[i].datas.length : 0;
 
     return provider.isLoading
-        ? const CustomScrollView(slivers: [SliverToBoxAdapter(child: QuotesSkeleton())])
+        ? const CustomScrollView(
+            slivers: [SliverToBoxAdapter(child: QuotesSkeleton())])
         : count == 0
-            ? const Center(child: EmptyPlaceHiolder(message: 'Quotes'))
+            ? const Center(child: EmptyPlaceHolder(message: 'Quotes'))
             : Padding(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
@@ -112,7 +114,7 @@ class _StaggeredGridTemplateState extends State<StaggeredGridTemplate> {
                           return GestureDetector(
                             onTap: () => Get.to(
                                 SingleQuote(
-                                  postId:quote.id,
+                                  postId: quote.id,
                                   image: quote.imageUrl,
                                   userId: quote.userId,
                                 ),

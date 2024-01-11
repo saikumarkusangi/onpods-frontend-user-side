@@ -15,6 +15,26 @@ class UserServices {
 
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(response.body);
+       
+        return jsonData;
+      } else {
+        throw Exception('Failed to load data');
+      }
+    } catch (e) {
+      throw Exception(e);
+    }
+  }
+
+// -------------------------------- delete -----------------------------------------
+  Future delete() async {
+    final userId = await UserSession.getUserId();
+    print('calling api user delete : @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@');
+    try {
+      final response = await http.delete(Uri.parse('$baseUrl/auth/delete'),
+          headers: {"Authorization": userId!});
+
+      if (response.statusCode == 200) {
+        final jsonData = jsonDecode(response.body);
 
         return jsonData;
       } else {
@@ -29,7 +49,7 @@ class UserServices {
 
   Future userQuotes(id, page) async {
     print('calling api user quotes : @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@');
-     final userId = await UserSession.getUserId();
+    final userId = await UserSession.getUserId();
     try {
       final response = await http.get(
           Uri.parse('$baseUrl/user/quotes/?id=$id&page=$page'),
@@ -50,7 +70,7 @@ class UserServices {
   // ------------------------------ User Followers -------------------------------------
 
   Future userFollowers(id, page, title) async {
-     final userId = await UserSession.getUserId();
+    final userId = await UserSession.getUserId();
     print(
         'calling api user Followers : @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@');
     try {
@@ -73,7 +93,7 @@ class UserServices {
 // ------------------------ Follow user -----------------------
 
   Future followUser(id) async {
-     final userId = await UserSession.getUserId();
+    final userId = await UserSession.getUserId();
     print(
         'calling api user Followers : @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@');
     try {
@@ -96,7 +116,7 @@ class UserServices {
   // ------------------------ Follow user -----------------------
 
   Future unFollowUser(id) async {
-     final userId = await UserSession.getUserId();
+    final userId = await UserSession.getUserId();
     print(
         'calling api user Followers : @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@');
     try {
@@ -118,8 +138,8 @@ class UserServices {
 
   // ------------------------ Update User -----------------------
 
-  Future updateUser(File profilePic, String userName) async {
-     final userId = await UserSession.getUserId();
+  Future updateUser(String profilePic, String userName, List interests) async {
+    final userId = await UserSession.getUserId();
     print('calling api user update : @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@');
 
     try {
@@ -130,20 +150,89 @@ class UserServices {
       request.headers['Authorization'] = userId!;
 
       // Add the file to the request
-      request.files.add(
-        await http.MultipartFile.fromPath(
-          'file',
-          profilePic.path,
-        ),
-      );
+      if (profilePic.isNotEmpty) {
+        request.files.add(
+          await http.MultipartFile.fromPath(
+            'file',
+            profilePic,
+          ),
+        );
+      }
 
-      // Add other form data, if needed
-      request.fields['username'] = userName;
+      if (userName != '') {
+        // Add other form data, if needed
+        request.fields['username'] = userName;
+      }
+      if (interests.isNotEmpty) {
+        for (int i = 0; i < interests.length; i++) {
+          String fieldName = 'interests[$i]';
+          String interestValue = interests[i];
+          request.fields[fieldName] = interestValue;
+        }
+      }
 
       final response = await request.send();
       final responseString = await response.stream.bytesToString();
 
       print(responseString);
+    } catch (e) {
+      throw Exception(e);
+    }
+  }
+
+  // ------------------------ Update My List -----------------------
+  Future updateMyList(List<String> ids, String action) async {
+    final userId = await UserSession.getUserId();
+
+    try {
+      final Uri url = Uri.parse('$baseUrl/user/myList');
+
+      final Map<String, dynamic> requestBody = {
+        "action": action,
+        "podcastIds": ids,
+      };
+
+      final response = await http.put(
+        url,
+        headers: {
+          'Authorization': userId!,
+          'Content-Type': 'application/json',
+        },
+        body: json.encode(requestBody),
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        return data;
+      } else {
+        throw Exception('Failed to load myList');
+      }
+    } catch (e) {
+      throw Exception(e);
+    }
+  }
+
+// ------------------------ Fetch MyList -----------------------
+
+  Future fetchMyList() async {
+    final userId = await UserSession.getUserId();
+    print('calling api user my list : @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@');
+
+    try {
+      final request = http.MultipartRequest(
+        'GET',
+        Uri.parse('$baseUrl/user/myList'),
+      );
+      request.headers['Authorization'] = userId!;
+
+      final response = await request.send();
+      final responseString = await response.stream.bytesToString();
+      if (response.statusCode == 200) {
+        final data = json.decode(responseString);
+        return data;
+      } else {
+        throw Exception('Failed to load myList');
+      }
     } catch (e) {
       throw Exception(e);
     }

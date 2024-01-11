@@ -11,12 +11,54 @@ class SinglePodcastCategory extends StatefulWidget {
 }
 
 class _SinglePodcastCategoryState extends State<SinglePodcastCategory> {
+  final ScrollController _scrollController = ScrollController();
+  bool _isLoadingMore = false;
   @override
   void initState() {
     super.initState();
+    _initializeScrollController();
+    _fetchPodcasts();
+  }
+
+  Future<void> _fetchPodcasts() async {
     final podcastProvider =
         Provider.of<PodcastProvider>(context, listen: false);
     podcastProvider.fetchPodcastsByCategory(widget.categoryId, 1);
+  }
+
+  void _initializeScrollController() {
+    _scrollController.addListener(() async {
+      if (_scrollController.position.pixels ==
+          _scrollController.position.maxScrollExtent) {
+        final provider = Provider.of<PodcastProvider>(context, listen: false);
+
+        try {
+          if (provider.podcasts[0].totalPages! > provider.podcasts[0].page!) {
+            setState(() {
+              _isLoadingMore = true;
+            });
+            print(
+                '@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ current page :${provider.podcasts[0].page}');
+            print(
+                '@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ total page :${provider.podcasts[0].totalPages}');
+            await provider.fetchPodcastsByCategory(
+                widget.categoryId, provider.podcasts[0].page! + 1);
+          }
+        } catch (e) {
+          throw Exception(e);
+        } finally {
+          setState(() {
+            _isLoadingMore = false;
+          });
+        }
+      }
+    });
+  }
+
+  void dispose() {
+    _scrollController.dispose();
+
+    super.dispose();
   }
 
   @override
@@ -24,98 +66,170 @@ class _SinglePodcastCategoryState extends State<SinglePodcastCategory> {
     final podcastProvider = Provider.of<PodcastProvider>(context);
 
     return Scaffold(
+      bottomNavigationBar: const MiniPlayer(),
       appBar: AppBar(
         iconTheme: const IconThemeData(color: Colors.white),
         backgroundColor: Colors.black,
         title: Text(
           widget.title,
-          style: const TextStyle(color: Colors.white),
+          style: TextStyle(color: Colors.white, fontSize: 24.sp),
         ),
       ),
       body: RefreshIndicator(
         onRefresh: () async {
-          podcastProvider.fetchPodcastsByCategory(
-             widget.categoryId, 1);
+          podcastProvider.podcasts.clear();
+          podcastProvider.setCategory();
+          podcastProvider.fetchPodcastsByCategory(widget.categoryId, 1);
         },
-        child: SingleChildScrollView(
-          child: Column(children: [
-            if (podcastProvider.isLoading)
-              const ListSkeleton()
-            else if (podcastProvider.podcasts[0].count == 0)
-              const Center(
-                child: EmptyPlaceHiolder(
-                  message: 'Podcasts',
-                ),
-              )
-            else
-              ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: podcastProvider.podcasts[0].count,
-                  itemBuilder: (context, index) {
-               
-                    final podcast = podcastProvider.podcasts[0].data![index];
-                    return GestureDetector(
-                      onTap: () => Get.to(
-                           DetailedPodcast(
-                              description: podcast.description ?? '',
-                              image: podcast.posterUrl ?? '',
-                              episodes: [],
-                              // rating: double.parse(podcast.rating),
-                              rating: 2,
-                              title: podcast.title ?? ''),
-                          transition: Transition.downToUp),
-                      child: Container(
-                        padding: const EdgeInsets.all(16),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            SizedBox(
-                              height: 150,
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(20),
-                                child: CachedNetworkImage(
-                                    width:
-                                        MediaQuery.of(context).size.width * 0.4,
-                                    imageUrl: podcast.posterUrl ?? 'https://media.istockphoto.com/id/1283532997/vector/podcast-concept-thin-line-icon-abstract-icon-abstract-gradient-background-modern-sound-wave.jpg?s=612x612&w=0&k=20&c=YLg7rHeSuYqeIuGRAcvf2a7J8X8Sx-IkmqYHXIJGPYQ='),
-                              ),
-                            ),
-                            SizedBox(
-                              width: MediaQuery.of(context).size.width * 0.485,
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                   Text(
-                                    podcast.title ?? '',
-                                    maxLines: 4,
-                                    style: const TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.w800,
-                                        fontSize: 18,
-                                        overflow: TextOverflow.ellipsis),
+        child: podcastProvider.isLoading &&
+                podcastProvider.categoryId != widget.categoryId
+            ? const ListSkeleton()
+            : podcastProvider.podcasts[0].count == 0
+                ? const Center(
+                    child: EmptyPlaceHolder(
+                      message: 'Podcasts',
+                    ),
+                  )
+                : CustomScrollView(
+                    controller: _scrollController,
+                    slivers: [
+                      SliverToBoxAdapter(
+                        child: ListView.builder(
+                            physics: const NeverScrollableScrollPhysics(),
+                            shrinkWrap: true,
+                            itemCount: podcastProvider.podcasts[0].data!.length,
+                            itemBuilder: (context, index) {
+                              final podcast =
+                                  podcastProvider.podcasts[0].data![index];
+                              return GestureDetector(
+                                onTap: () {
+
+                                  Get.to(
+                                      DetailedPodcast(
+                                          podcastId: podcast.id!,
+                                          description:
+                                              podcast.description ?? '',
+                                          image: podcast.posterUrl ?? '',
+                                          title: podcast.title ?? ''),
+                                      transition: Transition.downToUp);
+                                },
+                                child: Container(
+                                  padding: const EdgeInsets.all(16),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      SizedBox(
+                                        height: 0.19.sh,
+                                        child: ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(6),
+                                          child: CachedNetworkImage(
+                                            fit: BoxFit.cover,
+                                            width: 0.4.sw,
+                                            height: 0.19.sh,
+                                            imageUrl: podcast.posterUrl!,
+                                            errorWidget: (context, url,
+                                                    error) =>
+                                                Image.asset(podcastPlaceHolder),
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                                0.485,
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              podcast.title ?? '',
+                                              maxLines: 3,
+                                              style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontWeight: FontWeight.w800,
+                                                  fontSize: 20.sp,
+                                                  overflow:
+                                                      TextOverflow.ellipsis),
+                                            ),
+                                            Row(
+                                              children: [
+                                                const Icon(
+                                                        Icons.star,
+                                                        color: Colors.yellow,
+                                                      ),
+
+                                                const SizedBox(
+                                                  width: 10,
+                                                ),
+                                                Text(
+                                                 podcast.rating
+                                                          .toString(),
+
+                                                  style: TextStyle(
+                                                      color:
+                                                          Colors.grey.shade500,
+                                                      fontSize: 16.sp),
+                                                ),
+                                                const SizedBox(
+                                                  width: 10,
+                                                ),
+                                                podcast.totalListens != '0'
+                                                    ? Text(
+                                                        '| ${podcast.totalListens} plays',
+                                                        style: TextStyle(
+                                                            color: Colors
+                                                                .grey.shade500,
+                                                            fontSize: 16.sp),
+                                                      )
+                                                    : const SizedBox()
+                                              ],
+                                            ),
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsets.only(top: 5),
+                                              child: RichText(
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                  maxLines: 6,
+                                                  text: TextSpan(
+                                                    text: podcast.description ??
+                                                        '',
+                                                    style: TextStyle(
+                                                      color:
+                                                          Colors.grey.shade500,
+                                                      fontSize: 16.sp,
+                                                    ),
+                                                  )),
+                                            )
+                                          ],
+                                        ),
+                                      )
+                                    ],
                                   ),
-                                  const SizedBox(
-                                    height: 10,
+                                ),
+                              );
+                            }),
+                      ),
+                      _isLoadingMore
+                          ? const SliverToBoxAdapter(
+                              child: Padding(
+                                padding: EdgeInsets.all(20),
+                                child: Center(
+                                  child: CircularProgressIndicator(
+                                    color: blueColor,
                                   ),
-                                  Text(
-                                   podcast.description ?? '',
-                                    maxLines: 3,
-                                    style: TextStyle(
-                                        color: Colors.grey.shade400,
-                                        fontSize: 14,
-                                        overflow: TextOverflow.ellipsis),
-                                  )
-                                ],
+                                ),
                               ),
                             )
-                          ],
-                        ),
-                      ),
-                    );
-                  })
-          ]),
-        ),
+                          : const SliverToBoxAdapter(child: SizedBox())
+                    ],
+                  ),
       ),
     );
   }

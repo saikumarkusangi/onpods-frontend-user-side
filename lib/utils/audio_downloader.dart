@@ -1,81 +1,122 @@
 import 'dart:io';
+import 'dart:async';
 import 'package:http/http.dart' as http;
-import 'package:onpods/utils/exports.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:flutter/foundation.dart';
 
 enum DownloadStatus { notStarted, started, downloading, completed }
 
 class FileDownloaderProvider with ChangeNotifier {
-  late StreamSubscription _downloadSubscription;
+  late StreamSubscription<List<int>> _audioDownloadSubscription;
+  late StreamSubscription<List<int>> _posterDownloadSubscription;
   DownloadStatus _downloadStatus = DownloadStatus.notStarted;
   int _downloadPercentage = 0;
   String _downloadedFile = "";
 
-  int get downloadPercentage => _downloadPercentage;
+  final ValueNotifier<int> downloadPercentageNotifier = ValueNotifier<int>(0);
+
   DownloadStatus get downloadStatus => _downloadStatus;
   String get downloadedFile => _downloadedFile;
 
-  Future<void> downloadFile(String url, String filename) async {
+  Future<void> downloadFileWithPoster(
+      String audioUrl, String posterUrl, String filename) async {
     bool permissionReady = await _checkPermission();
     final Completer<void> completer = Completer<void>();
 
     if (!permissionReady) {
-      print('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@m');
-      _checkPermission().then((hasGranted) {
-        permissionReady = hasGranted;
-      });
-    } else {
-      print('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@');
-      var httpClient = http.Client();
-      var request = http.Request('GET', Uri.parse(url));
-      var response = await httpClient.send(request); // Await for the response
+      await Permission.storage.request();
+      completer.complete();
 
-      final dir = Platform.isAndroid
-          ? '/sdcard/download'
-          : (await getApplicationDocumentsDirectory()).path;
+      return;
+    }
 
-      List<List<int>> chunks = <List<int>>[];
-      int downloaded = 0;
+    var audioRequest = http.Request('GET', Uri.parse(audioUrl));
+    var posterRequest = http.Request('GET', Uri.parse(posterUrl));
+
+    try {
+      print('downloading starting');
+      var audioResponse = await http.Client().send(audioRequest);
+      var posterResponse = await http.Client().send(posterRequest);
+
+      final dir = (await getApplicationDocumentsDirectory()).path;
+
+      Directory('$dir/downloads/').create(recursive: true);
+
+      List<List<int>> audioChunks = <List<int>>[];
+      List<List<int>> posterChunks = <List<int>>[];
+      int audioDownloaded = 0;
+      int posterDownloaded = 0;
 
       updateDownloadStatus(DownloadStatus.started);
 
-      _downloadSubscription = response.stream.listen((List<int> chunk) async {
-        updateDownloadStatus(DownloadStatus.downloading);
-        // Display percentage of completion
-        print('downloadPercentage onListen: $_downloadPercentage');
+      _audioDownloadSubscription = audioResponse.stream.listen(
+        (List<int> chunk) {
+          audioChunks.add(chunk);
+          audioDownloaded += chunk.length;
+          _downloadPercentage =
+              ((audioDownloaded / audioResponse.contentLength!) * 50).round();
+          print('Audio Download Progress: $_downloadPercentage%');
+          notifyListeners();
+        },
+      );
 
-        chunks.add(chunk);
-        downloaded += chunk.length;
-        _downloadPercentage =
-            ((downloaded / response.contentLength!) * 100).round();
-        notifyListeners();
-      }, onDone: () async {
-        // Display percentage of completion
-        _downloadPercentage = 100; // Ensure it's 100% when done
-        notifyListeners();
-        print('downloadPercentage onDone: $_downloadPercentage');
+      _posterDownloadSubscription = posterResponse.stream.listen(
+        (List<int> chunk) {
+          posterChunks.add(chunk);
+          posterDownloaded += chunk.length;
+          _downloadPercentage = 50 +
+              ((posterDownloaded / posterResponse.contentLength!) * 50).round();
+          print('Poster Download Progress: $_downloadPercentage%');
+          notifyListeners();
+        },
+      );
 
-        // Save the file
-        File file = File('$dir/$filename');
+      await Future.wait([
+        _audioDownloadSubscription.asFuture(),
+        _posterDownloadSubscription.asFuture(),
+      ]);
 
-        _downloadedFile = '$dir/$filename';
-        print(_downloadedFile);
+      _downloadPercentage = 100; // Ensure it's 100% when done
+      notifyListeners();
 
-        final Uint8List bytes = Uint8List(response.contentLength!);
-        int offset = 0;
-        for (List<int> chunk in chunks) {
-          bytes.setRange(offset, offset + chunk.length, chunk);
-          offset += chunk.length;
-        }
-        await file.writeAsBytes(bytes);
+      File audioFile = File('$dir/$filename.mp3');
+      File posterFile = File('$dir/$filename.jpg');
 
-        updateDownloadStatus(DownloadStatus.completed);
-        _downloadSubscription.cancel();
-        _downloadPercentage = 0;
+      _downloadedFile = '$dir/$filename.mp3';
+      print('Downloaded audio file: $_downloadedFile');
 
-        notifyListeners();
-        print('DownloadFile: Completed');
-        completer.complete();
-      });
+      final Uint8List audioBytes = Uint8List(audioResponse.contentLength!);
+      int audioOffset = 0;
+      for (List<int> chunk in audioChunks) {
+        audioBytes.setRange(audioOffset, audioOffset + chunk.length, chunk);
+        audioOffset += chunk.length;
+      }
+
+      await audioFile.writeAsBytes(audioBytes);
+
+      final Uint8List posterBytes = Uint8List(posterResponse.contentLength!);
+      int posterOffset = 0;
+      for (List<int> chunk in posterChunks) {
+        posterBytes.setRange(posterOffset, posterOffset + chunk.length, chunk);
+        posterOffset += chunk.length;
+      }
+
+      await posterFile.writeAsBytes(posterBytes);
+
+      updateDownloadStatus(DownloadStatus.completed);
+      _audioDownloadSubscription.cancel();
+      _posterDownloadSubscription.cancel();
+      _downloadPercentage = 0;
+
+      notifyListeners();
+      print('DownloadFile: Completed');
+      completer.complete();
+    } catch (e) {
+      print('Error during download: $e');
+      updateDownloadStatus(DownloadStatus.notStarted);
+      notifyListeners();
+      completer.completeError(e);
     }
 
     await completer.future;
@@ -88,16 +129,22 @@ class FileDownloaderProvider with ChangeNotifier {
   }
 
   Future<bool> _checkPermission() async {
-    PermissionStatus permission = await Permission.storage.status;
-    if (permission != PermissionStatus.granted) {
+    var status = await Permission.storage.status;
+    print(status.isGranted.toString() +
+        '@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@');
+    if (status.isGranted) {
+      return true;
+    } else {
       var result = await Permission.storage.request();
+      print(result.isGranted.toString() +
+          '@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@');
       if (result.isGranted) {
+        print(result.isGranted.toString() +
+            '@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@');
+
         return true;
       }
-    } else {
-      return true;
     }
-
     return false;
   }
 }

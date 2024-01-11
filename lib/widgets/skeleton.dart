@@ -13,79 +13,50 @@ class HomeSkeleton extends StatelessWidget {
 
   final double? height, width;
 
-  static final Widget _container = Padding(
-    padding: const EdgeInsets.only(top: 10),
-    child: Container(
-      width: 0.28.sw,
-      height: 0.18.sh,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-        color: Colors.grey,
-      ),
-    ),
-  );
-
   @override
   Widget build(BuildContext context) {
     return Shimmer.fromColors(
       baseColor: const Color(0xff19232F),
       highlightColor: const Color.fromARGB(255, 43, 52, 64),
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: List.generate(3, (index) => _container),
-          ),
-          // Padding(
-          //   padding: const EdgeInsets.only(top: 14),
-          //   child: ListView.builder(
-          //     shrinkWrap: true,
-          //     itemCount: 4,
-          //     itemBuilder: (context, index) => _listTile,
-          //   ),
-          // ),
-        ],
-      ),
-    );
-  }
-}
-
-class RecommendationSkeleton extends StatelessWidget {
-  const RecommendationSkeleton({super.key});
-  static final Widget _container = Padding(
-    padding: const EdgeInsets.only(top: 10),
-    child: Column(
-      children: [
-        Container(
-          width: 0.5.sw,
-          height: 0.12.sh,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(10),
-            color: Colors.grey,
-          ),
-        ),
-      ],
-    ),
-  );
-
-  @override
-  Widget build(BuildContext context) {
-    return Shimmer.fromColors(
-      baseColor: const Color(0xff19232F),
-      highlightColor: const Color.fromARGB(255, 43, 52, 64),
-      child: SizedBox(
-        height: 120,
-        child: ListView.builder(
-            itemCount: 2,
-            scrollDirection: Axis.horizontal,
-            physics: const NeverScrollableScrollPhysics(),
-            itemBuilder: (context, index) {
-              return Padding(
-                padding: const EdgeInsets.only(left: 15),
-                child: _container,
-              );
-            }),
-      ),
+      child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: SizedBox(
+            width: double.maxFinite,
+            height: 250,
+            child: ListView.builder(
+              itemCount: 3,
+              scrollDirection: Axis.horizontal,
+              shrinkWrap: true,
+              itemBuilder: (context, index) {
+                return Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Container(
+                        width: 0.4.sw,
+                        height: 160,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    Container(
+                      width: 0.4.sw,
+                      height: 20,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+          )),
     );
   }
 }
@@ -140,21 +111,27 @@ class ProfileQuotesSkeleton extends StatelessWidget {
       child: Shimmer.fromColors(
           baseColor: const Color(0xff19232F),
           highlightColor: const Color.fromARGB(255, 43, 52, 64),
-          child: Wrap(
-            children: List.generate(
-              9,
-              (index) => Padding(
-                padding: const EdgeInsets.all(6),
-                child: Container(
-                  width: MediaQuery.of(context).size.width * 0.28,
-                  height: 100,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    color: Colors.grey,
-                  ),
-                ),
-              ),
-            ),
+          child: SizedBox(
+            width: 1.sw,
+            height: 0.6.sh,
+            child: GridView.builder(
+              shrinkWrap: true,
+              itemCount: 9,
+                gridDelegate:
+                    const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
+                itemBuilder: ((context, index) {
+                  return Padding(
+                    padding: const EdgeInsets.all(6),
+                    child: Container(
+                      width: 0.42.sw,
+                      height: 0.2.sh,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: Colors.grey,
+                      ),
+                    ),
+                  );
+                })),
           )),
     );
   }
@@ -222,8 +199,8 @@ Widget buildShimmerContainer({
   double? height,
 }) {
   return Shimmer.fromColors(
-    baseColor: const Color.fromARGB(255, 14, 18, 24),
-    highlightColor: const Color.fromARGB(255, 44, 44, 44),
+    baseColor: const Color(0xff19232F),
+    highlightColor: const Color.fromARGB(255, 43, 52, 64),
     child: Container(
       width: width,
       height: height,
@@ -246,7 +223,7 @@ Widget buildShimmerContainerList(int itemCount) {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.symmetric(vertical: 10,horizontal: 20),
+            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
             child: buildShimmerContainer(
               width: 150,
               height: 180,
@@ -259,32 +236,31 @@ Widget buildShimmerContainerList(int itemCount) {
               Padding(
                 padding: const EdgeInsets.only(top: 15),
                 child: buildShimmerContainer(
-                  width: MediaQuery.of(context).size.width* 0.4,
+                  width: MediaQuery.of(context).size.width * 0.4,
                   height: 15,
                 ),
               ),
-               Padding(
-                 padding: const EdgeInsets.only(top: 20),
-                 child: buildShimmerContainer(
-                  width: MediaQuery.of(context).size.width* 0.4,
+              Padding(
+                padding: const EdgeInsets.only(top: 20),
+                child: buildShimmerContainer(
+                  width: MediaQuery.of(context).size.width * 0.4,
                   height: 10,
-                             ),
-               ),
-               Padding(
-               padding: const EdgeInsets.only(top: 10),
-                 child: buildShimmerContainer(
-                  width: MediaQuery.of(context).size.width* 0.3,
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 10),
+                child: buildShimmerContainer(
+                  width: MediaQuery.of(context).size.width * 0.3,
                   height: 10,
-                             ),
-               ),
-              
-               Padding(
-               padding: const EdgeInsets.only(top: 10),
-                 child: buildShimmerContainer(
-                  width: MediaQuery.of(context).size.width* 0.2,
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 10),
+                child: buildShimmerContainer(
+                  width: MediaQuery.of(context).size.width * 0.2,
                   height: 10,
-                             ),
-               ),
+                ),
+              ),
             ],
           ),
         ],
@@ -427,6 +403,38 @@ class QuotesSkeleton extends StatelessWidget {
                 ),
               ),
             ],
+          ),
+        ));
+  }
+}
+
+class PodcastCategoriesSkeleton extends StatelessWidget {
+  const PodcastCategoriesSkeleton({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Shimmer.fromColors(
+        baseColor: const Color(0xff19232F),
+        highlightColor: const Color.fromARGB(255, 43, 52, 64),
+        child: SizedBox(
+          height: 1.sh,
+          width: 1.sw,
+          child: GridView.builder(
+            shrinkWrap: true,
+            itemCount: 8,
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2, childAspectRatio: 1.4),
+            itemBuilder: (context, index) => Padding(
+              padding: const EdgeInsets.all(6),
+              child: Container(
+                width: 300,
+                height: 100,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  color: Colors.grey,
+                ),
+              ),
+            ),
           ),
         ));
   }

@@ -46,7 +46,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context);
-  final _googleOauth = GoogleSignIn();
+    final _googleOauth = GoogleSignIn();
 
     return WidgetHUD(
       showHUD: authProvider.isLoading,
@@ -62,109 +62,113 @@ class _LoginScreenState extends State<LoginScreen> {
           child: SingleChildScrollView(
             child: Column(
               children: [
-               Stack(
-      children: [
-        SizedBox(
-          height: 0.5.sh,
-          child: Image.asset(loginImage,
-            fit: BoxFit.cover,
-          ),
-        ),
-        Align(
-          alignment: Alignment.bottomCenter,
-          child: Container(
-            padding: const EdgeInsets.only(left: 20, top: 150, right: 20),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.bottomCenter,
-                end: Alignment.topCenter,
-                colors: [
-                  Colors.black,
-                  Colors.black.withOpacity(0.9),
-                  Colors.black.withOpacity(0.7),
-                ],
-              ),
-            ),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    'Enjoy Podcasts,\nQuotes and more.',
-                    style: TextStyle(
-                        fontSize: 34,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white),
-                  ),
-                  const SizedBox(
-                    height: 30,
-                  ),
-                  _buildEmailField(),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  _buildPasswordField(),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  CustomElevatedButton(
-                    onTap: submit,
-                    height: 50,
-                    text: 'Login',
-                    buttonTextStyle:
-                        const TextStyle(color: Colors.white, fontSize: 18),
-                    buttonColor: blueColor,
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  _buildForgotPasswordLink(),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        height: 1,
-                        width: 0.35.sw,
-                        color: Colors.white54,
+                Stack(
+                  children: [
+                    SizedBox(
+                      height: 0.6.sh,
+                      child: Image.asset(
+                        loginImage,
+                        fit: BoxFit.cover,
                       ),
-                      const Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: Text(
-                          'OR',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 14,
+                    ),
+                    Align(
+                      alignment: Alignment.bottomCenter,
+                      child: Container(
+                        padding: const EdgeInsets.only(
+                            left: 20, top: 150, right: 20),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.bottomCenter,
+                            end: Alignment.topCenter,
+                            colors: [
+                              Colors.black,
+                              Colors.black.withOpacity(0.9),
+                              Colors.black.withOpacity(0.7),
+                            ],
+                          ),
+                        ),
+                        child: Form(
+                          key: _formKey,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text(
+                                'Enjoy Podcasts,\nQuotes and more.',
+                                style: TextStyle(
+                                    fontSize: 34,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white),
+                              ),
+                              const SizedBox(
+                                height: 30,
+                              ),
+                              _buildEmailField(),
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              _buildPasswordField(),
+                              const SizedBox(
+                                height: 20,
+                              ),
+                              CustomElevatedButton(
+                                onTap: submit,
+                                height: 50,
+                                text: 'Login',
+                                buttonTextStyle: const TextStyle(
+                                    color: Colors.white, fontSize: 18),
+                                buttonColor: blueColor,
+                              ),
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              _buildForgotPasswordLink(),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Container(
+                                    height: 1,
+                                    width: 0.35.sw,
+                                    color: Colors.white54,
+                                  ),
+                                  const Padding(
+                                    padding: EdgeInsets.all(8.0),
+                                    child: Text(
+                                      'OR',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                  ),
+                                  Container(
+                                    height: 1,
+                                    width: 0.35.sw,
+                                    color: Colors.white54,
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              customGoogleButton('Login with Google', () async {
+                                final response = await _googleOauth.signIn();
+                
+
+                                  authProvider.oauthLogin(response!.id);
+
+                              }),
+                              const SizedBox(
+                                height: 20,
+                              ),
+                              _buildSignUpLink()
+                            ],
                           ),
                         ),
                       ),
-                      Container(
-                        height: 1,
-                        width: 0.35.sw,
-                        color: Colors.white54,
-                      ),
-                    ],
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  customGoogleButton('Login with Google', () async {
-                    final response = await _googleOauth.signIn();
-                    authProvider.login(response!.email, response.id);
-                  }),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  _buildSignUpLink()
-                ],
-              ),
-            ),
-          ),
-        ),
-      ],
-    )
-  
+                    ),
+                  ],
+                )
               ],
             ),
           ),
@@ -172,9 +176,6 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
     );
   }
-
-
-
 
   Widget _buildEmailField() {
     return CustomTextFormField(
@@ -241,11 +242,13 @@ class _LoginScreenState extends State<LoginScreen> {
     return GestureDetector(
       onTap: () => Get.to(const ForgotPasswordScreen(),
           transition: Transition.cupertino),
-      child: const Align(
+      child: Align(
         alignment: Alignment.centerRight,
-        child: Text(
-          'Forgot Password?',
-          style: TextStyle(color: blueColor, fontSize: 16),
+        child: RichText(
+          text: const TextSpan(
+            text: 'Forgot Password?',
+            style: TextStyle(color: blueColor, fontSize: 16),
+          ),
         ),
       ),
     );
@@ -260,7 +263,8 @@ class _LoginScreenState extends State<LoginScreen> {
           TextSpan(
             recognizer: TapGestureRecognizer()
               ..onTap = () {
-                Get.to(const SignUpScreen(), transition: Transition.rightToLeftWithFade);
+                Get.to(const SignUpScreen(),
+                    transition: Transition.rightToLeftWithFade);
               },
             text: ' Sign up',
             style: const TextStyle(color: blueColor, fontSize: 16),

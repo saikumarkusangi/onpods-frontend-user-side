@@ -5,11 +5,13 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/route_manager.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
+import 'package:onpods/resources/podcast_service.dart';
 import 'package:onpods/utils/colors.dart';
 import 'package:onpods/utils/images.dart';
 import 'package:palette_generator/palette_generator.dart';
-import '../../models/audio_model.dart';
-import 'package:rxdart/rxdart.dart';
+import 'package:provider/provider.dart';
+import 'package:marquee/marquee.dart';
+import '../../providers/mini_player_provider.dart';
 
 class Episode {
   final String audioUrl;
@@ -17,21 +19,16 @@ class Episode {
   final String album;
   final String artist;
   final String artUri;
+  final int startingIndex;
 
   Episode({
     required this.audioUrl,
+    required this.startingIndex,
     required this.title,
     required this.album,
     required this.artist,
     required this.artUri,
   });
-}
-
-class PositionData {
-  const PositionData(this.position, this.bufferPosition, this.duration);
-  final Duration position;
-  final Duration bufferPosition;
-  final Duration duration;
 }
 
 class PlayerScreen extends StatefulWidget {
@@ -40,6 +37,10 @@ class PlayerScreen extends StatefulWidget {
   final String episode;
   final String audioUrl;
   final List playlist;
+  final int startingIndex;
+  final String albumImage;
+  final String podcastId;
+  final String episodeId;
 
   const PlayerScreen({
     Key? key,
@@ -48,6 +49,10 @@ class PlayerScreen extends StatefulWidget {
     required this.episode,
     required this.playlist,
     required this.audioUrl,
+    required this.startingIndex,
+    required this.albumImage,
+    required this.podcastId,
+    required this.episodeId,
   }) : super(key: key);
 
   @override
@@ -58,15 +63,17 @@ class _PlayerScreenState extends State<PlayerScreen> {
   PaletteGenerator? _paletteGenerator =
       PaletteGenerator.fromColors([PaletteColor(Colors.transparent, 1)]);
 
-  late AudioPlayer _player;
+  // late AudioPlayer _player;
 
   @override
   void initState() {
     super.initState();
     generatePalette();
 
-    _player = AudioPlayer();
+    // _player = AudioPlayer();
+
     _init();
+    callApi();
   }
 
   Future<void> generatePalette() async {
@@ -77,61 +84,78 @@ class _PlayerScreenState extends State<PlayerScreen> {
     });
   }
 
+  callApi() {
+    PodcastService().listenEpisode(widget.podcastId, widget.episodeId);
+  }
+
   @override
   void dispose() {
     super.dispose();
-    _player.dispose();
+    // _player.dispose();
+  }
+
+  List rearrangePlaylist(List playlist, int startingIndex) {
+    return [
+      ...playlist.sublist(startingIndex),
+      ...playlist.sublist(0, startingIndex),
+    ];
   }
 
   Future<void> _init() async {
-    final playList = ConcatenatingAudioSource(
-      children: widget.playlist.map((e) {
-        return AudioSource.uri(
-          Uri.parse(e.songUrl),
-          tag: MediaItem(
-            id: '1', // Use a unique ID for each episode
-            album: widget.title,
-            title: e.title,
-            artist: '',
-            artUri: Uri.parse(widget.poster),
-          ),
-        );
-      }).toList(),
-    );
+    final provider = Provider.of<MiniPlayerProvider>(context, listen: false);
+    // provider.clearEpisodes();
+    final rearrangedPlaylist =
+        rearrangePlaylist(widget.playlist, widget.startingIndex);
+    print('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@');
 
+    try {
+      provider.update(
+          rearrangedPlaylist[0].title,
+          rearrangedPlaylist[0].posterUrl != ''
+              ? rearrangedPlaylist[0].posterUrl
+              : widget.albumImage,
+          rearrangedPlaylist);
+    } catch (e) {
+      provider.update(
+          rearrangedPlaylist[0]['title'],
+          rearrangedPlaylist[0]['posterUrl'] != ''
+              ? rearrangedPlaylist[0]['posterUrl']
+              : widget.albumImage,
+          rearrangedPlaylist);
+    }
+    print('######################################################');
+    print(widget.episodeId);
+    print(provider.podcastId);
+    if (widget.episodeId != provider.podcastId) {
+      provider.play();
+      provider.updateId(widget.episodeId);
+    } else {
+      // provider.updateId(widget.episodeId);
+    }
 
-   
-    print('@@@@@@@@@@@@@@@@@@@@@@@@@@@${_player.currentIndex}');
-    final currentMediaItem = playList.sequence[_player.currentIndex ?? 0];
-
-// Get the title from the current MediaItem's tag
-    final currentAudioTitle = currentMediaItem.tag.title ?? "Unknown Title";
-
-    // Create an AudioModel and set it as the currently playing audio
-    final currentAudio = AudioModel(
-      title: currentAudioTitle,
-      artist: "Your Artist Name",
-      playbackState: _player.processingState,
-    );
-
-    // Use the provider to set the current audio
-
-  
-    await _player.setAudioSource(playList);
-    _player.play();
+    //   StreamBuilder<SequenceState?>(
+    //       stream: provider.player.sequenceStateStream,
+    //       builder: (context, snapshot) {
+    //         final state = snapshot.data;
+    //         if (state?.sequence.isEmpty ?? true) {
+    //           return const SizedBox();
+    //         }
+    //         final metadata = state!.currentSource!.tag as MediaItem;
+    //         if (metadata.id == provider.podcastId) {
+    //              provider.play();
+    //         } else {
+    //           provider.clearEpisodes();
+    //           provider.play();
+    //         }
+    //         return const SizedBox();
+    //       });
+    // }
   }
-
-  Stream<PositionData> get _positionDataStream =>
-      Rx.combineLatest3<Duration, Duration, Duration?, PositionData>(
-          _player.positionStream,
-          _player.bufferedPositionStream,
-          _player.durationStream,
-          (position, bufferPosition, duration) => PositionData(
-              position, bufferPosition, duration ?? Duration.zero));
-
 
   @override
   Widget build(BuildContext context) {
+    final miniPlayerProvider = Provider.of<MiniPlayerProvider>(context);
+
     return Scaffold(
       body: Stack(
         children: [
@@ -151,7 +175,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
             ),
           ).animate().fadeIn(delay: const Duration(milliseconds: 800)),
           StreamBuilder<PlayerState>(
-              stream: _player.playerStateStream,
+              stream: miniPlayerProvider.player.playerStateStream,
               builder: (context, snapshot) {
                 final playerState = snapshot.data;
                 final playing = playerState?.playing;
@@ -162,25 +186,44 @@ class _PlayerScreenState extends State<PlayerScreen> {
                       playing! ? cdGif : cdGifPng,
                       width: MediaQuery.of(context).size.width * 0.6,
                     ).animate().moveY(
-                          delay: const Duration(milliseconds: 1400),
+                          delay: const Duration(milliseconds: 800),
                           begin: 100,
                         ),
                   ),
                 );
               }),
-          Align(
-            alignment: Alignment.center,
-            child: Padding(
-              padding: const EdgeInsets.only(bottom: 60),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(14),
-                child: CachedNetworkImage(
-                  imageUrl: widget.poster,
-                  width: MediaQuery.of(context).size.width * 0.7,
-                ),
-              ),
-            ),
-          ).animate().rotate(duration: const Duration(milliseconds: 300)),
+          StreamBuilder<SequenceState?>(
+              stream: miniPlayerProvider.player.sequenceStateStream,
+              builder: (context, snapshot) {
+                final state = snapshot.data;
+                if (state?.sequence.isEmpty ?? true) {
+                  return const SizedBox();
+                }
+                final metadata = state!.currentSource!.tag as MediaItem;
+
+                return Align(
+                  alignment: Alignment.center,
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 60),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(14),
+                      child: CachedNetworkImage(
+                        imageUrl: metadata.artUri.toString().isNotEmpty
+                            ? metadata.artUri.toString()
+                            : widget.poster,
+                        width: MediaQuery.of(context).size.width * 0.7,
+                        height: MediaQuery.of(context).size.height * 0.3,
+                        fit: BoxFit.cover,
+                        errorWidget: (context, url, error) => Container(
+                          padding: const EdgeInsets.all(30),
+                          color: const Color.fromARGB(255, 40, 37, 37),
+                          child: Image.asset(splashLogo, fit: BoxFit.contain),
+                        ),
+                      ),
+                    ),
+                  ),
+                ).animate().rotate(duration: const Duration(milliseconds: 300));
+              }),
           Positioned(
             top: 50,
             left: 15,
@@ -217,13 +260,13 @@ class _PlayerScreenState extends State<PlayerScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 70),
             child: Align(
               alignment: Alignment.center,
-              heightFactor: 6,
+              heightFactor: 5.5,
               child: Text(
                 widget.title,
                 maxLines: 1,
-                style: const TextStyle(
+                style: TextStyle(
                   color: Colors.white,
-                  fontSize: 18,
+                  fontSize: 6 * MediaQuery.of(context).devicePixelRatio,
                   fontWeight: FontWeight.w800,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -233,68 +276,126 @@ class _PlayerScreenState extends State<PlayerScreen> {
           Align(
             alignment: Alignment.bottomCenter,
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 50),
+              padding: const EdgeInsets.symmetric(vertical: 50),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  StreamBuilder<SequenceState?>(
-                      stream: _player.sequenceStateStream,
-                      builder: (context, snapshot) {
-                        final state = snapshot.data;
-                        if (state?.sequence.isEmpty ?? true) {
-                          return const SizedBox();
-                        }
-                        final metadata = state!.currentSource!.tag as MediaItem;
-                        return Text(
-                          metadata.title,
-                          maxLines: 2,
-                          style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w800,
-                              fontSize: 16,
-                              overflow: TextOverflow.ellipsis),
-                        );
-                      }),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    child: StreamBuilder<SequenceState?>(
+                        stream: miniPlayerProvider.player.sequenceStateStream,
+                        builder: (context, snapshot) {
+                          final state = snapshot.data;
+                          if (state?.sequence.isEmpty ?? true) {
+                            return const SizedBox();
+                          }
+                          final metadata =
+                              state!.currentSource!.tag as MediaItem;
+                          return SizedBox(
+                            height: 40,
+                            width: MediaQuery.of(context).size.width,
+                            child: Marquee(
+                              text: metadata.title,
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w800,
+                                fontSize:
+                                    7 * MediaQuery.of(context).devicePixelRatio,
+                              ),
+                              scrollAxis: Axis.horizontal,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              blankSpace: 100.0,
+                              velocity: 50.0,
+                              pauseAfterRound: const Duration(seconds: 1),
+                              startPadding: 10.0,
+                              accelerationDuration: const Duration(seconds: 1),
+                              accelerationCurve: Curves.linear,
+                              decelerationDuration:
+                                  const Duration(milliseconds: 500),
+                              decelerationCurve: Curves.easeOut,
+                            ),
+                          );
+                        }),
+                  ),
                   const SizedBox(
                     height: 30,
                   ),
-                  StreamBuilder<PositionData>(
-                      stream: _positionDataStream,
-                      builder: (context, snapshot) {
-                        final positionData = snapshot.data;
-                        return ProgressBar(
-                          timeLabelPadding: 12,
-                          timeLabelTextStyle:
-                              const TextStyle(color: Colors.white),
-                          thumbGlowColor: Colors.white,
-                          thumbColor: Colors.white,
-                          bufferedBarColor: Colors.grey.shade600,
-                          progressBarColor: Colors.white,
-                          baseBarColor: Colors.white10,
-                          thumbRadius: 6,
-                          thumbGlowRadius: 8,
-                          progress: positionData?.position ?? Duration.zero,
-                          buffered:
-                              positionData?.bufferPosition ?? Duration.zero,
-                          total: positionData?.duration ?? Duration.zero,
-                          onSeek: _player.seek,
-                        );
-                      }),
                   Padding(
-                    padding: const EdgeInsets.only(bottom: 30),
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: StreamBuilder<PositionData>(
+                        stream: miniPlayerProvider.positionDataStream,
+                        builder: (context, snapshot) {
+                          final positionData = snapshot.data;
+                          return ProgressBar(
+                            timeLabelPadding: 12,
+                            timeLabelTextStyle:
+                                const TextStyle(color: Colors.white),
+                            thumbGlowColor: Colors.white,
+                            thumbColor: Colors.white,
+                            bufferedBarColor: Colors.grey.shade600,
+                            progressBarColor: Colors.white,
+                            baseBarColor: Colors.white10,
+                            thumbRadius: 6,
+                            thumbGlowRadius: 8,
+                            progress: positionData?.position ?? Duration.zero,
+                            buffered:
+                                positionData?.bufferPosition ?? Duration.zero,
+                            total: positionData?.duration ?? Duration.zero,
+                            onSeek: miniPlayerProvider.player.seek,
+                          );
+                        }),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 20, top: 10),
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         IconButton(
-                          iconSize: 48,
-                          onPressed: () => _player.seekToPrevious(),
+                          onPressed: () {
+                            if (miniPlayerProvider.player.position >
+                                Duration.zero) {
+                              Duration newPosition =
+                                  miniPlayerProvider.player.position -
+                                      const Duration(seconds: 10);
+
+                              newPosition = newPosition.isNegative
+                                  ? Duration.zero
+                                  : newPosition;
+
+                              // Perform the seek
+                              miniPlayerProvider.player.seek(newPosition);
+                            }
+                          },
+                          icon: const Icon(
+                            Icons.replay_10,
+                            color: Colors.white,
+                            size: 32,
+                          ),
+                        ),
+                        IconButton(
+                          onPressed: () {
+                            if (!miniPlayerProvider.player.hasPrevious) {
+                              miniPlayerProvider.player.seek(Duration.zero,
+                                  index: widget.playlist.length - 1);
+                              //  ScaffoldMessenger.of(context).showSnackBar(
+                              //   const SnackBar(
+                              //     duration: Duration(milliseconds: 1000),
+                              //     content: Text(
+                              //         'You are listening to the first episode.'),
+                              //   ),
+                              // );
+                            }
+
+                            miniPlayerProvider.player.seekToPrevious();
+                          },
                           icon: const Icon(
                             Icons.skip_previous,
                             color: Colors.white,
+                            size: 52,
                           ),
                         ),
                         StreamBuilder<PlayerState>(
-                          stream: _player.playerStateStream,
+                          stream: miniPlayerProvider.player.playerStateStream,
                           builder: (context, snapshot) {
                             final playerState = snapshot.data;
                             final processingState =
@@ -304,38 +405,66 @@ class _PlayerScreenState extends State<PlayerScreen> {
                             if (!(playing ?? false)) {
                               return IconButton(
                                   onPressed: () {
-                                    _player.play();
+                                    miniPlayerProvider.player.play();
                                   },
                                   icon: const Icon(
                                     Icons.play_arrow_rounded,
                                     color: Colors.white,
-                                    size: 48,
+                                    size: 52,
                                   ));
                             } else if (processingState !=
                                 ProcessingState.completed) {
                               return IconButton(
                                   onPressed: () {
-                                    _player.pause();
+                                    miniPlayerProvider.player.pause();
                                   },
                                   icon: const Icon(
                                     Icons.pause,
                                     color: Colors.white,
-                                    size: 48,
+                                    size: 52,
                                   ));
                             }
                             return const Icon(
                               Icons.play_arrow_rounded,
                               color: Colors.white,
-                              size: 48,
+                              size: 52,
                             );
                           },
                         ),
                         IconButton(
-                          iconSize: 48,
-                          onPressed: () => _player.seekToNext(),
+                          onPressed: () {
+                            if (!miniPlayerProvider.player.hasNext) {
+                              miniPlayerProvider.player
+                                  .seek(Duration.zero, index: 0);
+                              // ScaffoldMessenger.of(context).showSnackBar(
+                              //   const SnackBar(
+                              //     duration: Duration(milliseconds: 1000),
+                              //     content: Text(
+                              //         'You are listening to the last episode.'),
+                              //   ),
+                              // );
+                            }
+                            miniPlayerProvider.player.seekToNext();
+                            miniPlayerProvider.updateId(
+                                miniPlayerProvider.episodes[
+                                    miniPlayerProvider.player.currentIndex!]['id']);
+                          },
                           icon: const Icon(
                             Icons.skip_next_sharp,
                             color: Colors.white,
+                            size: 52,
+                          ),
+                        ),
+                        IconButton(
+                          onPressed: () {
+                            miniPlayerProvider.player.seek(
+                                miniPlayerProvider.player.position +
+                                    const Duration(seconds: 10));
+                          },
+                          icon: const Icon(
+                            Icons.forward_10,
+                            color: Colors.white,
+                            size: 32,
                           ),
                         ),
                       ],
@@ -344,7 +473,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                 ],
               ),
             ),
-          )
+          ),
         ],
       ),
     );

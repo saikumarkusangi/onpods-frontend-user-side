@@ -82,6 +82,7 @@ class _FollowersScreenState extends State<FollowersScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+       bottomNavigationBar: const MiniPlayer(),
       body: CustomScrollView(
         controller: _scrollController,
         slivers: [
@@ -112,7 +113,7 @@ class _FollowersScreenState extends State<FollowersScreen> {
                       child: SizedBox(
                           height: MediaQuery.of(context).size.height * 0.7,
                           width: MediaQuery.of(context).size.width,
-                          child: EmptyPlaceHiolder(message: widget.title,)))
+                          child: EmptyPlaceHolder(message: widget.title,)))
                   : SliverList.builder(
                       itemCount: data['data'].length,
                       itemBuilder: (context, index) {
@@ -129,7 +130,7 @@ class _FollowersScreenState extends State<FollowersScreen> {
                                       ? UserProfileScreen(
                                           userId: user['userId'],
                                           userName: user['userName'],
-                                  
+
                                         )
                                       : const ProfileScreen());
                             },

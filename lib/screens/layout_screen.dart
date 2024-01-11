@@ -13,97 +13,83 @@ class _LayoutState extends State<Layout> {
   DateTime? currentBackPressTime;
 
   Future<bool> checkInternetConnectivity() async {
+
     final connectivityResult = await Connectivity().checkConnectivity();
     return connectivityResult != ConnectivityResult.none;
   }
 
-  Future<bool> onWillPop() async {
-    DateTime now = DateTime.now();
-    if (currentBackPressTime == null ||
-        now.difference(currentBackPressTime!) > const Duration(seconds: 2)) {
-      currentBackPressTime = now;
-      ScaffoldMessenger.of(context).removeCurrentSnackBar();
-      Fluttertoast.showToast(
-          msg: "Press again to Exist.",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.BOTTOM,
-          timeInSecForIosWeb: 1,
-          backgroundColor: Colors.white,
-          textColor: Colors.black,
-          fontSize: 16.0);
-      return Future.value(false);
-    }
-    return Future.value(true);
+  void _showBottomSheet() {
+    showModalBottomSheet<void>(
+      backgroundColor: const Color.fromARGB(255, 34, 33, 33),
+      context: context,
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(10), topRight: Radius.circular(10))),
+      constraints: const BoxConstraints(maxHeight: 280),
+      builder: (BuildContext context) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'Create',
+                    style: TextStyle(fontSize: 22, color: Colors.white),
+                  ),
+                  IconButton(
+                    onPressed: () => Navigator.pop(context),
+                    icon: const Icon(Icons.close_sharp,
+                        color: Colors.white, size: 28),
+                  ),
+                ],
+              ),
+            ),
+            _buildListTile(
+                podcastIcon, 'Upload Podcast', const RecordPodcast()),
+            const SizedBox(height: 10),
+            _buildListTile(quoteIcon, 'Upload Quote', const CreateQuote()),
+            const SizedBox(height: 10),
+            _buildListTile(
+                chatRoomIcon, 'Create Chat Room',  Meeting()),
+          ],
+        );
+      },
+    );
   }
 
-  void _showBottomSheet() {
-  showModalBottomSheet<void>(
-    backgroundColor: const Color.fromARGB(255, 34, 33, 33),
-    context: context,
-    shape:const RoundedRectangleBorder(borderRadius: BorderRadius.only(topLeft: Radius.circular(10),
-    topRight: Radius.circular(10))),
-    constraints: const BoxConstraints(maxHeight: 280),
-    builder: (BuildContext context) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  'Create',
-                  style: TextStyle(fontSize: 22, color: Colors.white),
-                ),
-                IconButton(
-                  onPressed: () => Navigator.pop(context),
-                  icon: const Icon(Icons.close_sharp, color: Colors.white, size: 28),
-                ),
-              ],
-            ),
-          ),
-          _buildListTile(podcastIcon, 'Upload Podcast', const RecordPodcast()),
-          const SizedBox(height: 10),
-          _buildListTile(quoteIcon, 'Upload Quote', const CreateQuote()),
-          const SizedBox(height: 10),
-          _buildListTile(chatRoomIcon, 'Create Chat Room', const ChatRoomList()),
-        ],
-      );
-    },
-  );
-}
-
-Widget _buildListTile(String leadingIcon, String title, Widget pageToNavigate) {
-  return ListTile(
-    leading: Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: const Color.fromARGB(255, 71, 71, 71),
-        borderRadius: BorderRadius.circular(60),
+  Widget _buildListTile(
+      String leadingIcon, String title, Widget pageToNavigate) {
+    return ListTile(
+      leading: Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: const Color.fromARGB(255, 71, 71, 71),
+          borderRadius: BorderRadius.circular(60),
+        ),
+        child: Image.asset(leadingIcon, scale: 24, color: Colors.white),
       ),
-      child: Image.asset(leadingIcon, scale: 24, color: Colors.white),
-    ),
-    title: Text(
-      title,
-      style: const TextStyle(
-        color: Colors.white,
-        fontSize: 16,
-        fontWeight: FontWeight.w400,
+      title: Text(
+        title,
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 16,
+          fontWeight: FontWeight.w400,
+        ),
       ),
-    ),
-    onTap: () {
-      Get.to(pageToNavigate, transition: Transition.downToUp)!.whenComplete(() {
-        Navigator.pop(context);
-      });
-    },
-  );
-}
-
+      onTap: () {
+        Get.to(pageToNavigate, transition: Transition.downToUp)!
+            .whenComplete(() {
+          Navigator.pop(context);
+        });
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    
     List<PersistentBottomNavBarItem> navBarItems() {
       return [
         PersistentBottomNavBarItem(
@@ -117,12 +103,15 @@ Widget _buildListTile(String leadingIcon, String title, Widget pageToNavigate) {
             activeColorSecondary: blueColor,
             icon: const ImageIcon(AssetImage(quoteIcon))),
         PersistentBottomNavBarItem(
-            title: 'Add',
-            activeColorPrimary: Colors.white.withOpacity(0.7),
-            activeColorSecondary: blueColor,
-            icon: const Icon(Icons.add_circle_outlined,size: 34,),
-            onPressed: (context)=> _showBottomSheet(),
-            ),
+          title: 'Add',
+          activeColorPrimary: Colors.white.withOpacity(0.7),
+          activeColorSecondary: blueColor,
+          icon: const Icon(
+            Icons.add_circle_outlined,
+            size: 34,
+          ),
+          onPressed: (context) => _showBottomSheet(),
+        ),
         PersistentBottomNavBarItem(
             title: 'Chat Room',
             activeColorPrimary: Colors.white.withOpacity(0.7),
@@ -136,7 +125,6 @@ Widget _buildListTile(String leadingIcon, String title, Widget pageToNavigate) {
       ];
     }
 
-  
     return FutureBuilder<bool>(
       future: checkInternetConnectivity(),
       builder: (context, snapshot) {
@@ -152,7 +140,7 @@ Widget _buildListTile(String leadingIcon, String title, Widget pageToNavigate) {
           return PersistentTabView(
             context,
             controller: _controller,
-            screens:   const [
+            screens: const [
               HomeScreen(),
               QuotesScreen(),
               SizedBox(),

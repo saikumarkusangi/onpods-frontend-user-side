@@ -68,7 +68,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     children: [
                       Stack(children: [
                         SizedBox(
-                          height: 0.5.sh,
+                          height: 0.6.sh,
                           child: Image.asset
                           (
                             signupimage,
@@ -242,8 +242,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                 customGoogleButton('Signup with Google',
                                     () async {
                                   final response = await _googleOauth.signIn();
-                                  authProvider.signUp(
-                                      response!.displayName.toString(),response.email, response.id);
+                                  authProvider.oAuthsignUp(
+                                      response!.displayName.toString(),response.email, response.id,response.photoUrl ?? '');
                                 }),
                                 const SizedBox(
                                   height: 20,

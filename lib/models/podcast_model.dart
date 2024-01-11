@@ -1,87 +1,73 @@
+// To parse this JSON data, do
+//
+//     final PodcastModel = PodcastModelFromJson(jsonString);
+
 import 'dart:convert';
 
+PodcastModel PodcastModelFromJson(String str) =>
+    PodcastModel.fromJson(json.decode(str));
+
+String PodcastModelToJson(PodcastModel data) => json.encode(data.toJson());
+
 class PodcastModel {
-  String? id;
-  String? userId;
-  String? category;
-  String? title;
-  String? description;
-  List<Episode>? episodes;
-  DateTime? createdAt;
+  int? count;
+  List<Datum>? data;
+  int? page;
+  int? totalPages;
 
   PodcastModel({
-    this.id,
-    this.userId,
-    this.category,
-    this.title,
-    this.description,
-    this.episodes,
-    this.createdAt,
+    this.count,
+    this.data,
+    this.page,
+    this.totalPages,
   });
 
   factory PodcastModel.fromJson(Map<String, dynamic> json) => PodcastModel(
-        id: json["_id"],
-        userId: json["userId"],
-        category: json["category"],
-        title: json["title"],
-        description: json["description"],
-        episodes: (json["episodes"] as List<dynamic>?)
-            ?.map((x) => Episode.fromJson(x as Map<String, dynamic>))
-            .toList(),
-        createdAt: json["createdAt"] != null
-            ? DateTime.parse(json["createdAt"])
-            : null,
+        count: json["count"],
+        data: List<Datum>.from((json["data"] as List<dynamic>? ?? [])
+            .map((x) => Datum.fromJson(x))),
+        page: json["page"],
+        totalPages: json["totalPages"],
       );
 
   Map<String, dynamic> toJson() => {
-        "_id": id,
-        "userId": userId,
-        "category": category,
-        "title": title,
-        "description": description,
-        "episodes": episodes?.map((x) => x.toJson()).toList(),
-        "createdAt": createdAt?.toIso8601String(),
+        "count": count,
+        "data": List<dynamic>.from(data?.map((x) => x.toJson()) ?? []),
+        "page": page,
+        "totalPages": totalPages,
       };
 }
 
-class Episode {
+class Datum {
+  String? id;
   String? title;
   String? description;
-  String? id;
-  String? audioUrl;
   String? posterUrl;
+  String? totalListens;
+  String? rating;
 
-  Episode({
-    this.title,
-    this.description,
-    this.id,
-    this.audioUrl,
-    this.posterUrl,
-  });
+  Datum(
+      {this.id,
+      this.title,
+      this.description,
+      this.posterUrl,
+      this.rating,
+      this.totalListens});
 
-  factory Episode.fromJson(Map<String, dynamic> json) => Episode(
-        title: json["title"],
-        description: json["description"],
-        id: json["_id"],
-        audioUrl: json["audioUrl"],
-        posterUrl: json["posterUrl"],
-      );
+  factory Datum.fromJson(Map<String, dynamic> json) => Datum(
+      id: json["_id"],
+      title: json["title"],
+      description: json["description"],
+      posterUrl: json["posterUrl"],
+      totalListens: json['totalListens'],
+      rating: json['rating']);
 
   Map<String, dynamic> toJson() => {
+        "_id": id,
         "title": title,
         "description": description,
-        "_id": id,
-        "audioUrl": audioUrl,
         "posterUrl": posterUrl,
+        "rating": rating,
+        "totalListens":totalListens
       };
 }
-
-// To parse this JSON data, do
-//
-//     final podcastModel = podcastModelFromJson(jsonString);
-
-PodcastModel podcastModelFromJson(String str) =>
-    PodcastModel.fromJson(json.decode(str) as Map<String, dynamic>);
-
-String podcastModelToJson(PodcastModel data) =>
-    json.encode(data.toJson() as Map<String, dynamic>);

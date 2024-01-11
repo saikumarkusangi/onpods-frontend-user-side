@@ -6,6 +6,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:onpods/providers/quotes_provider.dart';
 import 'package:onpods/resources/quote_service.dart';
+import 'package:onpods/screens/player/mini_player.dart';
 import 'package:onpods/utils/colors.dart';
 import 'package:provider/provider.dart';
 import '../layout_screen.dart';
@@ -48,14 +49,14 @@ class _UploadQuotesState extends State<UploadQuotes> {
 
       return ChoiceChip(
         shape: RoundedRectangleBorder(
-          borderRadius: borderRadius, // Use the defined BorderRadius here
+          borderRadius: borderRadius,
         ),
         label: Text(category.name),
         checkmarkColor: Colors.white,
         selectedColor: blueColor,
         labelStyle: TextStyle(
             color: selectedChipIndex == index ? Colors.white : Colors.black),
-        selected: selectedChipIndex == index, // Check if this chip is selected
+        selected: selectedChipIndex == index,
         onSelected: (bool selected) {
           setState(() {
             selectedChipIndex = selected ? index : '';
@@ -71,6 +72,7 @@ class _UploadQuotesState extends State<UploadQuotes> {
         color: blueColor,
       )),
       builder: (context, child) => Scaffold(
+         bottomNavigationBar: const MiniPlayer(),
         appBar: AppBar(
           iconTheme: const IconThemeData(color: Colors.white),
           title: const Text(
@@ -96,7 +98,7 @@ class _UploadQuotesState extends State<UploadQuotes> {
                   });
                   if (res) {
                     Get.snackbar(
-                      
+
                       'Success', // Title
                       'Quote Uploaded Successfully',
                        backgroundColor: Colors.white
@@ -129,8 +131,8 @@ class _UploadQuotesState extends State<UploadQuotes> {
                 ),
               ),
               Wrap(
-                spacing: 10, 
-                runSpacing: 10, 
+                spacing: 10,
+                runSpacing: 10,
                 children: chipWidgets,
               ),
             ],

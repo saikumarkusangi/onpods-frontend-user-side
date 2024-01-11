@@ -14,9 +14,10 @@ class _ProfileScreenState extends State<ProfileScreen>
   Map<dynamic, dynamic> quotes = {};
   bool loading = false;
   bool _isLoadingMore = false;
-  String userName = 'NIL';
-  String userEmail = 'NIL';
+ static String userName = 'NIL';
+ static String userEmail = 'NIL';
   String id = '';
+  List intrests = [];
   bool verified = false;
   String userProfileImage = '';
   int followersCount = 0;
@@ -27,7 +28,6 @@ class _ProfileScreenState extends State<ProfileScreen>
       loading = true;
     });
     final userId = await UserSession.getUserId();
-  
     final data = await UserServices().userById(userId);
     final userQuotes = await UserServices().userQuotes(userId, 1);
 
@@ -41,6 +41,7 @@ class _ProfileScreenState extends State<ProfileScreen>
       verified = data['verified'] ?? false;
       quotes.addAll(userQuotes);
       loading = false;
+      intrests = data['interests'] ?? [];
     });
   }
 
@@ -98,6 +99,7 @@ class _ProfileScreenState extends State<ProfileScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      bottomNavigationBar: const MiniPlayer(),
       extendBodyBehindAppBar: true,
       body: DefaultTabController(
           length: 2,
@@ -110,13 +112,15 @@ class _ProfileScreenState extends State<ProfileScreen>
                       pinned: true,
                       iconTheme:
                           const IconThemeData(color: Colors.white, size: 26),
-                      expandedHeight: 300,
+                      expandedHeight:
+                          MediaQuery.of(context).size.shortestSide - 60,
                       backgroundColor: const Color.fromRGBO(0, 0, 0, 1),
                       actions: [
                         IconButton(
                             onPressed: () => _showBottomSheet(context),
                             icon: const Icon(
-                              Icons.menu,
+                              Icons.more_vert,
+                              size: 35,
                             ))
                       ],
                       title: Row(
@@ -124,8 +128,8 @@ class _ProfileScreenState extends State<ProfileScreen>
                         children: [
                           Text(
                             userName,
-                            style: const TextStyle(
-                              fontSize: 20,
+                            style: TextStyle(
+                              fontSize: 26.sp,
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
                             ),
@@ -158,8 +162,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                               child: ClipRRect(
                                 borderRadius: BorderRadius.circular(60),
                                 child: CachedNetworkImage(
-                                  imageUrl:
-                                      'https://onpods.s3.ap-south-1.amazonaws.com/profile-pics/$id.jpg',
+                                  imageUrl:userProfileImage,
                                   placeholder: (context, url) => Center(
                                     child: Text(
                                       userName.substring(0, 1).toUpperCase(),
@@ -172,6 +175,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                                       style: const TextStyle(fontSize: 32),
                                     ),
                                   ),
+                                  fit: BoxFit.cover,
                                 ),
                               ),
                             ),
@@ -319,14 +323,18 @@ class _ProfileScreenState extends State<ProfileScreen>
                       ? const SliverToBoxAdapter(child: ProfileQuotesSkeleton())
                       : SliverToBoxAdapter(
                           child: quotes['data'].length == 0
-                              ? const EmptyPlaceHiolder(
-                                  message: 'Quotes',
+                              ? const Align(
+                                  heightFactor: 2,
+                                  alignment: Alignment.center,
+                                  child: EmptyPlaceHolder(
+                                    message: 'Quotes',
+                                  ),
                                 )
                               : Padding(
                                   padding: const EdgeInsets.only(
                                       left: 10, right: 10, top: 40),
                                   child: StaggeredGrid.count(
-                                    crossAxisCount: 3,
+                                    crossAxisCount: 2,
                                     mainAxisSpacing: 14.0,
                                     crossAxisSpacing: 10.0,
                                     children: List.generate(
@@ -370,31 +378,110 @@ class _ProfileScreenState extends State<ProfileScreen>
                   :
 
                   // Podcasts Tab Content
-                  const SliverToBoxAdapter(
-                      child: EmptyPlaceHiolder(
-                      message: 'Podcasts',
-                    )),
-              _isLoadingMore
-                  ? const SliverToBoxAdapter(
-                      child: Center(
-                        child: CircularProgressIndicator(),
+                  SliverToBoxAdapter(
+                      child: FutureBuilder(
+                        future: PodcastService().podcastsByUserId(id),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return const Center(
+                              child: ProfileQuotesSkeleton(),
+                            );
+                          } else if (snapshot.hasError ||
+                              !snapshot.hasData ||
+                              snapshot.data.isEmpty) {
+                            // Handle error
+                            return const Align(
+                                heightFactor: 2,
+                                alignment: Alignment.center,
+                                child: EmptyPlaceHolder(message: ''));
+                          } else {
+                            // Data loaded successfully, display the list
+                            return GridView.builder(
+                              gridDelegate:
+                                  const SliverGridDelegateWithFixedCrossAxisCount(
+                                      crossAxisCount: 2, childAspectRatio: 0.8),
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemCount: snapshot.data.length,
+                              itemBuilder: (context, index) {
+                                final podcast = snapshot.data;
+
+                                return Padding(
+                                  padding: const EdgeInsets.only(
+                                      left: 10, right: 10),
+                                  child: GestureDetector(
+                                    onTap: () => Get.to(
+                                      DetailedPodcast(
+                                        podcastId: podcast[index]['podcastId'],
+                                        description:
+                                            podcast[index]['description'] ?? '',
+                                        image:
+                                            podcast[index]['posterUrl'] ?? '',
+                                        title: podcast[index]['title'] ?? '',
+                                      ),
+                                      transition: Transition.downToUp,
+                                    ),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(6),
+                                          child: CachedNetworkImage(
+                                            fit: BoxFit.cover,
+                                            width: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                0.45,
+                                            height: 160,
+                                            imageUrl: podcast[index]
+                                                ['posterUrl'],
+                                            errorWidget: (context, url,
+                                                    error) =>
+                                                Image.asset(podcastPlaceHolder),
+                                          ),
+                                        ),
+                                        const SizedBox(
+                                          height: 10,
+                                        ),
+                                        Text(
+                                          podcast[index]['title'] ?? '',
+                                          maxLines: 2,
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 16.sp,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                          textAlign: TextAlign.center,
+                                        ),
+                                        const SizedBox(
+                                          height: 10,
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              },
+                            );
+                          }
+                        },
                       ),
-                    )
-                  : const SliverToBoxAdapter()
+                    ),
             ],
           )),
     );
-    ;
   }
 
   void _showBottomSheet(BuildContext context) {
     showModalBottomSheet(
-      constraints: BoxConstraints.tight(const Size(double.maxFinite, 480)),
+      constraints: BoxConstraints.tight(const Size(double.maxFinite, 550)),
       isScrollControlled: true,
       context: context,
       showDragHandle: true,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
-      backgroundColor: const Color.fromARGB(255, 44, 43, 43),
+      backgroundColor: const Color.fromARGB(255, 0, 0, 0),
       builder: (context) => DraggableScrollableSheet(
           initialChildSize: 1,
           expand: true,
@@ -402,6 +489,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                 profilePic: userProfileImage,
                 userName: userName,
                 userId: id,
+                intrests:intrests
               )),
     );
   }

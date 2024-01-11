@@ -1,36 +1,20 @@
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:onpods/utils/colors.dart';
+import 'package:onpods/utils/exports.dart';
+import 'package:onpods/utils/notification_service.dart';
 
 class NotificationsPage extends StatelessWidget {
   NotificationsPage({super.key});
 
-  // Example list of notifications
-  final List<NotificationItem> notifications = [
-    NotificationItem(
-      notification: 'You have a new message.',
-      iconData: Icons.message, // Message icon
-    ),
-    NotificationItem(
-      notification: 'You received a friend request.',
-      iconData: Icons.person_add, // Friend request icon
-    ),
-    NotificationItem(
-      notification: 'Event reminder: Meeting at 2 PM.',
-      iconData: Icons.event, // Meeting icon
-    ),
-    NotificationItem(
-      notification: 'Your post got a new comment.',
-      iconData: Icons.comment, // Comment icon
-    ),
-  ];
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+       bottomNavigationBar: const MiniPlayer(),
       appBar: AppBar(
         backgroundColor: Colors.black,
         title: const Text(
-          'Notifications',
+          'Announcements',
           style: TextStyle(
             color: Colors.white,
             fontSize: 24.0,
@@ -40,75 +24,86 @@ class NotificationsPage extends StatelessWidget {
         iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Today',
-              style: TextStyle(
-                color: Colors.grey.shade300,
-                fontSize: 16.0,
-                fontWeight: FontWeight.bold,
-              ),
+            CustomElevatedButton(
+              text: 'Normal Notification',
+              onTap: () async {
+                await NotificationService.showNotification(
+                    title: 'Hello', body: 'Body');
+              },
             ),
-            const SizedBox(height: 8.0),
-            Expanded(
-              child: ListView.builder(
-                itemCount: notifications.length,
-                itemBuilder: (context, index) {
-                  final notification = notifications[index];
-                  return NotificationCard(
-                    notification: notification.notification,
-                    iconData: notification.iconData,
-                  );
-                },
-              ),
+            CustomElevatedButton(
+              text: ' Notification with summary',
+              onTap: () async {
+                await NotificationService.showNotification(
+                    title: 'Hello',
+                    body: 'Body',
+                    summary: 'samll summary',
+                    notificationLayout: NotificationLayout.Inbox);
+              },
             ),
+            CustomElevatedButton(
+              text: 'progress bar notifcatoin',
+              onTap: () async {
+                await NotificationService.showNotification(
+                    title: 'Hello',
+                    body: 'Body',
+                    summary: 'samll summary',
+                    notificationLayout: NotificationLayout.ProgressBar);
+              },
+            ),
+            CustomElevatedButton(
+              text: ' Notification with summary',
+              onTap: () async {
+                await NotificationService.showNotification(
+                    title: 'Hello',
+                    body: 'Body',
+                    summary: 'samll summary',
+                    notificationLayout: NotificationLayout.BigPicture,
+                    bigPicture:
+                        'https://images-platform.99static.com/5GhOJOUi6vANL1tD2-7bUEhBKgk=/2x0:2000x1998/500x500/top/smart/99designs-contests-attachments/120/120272/attachment_120272240');
+              },
+            ),
+            CustomElevatedButton(
+              text: 'action button',
+              onTap: () async {
+                await NotificationService.showNotification(
+                  title: 'Hello',
+                  body: 'Body',
+                  summary: 'samll summary',
+                  payload: {'navigate': 'true'},
+                  actionButton: [
+                    NotificationActionButton(
+                        key: 'check',
+                        label: 'check it out',
+                        actionType: ActionType.SilentAction)
+                  ],
+                );
+
+
+              },
+            ),
+             CustomElevatedButton(
+                    text: 'media button',
+                    onTap: () async {
+                      await NotificationService.showNotification(
+                          title: 'Hello',
+                          body: 'Body',
+                          summary: 'samll summary',
+                          payload: {'navigate': 'true'},
+                          actionButton: [
+                            NotificationActionButton(
+                                key: 'check',
+                                label: 'check it out',
+                                actionType: ActionType.SilentAction)
+                          ],
+                          notificationLayout: NotificationLayout.MediaPlayer);
+                    })
           ],
         ),
-      ),
-    );
-  }
-}
-
-class NotificationItem {
-  final String notification;
-  final IconData iconData;
-
-  NotificationItem({required this.notification, required this.iconData});
-}
-
-class NotificationCard extends StatelessWidget {
-  final String notification;
-  final IconData iconData;
-
-  const NotificationCard(
-      {super.key, required this.notification, required this.iconData});
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      elevation: 2.0,
-      margin: const EdgeInsets.symmetric(vertical: 8.0),
-      child: ListTile(
-        leading: CircleAvatar(
-          backgroundColor: blueColor,
-          child: Icon(
-            iconData,
-            color: Colors.white,
-          ),
-        ),
-        title: Text(
-          notification,
-          style: const TextStyle(
-            color: Colors.black87,
-            fontSize: 16.0,
-          ),
-        ),
-        onTap: () {
-          // Handle notification click action here
-        },
       ),
     );
   }

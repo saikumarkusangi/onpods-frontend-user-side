@@ -31,21 +31,22 @@ class _SingleQuoteState extends State<SingleQuote> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+       bottomNavigationBar: const MiniPlayer(),
       body: SafeArea(
           child: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              decoration: BoxDecoration(
-                  color: Colors.grey.withOpacity(0.3),
-                  borderRadius: const BorderRadius.only(
+              decoration: const BoxDecoration(
+
+                  borderRadius: BorderRadius.only(
                       bottomLeft: Radius.circular(20),
                       bottomRight: Radius.circular(20))),
               child: Column(
                 children: [
                   InkWell(
-                   
+
                     child: Stack(
                       alignment: Alignment.center,
                       children: [
@@ -167,11 +168,12 @@ class _SingleQuoteState extends State<SingleQuote> {
                               style: const TextStyle(
                                 color: Colors.white,
                                 overflow: TextOverflow.ellipsis,
-                                fontWeight: FontWeight.w800,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 20
                               ),
                             ),
                           ),
-                          trailing: Container(
+                          trailing:widget.userId != userId ? Container(
                             width: 80,
                             height: 40,
                             decoration: BoxDecoration(
@@ -188,7 +190,7 @@ class _SingleQuoteState extends State<SingleQuote> {
                                     fontWeight: FontWeight.w400),
                               ),
                             ),
-                          ),
+                          ):null,
                         );
                       })
                 ],

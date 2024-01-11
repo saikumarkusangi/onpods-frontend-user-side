@@ -9,7 +9,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   const CustomAppBar({super.key, required this.appBarOpacity});
 
   @override
-  Size get preferredSize => const Size.fromHeight(60); 
+  Size get preferredSize => const Size.fromHeight(50);
 
   @override
   Widget build(BuildContext context) {
@@ -27,31 +27,31 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
               children: [
                 Image.asset(
                   appBarLogo,
-                  scale: 1.2,
+                  width: 0.3.sw,
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     GestureDetector(
-                      onTap: () => Get.to(const PodcastScreen(),
+                      onTap: () => Get.to(const SearchScreen(),
                           transition: Transition.cupertino),
                       child: Image.asset(
                         searchIconImage,
-                        scale: 24,
+                        scale: 3.5,
                         color: Colors.white,
                       ),
                     ),
                     const SizedBox(
-                      width: 5,
+                      width: 10,
                     ),
-                    IconButton(
-                      icon: const Icon(
-                        Icons.notifications_outlined,
-                        color: Colors.white,
-                        size: 28,
-                      ),
-                      onPressed: () => Get.to(NotificationsPage(),
+                    GestureDetector(
+                      onTap: () => Get.to( NotificationsPage(),
                           transition: Transition.cupertino),
+                      child: Image.asset(
+                        announcement,
+                        scale:3,
+                        color: Colors.white,
+                      ),
                     ),
                   ],
                 )

@@ -10,15 +10,15 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(const Duration(seconds: 1), () async {
+    Future.delayed(const Duration(milliseconds: 500), () async {
       final userId = await UserSession.getUserId();
       print('splash screening checking user' + userId.toString());
-      
+
       if (userId != null) {
-        Get.off(() => const Layout(), transition: Transition.circularReveal);
+        Get.offAll(() => const Layout(), transition: Transition.fadeIn);
       } else {
-        Get.off(() => const LoginScreen(),
-            transition: Transition.circularReveal);
+        Get.offAll(() => const LoginScreen(),
+            transition: Transition.fadeIn);
       }
     });
   }

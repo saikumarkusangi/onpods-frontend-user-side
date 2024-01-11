@@ -64,6 +64,7 @@ class CreateQuoteState extends State<CreateQuote> {
           return Container(
             color: Colors.black.withOpacity(0.4),
             child: Scaffold(
+               bottomNavigationBar: const MiniPlayer(),
               backgroundColor: Colors.transparent,
               body: SafeArea(
                 child: TextEditor(
@@ -431,10 +432,10 @@ class CreateQuoteState extends State<CreateQuote> {
                                     ],
                                     compressQuality: 100,
                                     compressFormat: ImageCompressFormat.jpg,
-                                  
+
                                   );
                                   if(croppedFile == null) {
-                                
+
                                   } else {
                                     Get.to(
                                       UploadQuotes(

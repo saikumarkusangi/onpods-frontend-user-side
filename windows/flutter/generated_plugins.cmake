@@ -3,7 +3,9 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
+  awesome_notifications
   file_selector_windows
+  firebase_core
   permission_handler_windows
   share_plus
   smart_auth

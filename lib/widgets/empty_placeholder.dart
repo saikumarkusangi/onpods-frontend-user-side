@@ -1,9 +1,9 @@
 
 import 'package:onpods/utils/exports.dart';
 
-class EmptyPlaceHiolder extends StatelessWidget {
+class EmptyPlaceHolder extends StatelessWidget {
   final String message;
-  const EmptyPlaceHiolder({super.key, required this.message});
+  const EmptyPlaceHolder({super.key, required this.message});
 
   @override
   Widget build(BuildContext context) {
@@ -11,14 +11,12 @@ class EmptyPlaceHiolder extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        const SizedBox(
-          height: 30,
-        ),
-        Image.asset(emptyImage, scale: 2.5),
+
+        Image.asset(emptyImage, scale: 4),
         const Text(
           'Nothing to show',
           style: TextStyle(
-              color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+              color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold),
         )
       ],
     );

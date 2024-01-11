@@ -29,7 +29,7 @@ class CustomTextFormField extends StatelessWidget {
       this.vertical,
       this.height,
       this.radius,
-       this.onSubmit})
+      this.onSubmit, this.onChanged})
       : super(
           key: key,
         );
@@ -79,6 +79,7 @@ class CustomTextFormField extends StatelessWidget {
   final double? vertical;
   final bool? filled;
   final onSubmit;
+  final onChanged;
 
   final FormFieldValidator<String>? validator;
 
@@ -104,6 +105,7 @@ class CustomTextFormField extends StatelessWidget {
         validator: validator,
         style: textStyle,
         onFieldSubmitted: onSubmit,
+        onChanged: onChanged,
       );
   InputDecoration get decoration => InputDecoration(
         hintText: hintText ?? "",
@@ -119,17 +121,16 @@ class CustomTextFormField extends StatelessWidget {
         filled: filled,
         border: borderDecoration ??
             OutlineInputBorder(
-            
               borderRadius: BorderRadius.circular(radius!),
             ),
         enabledBorder: borderDecoration ??
             OutlineInputBorder(
-                borderSide: BorderSide(color: fillColor!,width: 0),
+              borderSide: BorderSide(color: fillColor!, width: 0),
               borderRadius: BorderRadius.circular(radius!),
             ),
         focusedBorder: borderDecoration ??
             OutlineInputBorder(
-                borderSide: const BorderSide(color: Colors.white30),
+              borderSide: const BorderSide(color: Colors.white30),
               borderRadius: BorderRadius.circular(radius!),
             ),
       );

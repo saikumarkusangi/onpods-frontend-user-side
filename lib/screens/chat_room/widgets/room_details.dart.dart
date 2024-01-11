@@ -20,15 +20,15 @@ showRoomDetails(context, title) {
                         topLeft: Radius.circular(20),
                         topRight: Radius.circular(20))),
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Padding(
-                      padding: const EdgeInsets.all(8.0),
+                      padding: const EdgeInsets.only(top: 10),
                       child: Center(
                         child: Container(
                           decoration: BoxDecoration(
-                              color: darktextFieldColor,
+                              color: Colors.white,
                               borderRadius: BorderRadius.circular(10)),
                           width: 40,
                           height: 6,
@@ -42,33 +42,29 @@ showRoomDetails(context, title) {
                       padding: const EdgeInsets.only(left: 20),
                       child: Text(
                         title,
-                        style: const TextStyle(
+                        style:  TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
-                            fontSize: 22),
+                            fontSize: 24.sp),
                       ),
                     ),
-                    const SizedBox(
-                      height: 10,
-                    ),
+
                     Padding(
                       padding: const EdgeInsets.only(left: 20),
                       child: Text(
                         'Speakers',
                         style: TextStyle(
-                            color: Colors.white.withOpacity(0.5), fontSize: 18),
+                            color: Colors.white.withOpacity(0.5), fontSize: 18.sp),
                       ),
                     ),
-                    const SizedBox(
-                      height: 10,
-                    ),
+
                     GridView.builder(
                         physics: const NeverScrollableScrollPhysics(),
                         shrinkWrap: true,
                         gridDelegate:
                             const SliverGridDelegateWithFixedCrossAxisCount(
                                 crossAxisCount: 3,
-                                childAspectRatio: 1.4,
+                                childAspectRatio: 1.5,
                                 mainAxisSpacing: 20),
                         itemCount: 8,
                         itemBuilder: (context, index) {
@@ -83,20 +79,18 @@ showRoomDetails(context, title) {
                       child: Text(
                         'Listeners',
                         style: TextStyle(
-                            color: Colors.white.withOpacity(0.5), fontSize: 18),
+                            color: Colors.white.withOpacity(0.5), fontSize: 18.sp),
                       ),
                     ),
-                    const SizedBox(
-                      height: 10,
-                    ),
+
                     GridView.builder(
                         physics: const NeverScrollableScrollPhysics(),
                         shrinkWrap: true,
                         gridDelegate:
                             const SliverGridDelegateWithFixedCrossAxisCount(
                                 crossAxisCount: 4,
-                                childAspectRatio: 1.4,
-                                mainAxisSpacing: 20),
+                                childAspectRatio: 1.5,
+                                mainAxisSpacing: 10),
                         itemCount: 8,
                         itemBuilder: (context, index) {
                           return Column(
@@ -106,23 +100,23 @@ showRoomDetails(context, title) {
                                 backgroundImage: NetworkImage(
                                     'https://randomuser.me/api/portraits/men/${index + 20}.jpg'),
                               ),
-                              const Text(
+                               Text(
                                 'Name',
                                 style: TextStyle(
-                                    color: Colors.white, fontSize: 14),
+                                    color: Colors.white, fontSize: 14.sp),
                               )
                             ],
                           );
                         }),
-                    const SizedBox(
-                      height: 40,
-                    ),
+
                     Container(
+                      padding: const EdgeInsets.only(bottom: 20),
                       color: bottomSheetColor,
                       child: Center(
                           child: CustomElevatedButton(
+                            onTap: () => Get.to(Meeting()),
                               width: 0.9.sw,
-                              height: 40,
+                              height: 50,
                               buttonTextStyle: const TextStyle(
                                   color: Colors.white, fontSize: 18),
                             buttonColor: blueColor,

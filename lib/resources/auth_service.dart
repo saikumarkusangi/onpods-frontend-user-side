@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:http/http.dart' as http;
 import 'package:onpods/utils/exports.dart';
 
@@ -42,10 +43,49 @@ class AuthService {
     }
   }
 
+// --------------------------------- Login--------------------------------------------------
+
+  Future<Map<String, dynamic>> oAuthlogin(String id) async {
+    try {
+      print(
+          'calling oauth login @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ id');
+      final response = await http.post(
+        Uri.parse('$baseUrl/auth/login'),
+        body: {
+          'oauth': id,
+        },
+      ).timeout(const Duration(seconds: 30));
+      print(response);
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> userData = json.decode(response.body);
+
+        return userData;
+      } else {
+        final Map<String, dynamic> error = json.decode(response.body);
+
+        throw error['message'];
+      }
+    } catch (e) {
+      if (e is TimeoutException) {
+        showSnackbar('Timeout', 'Server is too busy.Please come back again');
+      } else if (e
+          .toString()
+          .contains('ClientException with SocketException')) {
+        showSnackbar(
+            'Network Connection Error', 'Check your Internet Connection!!!');
+      } else {
+        // Handle other exceptions
+        showSnackbar('Something Went Wrong', e);
+      }
+      throw Exception('Error: $e');
+    }
+  }
+
 // ---------------------------------- Signup----------------------------------------
 
   Future<Map<String, dynamic>> signup(
       String name, String email, String password) async {
+          final fcmToken = await FirebaseMessaging.instance.getToken();
     try {
       final response = await http.post(
         Uri.parse('$baseUrl/auth/register'),
@@ -53,15 +93,56 @@ class AuthService {
           'username': name,
           'email': email,
           'password': password,
+          'fcmToken':fcmToken
         },
       ).timeout(const Duration(seconds: 30));
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> userData = json.decode(response.body);
-       
-        showSnackbar('Successful', 'Account Created Successfully!');
-        Get.offAll(const ChooseYourInterestScreen(),
-            transition: Transition.leftToRight);
+
+        return userData;
+      } else {
+        final Map<String, dynamic> error = json.decode(response.body);
+        throw error['message'];
+      }
+    } catch (e) {
+      if (e is TimeoutException) {
+        showSnackbar('Timeout', 'Server is too busy.Please come back again');
+      } else if (e
+          .toString()
+          .contains('ClientException with SocketException')) {
+        showSnackbar(
+            'Network Connection Error', 'Check your Internet Connection!!!');
+      } else {
+        // Handle other exceptions
+        showSnackbar('Something Went Wrong', e);
+      }
+      throw Exception('Error: $e');
+    }
+  }
+
+  // ---------------------------------- Signup----------------------------------------
+
+  Future<Map<String, dynamic>> oAuthsignup(
+      String name, String email, String id,String photoUrl) async {
+          final fcmToken = await FirebaseMessaging.instance.getToken();
+    try {
+      print(
+          'calling oauth signup @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@');
+      final response = await http.post(
+        Uri.parse('$baseUrl/auth/register'),
+        body: {
+          'username': name,
+          'email': email,
+          'oauth': id,
+          'profilePic':photoUrl,
+          'fcmToken':fcmToken
+        },
+      ).timeout(const Duration(seconds: 30));
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> userData = json.decode(response.body);
+
         return userData;
       } else {
         final Map<String, dynamic> error = json.decode(response.body);

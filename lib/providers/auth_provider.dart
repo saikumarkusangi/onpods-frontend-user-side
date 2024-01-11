@@ -19,13 +19,37 @@ class AuthProvider with ChangeNotifier {
     notifyListeners();
     try {
       final userData = await _authService!.login(email, password);
-      
+
       userId = userData['data']['id'];
       notifyListeners();
       UserSession.setUserId(userId);
       showSnackbar('Successful', 'You are logged in!');
-      Get.offAll(const Layout(), transition: Transition.leftToRight);
+      Get.offAll(const Layout(), transition: Transition.fadeIn);
     } catch (error) {
+      await _googleOauth.signOut();
+      throw Exception(error);
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+// ---------------------------- Login -----------------------------------------
+
+  Future<void> oauthLogin(String id) async {
+
+    _isLoading = true;
+    notifyListeners();
+    try {
+      final userData = await _authService!.oAuthlogin(id);
+
+      userId = userData['data']['id'];
+      notifyListeners();
+      UserSession.setUserId(userId);
+      showSnackbar('Successful', 'You are logged in!');
+      Get.offAll(const Layout(), transition: Transition.fadeIn);
+    } catch (error) {
+
       await _googleOauth.signOut();
       throw Exception(error);
     } finally {
@@ -37,12 +61,42 @@ class AuthProvider with ChangeNotifier {
   // ---------------------------- Sign UP -----------------------------------------
 
   Future<void> signUp(String name, String email, String password) async {
+
     _isLoading = true;
     notifyListeners();
     try {
       final userData = await _authService!.signup(name, email, password);
-      userId = userData['id'];
+
+      userId = userData['userId'];
       notifyListeners();
+      UserSession.setUserId(userId);
+      showSnackbar('Successful', 'Account Created Successfully!');
+      Get.offAll(const ChooseYourInterestScreen(),
+          transition: Transition.cupertino);
+    } catch (error) {
+      await _googleOauth.signOut();
+      throw Exception(error);
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  // ---------------------------- Sign UP -----------------------------------------
+
+  Future<void> oAuthsignUp(String name, String email, String id,String photoUrl) async {
+
+    _isLoading = true;
+    notifyListeners();
+    try {
+      final userData = await _authService!.oAuthsignup(name, email, id,photoUrl);
+
+      userId = userData['userId'];
+      notifyListeners();
+      UserSession.setUserId(userId);
+      showSnackbar('Successful', 'Account Created Successfully!');
+      Get.offAll(const ChooseYourInterestScreen(),
+          transition: Transition.cupertino);
     } catch (error) {
       await _googleOauth.signOut();
       throw Exception(error);

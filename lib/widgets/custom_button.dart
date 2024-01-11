@@ -50,6 +50,7 @@ class CustomElevatedButton extends BaseButton {
         decoration: decoration,
         child: ElevatedButton(
           style:  ButtonStyle(
+
                   shape: MaterialStateProperty.all(
                     RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
