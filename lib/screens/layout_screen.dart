@@ -53,7 +53,7 @@ class _LayoutState extends State<Layout> {
             _buildListTile(quoteIcon, 'Upload Quote', const CreateQuote()),
             const SizedBox(height: 10),
             _buildListTile(
-                chatRoomIcon, 'Create Chat Room',  Meeting()),
+                chatRoomIcon, 'Create Chat Room',  EmptyPlaceHolder(message: 'message')),
           ],
         );
       },

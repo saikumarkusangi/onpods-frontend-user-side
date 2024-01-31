@@ -114,7 +114,7 @@ showRoomDetails(context, title) {
                       color: bottomSheetColor,
                       child: Center(
                           child: CustomElevatedButton(
-                            onTap: () => Get.to(Meeting()),
+                            onTap: () {},
                               width: 0.9.sw,
                               height: 50,
                               buttonTextStyle: const TextStyle(
