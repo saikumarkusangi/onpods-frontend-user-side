@@ -11,7 +11,7 @@ class FileDownloaderProvider with ChangeNotifier {
   late StreamSubscription<List<int>> _audioDownloadSubscription;
   late StreamSubscription<List<int>> _posterDownloadSubscription;
   DownloadStatus _downloadStatus = DownloadStatus.notStarted;
-  int _downloadPercentage = 0;
+  int downloadPercentage = 0;
   String _downloadedFile = "";
 
   final ValueNotifier<int> downloadPercentageNotifier = ValueNotifier<int>(0);
@@ -35,7 +35,6 @@ class FileDownloaderProvider with ChangeNotifier {
     var posterRequest = http.Request('GET', Uri.parse(posterUrl));
 
     try {
-      print('downloading starting');
       var audioResponse = await http.Client().send(audioRequest);
       var posterResponse = await http.Client().send(posterRequest);
 
@@ -54,9 +53,9 @@ class FileDownloaderProvider with ChangeNotifier {
         (List<int> chunk) {
           audioChunks.add(chunk);
           audioDownloaded += chunk.length;
-          _downloadPercentage =
-              ((audioDownloaded / audioResponse.contentLength!) * 50).round();
-          print('Audio Download Progress: $_downloadPercentage%');
+          downloadPercentage =
+              ((audioDownloaded / audioResponse.contentLength!) * 100).round();
+
           notifyListeners();
         },
       );
@@ -65,9 +64,9 @@ class FileDownloaderProvider with ChangeNotifier {
         (List<int> chunk) {
           posterChunks.add(chunk);
           posterDownloaded += chunk.length;
-          _downloadPercentage = 50 +
+          downloadPercentage = 50 +
               ((posterDownloaded / posterResponse.contentLength!) * 50).round();
-          print('Poster Download Progress: $_downloadPercentage%');
+
           notifyListeners();
         },
       );
@@ -76,15 +75,16 @@ class FileDownloaderProvider with ChangeNotifier {
         _audioDownloadSubscription.asFuture(),
         _posterDownloadSubscription.asFuture(),
       ]);
+      updateDownloadStatus(DownloadStatus.completed);
 
-      _downloadPercentage = 100; // Ensure it's 100% when done
+      downloadPercentage = 100;
+      updateDownloadStatus(DownloadStatus.completed);
       notifyListeners();
 
       File audioFile = File('$dir/$filename.mp3');
       File posterFile = File('$dir/$filename.jpg');
 
       _downloadedFile = '$dir/$filename.mp3';
-      print('Downloaded audio file: $_downloadedFile');
 
       final Uint8List audioBytes = Uint8List(audioResponse.contentLength!);
       int audioOffset = 0;
@@ -107,13 +107,12 @@ class FileDownloaderProvider with ChangeNotifier {
       updateDownloadStatus(DownloadStatus.completed);
       _audioDownloadSubscription.cancel();
       _posterDownloadSubscription.cancel();
-      _downloadPercentage = 0;
+      downloadPercentage = 0;
 
       notifyListeners();
-      print('DownloadFile: Completed');
+
       completer.complete();
     } catch (e) {
-      print('Error during download: $e');
       updateDownloadStatus(DownloadStatus.notStarted);
       notifyListeners();
       completer.completeError(e);
@@ -124,24 +123,23 @@ class FileDownloaderProvider with ChangeNotifier {
 
   void updateDownloadStatus(DownloadStatus status) {
     _downloadStatus = status;
-    print('updateDownloadStatus: $status');
+
+    notifyListeners();
+  }
+
+  void updateDownloadPercentage(int percentage) {
+    downloadPercentage = percentage;
+
     notifyListeners();
   }
 
   Future<bool> _checkPermission() async {
     var status = await Permission.storage.status;
-    print(status.isGranted.toString() +
-        '@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@');
     if (status.isGranted) {
       return true;
     } else {
-      var result = await Permission.storage.request();
-      print(result.isGranted.toString() +
-          '@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@');
+      var result = await Permission.notification.request();
       if (result.isGranted) {
-        print(result.isGranted.toString() +
-            '@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@');
-
         return true;
       }
     }

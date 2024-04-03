@@ -1,4 +1,5 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:onpods/providers/local_downloads_provider.dart';
 import 'package:onpods/providers/mini_player_provider.dart';
 import 'package:onpods/utils/dynamic_links.dart';
 import 'package:onpods/utils/exports.dart';
@@ -51,6 +52,7 @@ class MyApp extends StatelessWidget {
             ChangeNotifierProvider(create: (_) => QuoteProvider()),
             ChangeNotifierProvider(create: (_) => RecordingDurationProvider()),
             ChangeNotifierProvider(create: (_) => BgAudioProvider()),
+            ChangeNotifierProvider(create: (_) => LocalDownloadProvider()),
             ChangeNotifierProvider(
               create: (_) => FileDownloaderProvider(),
             ),

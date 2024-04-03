@@ -14,10 +14,11 @@ class _SearchScreenState extends State<SearchScreen> {
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<PodcastProvider>(context);
-    return PopScope(
-      onPopInvoked: (val) {
-        provider.searchData.clear();
-      },
+    return WillPopScope(
+      onWillPop: () async {
+    provider.searchData.clear();
+    return true; // Allow the screen to be popped
+  },
       child: WidgetHUD(
         showHUD: provider.podcastCategories.isEmpty,
         hud: HUD(

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:onpods/utils/exports.dart';
 
 class SingleQuote extends StatefulWidget {
@@ -15,7 +17,6 @@ class SingleQuote extends StatefulWidget {
 }
 
 class _SingleQuoteState extends State<SingleQuote> {
-
   late String userId;
   @override
   void initState() {
@@ -30,8 +31,9 @@ class _SingleQuoteState extends State<SingleQuote> {
 
   @override
   Widget build(BuildContext context) {
+     final quoteProvider = Provider.of<QuoteProvider>(context, listen: false);
     return Scaffold(
-       bottomNavigationBar: const MiniPlayer(),
+      bottomNavigationBar: const MiniPlayer(),
       body: SafeArea(
           child: SingleChildScrollView(
         child: Column(
@@ -39,14 +41,12 @@ class _SingleQuoteState extends State<SingleQuote> {
           children: [
             Container(
               decoration: const BoxDecoration(
-
                   borderRadius: BorderRadius.only(
                       bottomLeft: Radius.circular(20),
                       bottomRight: Radius.circular(20))),
               child: Column(
                 children: [
                   InkWell(
-
                     child: Stack(
                       alignment: Alignment.center,
                       children: [
@@ -85,7 +85,7 @@ class _SingleQuoteState extends State<SingleQuote> {
                           right: 10,
                           top: 10,
                           child: InkWell(
-                            onTap: _showBottomSheet,
+                            onTap: () => _showBottomSheet(widget.image),
                             child: Container(
                                 width: 45,
                                 height: 45,
@@ -132,7 +132,7 @@ class _SingleQuoteState extends State<SingleQuote> {
                                       const Color.fromARGB(255, 236, 184, 202),
                                   borderRadius: BorderRadius.circular(60)),
                               child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(60),
+                                borderRadius: BorderRadius.circular(60),
                                 child: CachedNetworkImage(
                                   imageUrl: snapshot.data['profilePic'],
                                   placeholder: (context, url) => Center(
@@ -166,31 +166,32 @@ class _SingleQuoteState extends State<SingleQuote> {
                               snapshot.data['username'] ?? '',
                               maxLines: 1,
                               style: const TextStyle(
-                                color: Colors.white,
-                                overflow: TextOverflow.ellipsis,
-                                fontWeight: FontWeight.w600,
-                                fontSize: 20
-                              ),
+                                  color: Colors.white,
+                                  overflow: TextOverflow.ellipsis,
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 20),
                             ),
                           ),
-                          trailing:widget.userId != userId ? Container(
-                            width: 80,
-                            height: 40,
-                            decoration: BoxDecoration(
-                                color: blueColor,
-                                borderRadius: BorderRadius.circular(40)),
-                            child: const Center(
-                              child: Text(
-                                'Follow',
-                                maxLines: 1,
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 15,
-                                    overflow: TextOverflow.ellipsis,
-                                    fontWeight: FontWeight.w400),
-                              ),
-                            ),
-                          ):null,
+                          trailing: widget.userId != userId
+                              ? Container(
+                                  width: 80,
+                                  height: 40,
+                                  decoration: BoxDecoration(
+                                      color: blueColor,
+                                      borderRadius: BorderRadius.circular(40)),
+                                  child: const Center(
+                                    child: Text(
+                                      'Follow',
+                                      maxLines: 1,
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 15,
+                                          overflow: TextOverflow.ellipsis,
+                                          fontWeight: FontWeight.w400),
+                                    ),
+                                  ),
+                                )
+                              : null,
                         );
                       })
                 ],
@@ -203,64 +204,93 @@ class _SingleQuoteState extends State<SingleQuote> {
                 style: TextStyle(color: Colors.white, fontSize: 23),
               ),
             ),
+            const SizedBox(height: 20,),
+            SizedBox(
+              width: double.maxFinite,
+             
+              child: GridView.builder(
+                itemCount: 2,
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2),
+                  itemBuilder: (context, index) {
+                    return Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: ClipRRect(
+                        borderRadius: const BorderRadius.all(Radius.circular(6)),
+                        child: CachedNetworkImage(imageUrl:quoteProvider.quotes[0].datas[0].imageUrl,
+                        fit: BoxFit.cover,
+                        errorWidget: (context, url, error) => Image.asset(imagePlaceHolder),
+                        placeholder: (context, imageProvider) => Shimmer.fromColors(baseColor: Colors.grey.shade200, highlightColor: Colors.grey.shade400, child: const SizedBox(width: 200,height: 300,)),
+                        ),
+                      ),
+                    );
+                  }),
+            )
           ],
         ),
       )),
     );
   }
 
-  void _showBottomSheet() {
+  void _showBottomSheet(imageUrl) {
     showModalBottomSheet(
         context: context,
         showDragHandle: true,
-        constraints: const BoxConstraints(maxHeight: 275),
+        constraints: const BoxConstraints(maxHeight: 250),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         backgroundColor: const Color.fromARGB(255, 48, 47, 47),
         builder: (context) {
           return Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              ListTile(
-                leading: Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                        color: Colors.blue.shade200,
-                        borderRadius: BorderRadius.circular(40)),
-                    child: const Icon(
-                      Icons.share,
-                      color: Colors.black,
-                    )),
-                title: const Text(
-                  'Share',
-                  style: TextStyle(color: Colors.white, fontSize: 24),
+              GestureDetector(
+                onTap: () async {
+                  Get.back();
+                  final bytes = await NetworkAssetBundle(Uri.parse(imageUrl))
+                      .load(imageUrl);
+
+                  final tempDir = await getTemporaryDirectory();
+                  final tempFile = File('${tempDir.path}/temp_image.jpg');
+                  await tempFile.writeAsBytes(bytes.buffer.asUint8List());
+                  await Share.shareFiles(
+                    [tempFile.path],
+                    text:
+                        'https://chat.openai.com/c/592c71e8-43aa-48fe-acf3-0f6d3f0b6d19',
+                    subject: 'Share Quote',
+                  );
+                },
+                child: const ListTile(
+                  leading: Icon(
+                    Icons.share,
+                    color: Colors.white,
+                    size: 28,
+                  ),
+                  title: Text(
+                    'Share',
+                    style: TextStyle(color: Colors.white, fontSize: 24),
+                  ),
                 ),
               ),
-              ListTile(
-                leading: Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                        color: Colors.purple.shade200,
-                        borderRadius: BorderRadius.circular(40)),
-                    child: const Icon(
-                      Icons.download,
-                      color: Colors.white,
-                    )),
-                title: const Text(
+              const ListTile(
+                leading: Icon(
+                  Icons.download,
+                  color: Colors.white,
+                  size: 28,
+                ),
+                title: Text(
                   'Download',
                   style: TextStyle(color: Colors.white, fontSize: 24),
                 ),
               ),
-              ListTile(
-                leading: Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                        color: Colors.redAccent.shade200,
-                        borderRadius: BorderRadius.circular(40)),
-                    child: const Icon(
-                      Icons.report,
-                      color: Colors.white,
-                    )),
-                title: const Text(
+              const ListTile(
+                leading: Icon(
+                  Icons.report,
+                  color: Colors.white,
+                  size: 28,
+                ),
+                title: Text(
                   'Report',
                   style: TextStyle(color: Colors.white, fontSize: 24),
                 ),

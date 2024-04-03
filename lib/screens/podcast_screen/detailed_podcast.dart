@@ -2,16 +2,20 @@ import 'dart:io';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter_hud/flutter_hud.dart';
+import 'package:onpods/providers/local_downloads_provider.dart';
 import 'package:onpods/screens/podcast_screen/edit_page.dart';
 import 'package:onpods/screens/podcast_screen/widgets/rating_screen.dart';
+import 'package:onpods/utils/dynamic_links.dart';
 import 'package:onpods/utils/exports.dart';
 import 'package:onpods/utils/notification_service.dart';
+import 'package:percent_indicator/circular_percent_indicator.dart';
 
 class DetailedPodcast extends StatefulWidget {
   final String image;
   final String title;
   final String description;
   final String podcastId;
+  
 
   const DetailedPodcast(
       {Key? key,
@@ -32,6 +36,8 @@ class _DetailedPodcastState extends State<DetailedPodcast> {
   PaletteGenerator? _paletteGenerator =
       PaletteGenerator.fromColors([PaletteColor(Colors.black, 2)]);
   bool flag = true;
+  String? currentDownloadId;
+
 
   @override
   void initState() {
@@ -68,9 +74,12 @@ class _DetailedPodcastState extends State<DetailedPodcast> {
   final ValueNotifier<bool> flagNotifier = ValueNotifier<bool>(false);
   final ValueNotifier<bool> listed = ValueNotifier<bool>(false);
   final ValueNotifier<bool> loading = ValueNotifier<bool>(false);
+  final ValueNotifier<bool> sort = ValueNotifier<bool>(false);
+
   @override
   Widget build(BuildContext context) {
     final currentPodcastProvider = Provider.of<PodcastProvider>(context);
+    final localDownloadProvider = Provider.of<LocalDownloadProvider>(context);
     final ValueNotifier<bool> followed = ValueNotifier<bool>(
         currentPodcastProvider.currentPodcast.isNotEmpty
             ? currentPodcastProvider.currentPodcast[0].following
@@ -79,8 +88,7 @@ class _DetailedPodcastState extends State<DetailedPodcast> {
         currentPodcastProvider.currentPodcast.isNotEmpty
             ? currentPodcastProvider.currentPodcast[0].addedToMyList
             : false);
-    var fileDownloaderProvider =
-        Provider.of<FileDownloaderProvider>(context, listen: false);
+    var fileDownloaderProvider = Provider.of<FileDownloaderProvider>(context);
     return ValueListenableBuilder(
       valueListenable: loading,
       builder: (context, value, child) => WidgetHUD(
@@ -563,19 +571,41 @@ class _DetailedPodcastState extends State<DetailedPodcast> {
                                 );
                               },
                             )),
-                  Container(
-                    padding: const EdgeInsets.only(left: 10),
-                    margin: const EdgeInsets.only(left: 15),
-                    decoration: const BoxDecoration(
-                        border: Border(
-                            left: BorderSide(color: blueColor, width: 4))),
-                    child: Text(
-                      'All Episodes',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w800,
-                        fontSize: 22.sp,
-                      ),
+                  ValueListenableBuilder(
+                    valueListenable: sort,
+                    builder: (context, value, child) => Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.only(left: 10),
+                          margin: const EdgeInsets.only(left: 15),
+                          decoration: const BoxDecoration(
+                              border: Border(
+                                  left:
+                                      BorderSide(color: blueColor, width: 4))),
+                          child: Text(
+                            'All Episodes',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w800,
+                              fontSize: 22.sp,
+                            ),
+                          ),
+                        ),
+                        TextButton.icon(
+                            onPressed: () {
+                              sort.value = !sort.value;
+                              setState(() {});
+                            },
+                            icon: const Icon(
+                              Icons.swap_vert,
+                              color: blueColor,
+                            ),
+                            label: const Text(
+                              'Sort',
+                              style: TextStyle(color: Colors.white),
+                            ))
+                      ],
                     ),
                   )
                 ]),
@@ -599,8 +629,14 @@ class _DetailedPodcastState extends State<DetailedPodcast> {
                     itemCount: currentPodcastProvider
                         .currentPodcast[0].episodes.length,
                     itemBuilder: (context, index) {
-                      final episodes =
-                          currentPodcastProvider.currentPodcast[0].episodes;
+                      final episodes = sort.value
+                          ? currentPodcastProvider
+                              .currentPodcast[0].episodes.reversed
+                              .toList()
+                          : currentPodcastProvider.currentPodcast[0].episodes;
+                      final isDownloaded =
+                          localDownloadProvider.checkForDownload(
+                              '${widget.title}~e${episodes[index].title}');
                       return GestureDetector(
                           onTap: () => Get.to(
                               PlayerScreen(
@@ -635,11 +671,12 @@ class _DetailedPodcastState extends State<DetailedPodcast> {
                                           podcastPlaceHolder,
                                           scale: 3,
                                         ),
-                                        imageUrl: episodes[index].posterUrl.isNotEmpty ?
-                                        episodes[index].posterUrl :
-                                            widget.image,
+                                        imageUrl:
+                                            episodes[index].posterUrl.isNotEmpty
+                                                ? episodes[index].posterUrl
+                                                : widget.image,
                                         errorWidget: (context, url, error) =>
-                                             Image.asset(
+                                            Image.asset(
                                           podcastPlaceHolder,
                                           scale: 3,
                                         ),
@@ -706,45 +743,67 @@ class _DetailedPodcastState extends State<DetailedPodcast> {
                                           ),
                                           onPressed: () {},
                                         ),
-                                        IconButton(
-                                          icon: Icon(
-                                            Icons.download_for_offline,
-                                            size: 32.sp,
-                                            color: Colors.white,
-                                          ),
-                                          onPressed: () async {
-                                            NotificationService
-                                                .showNotification(
-                                                    title: 'Downloading..',
-                                                    body: episodes[index].title,
-                                                    locked: true,
-                                                    bigPicture: episodes[index]
-                                                            .posterUrl
-                                                            .isNotEmpty
-                                                        ? episodes[index]
-                                                            .posterUrl
-                                                        : widget.image,
-                                                    notificationLayout:
-                                                        NotificationLayout
-                                                            .ProgressBar,
-                                                    payload: {
-                                                  'navigate': 'true',
-                                                  'to': 'downloads'
-                                                });
-                                            fileDownloaderProvider
-                                                .downloadFileWithPoster(
-                                                    episodes[index].audioUrl,
-                                                    episodes[index]
-                                                            .posterUrl
-                                                            .isNotEmpty
-                                                        ? episodes[index]
-                                                            .posterUrl
-                                                        : widget.image,
-                                                    '${widget.title}-${episodes[index].title}')
-                                                .then((onValue) {});
-                                          },
-                                        ),
-                                        IconButton(
+                                     IconButton(
+  icon: isDownloaded
+      ? Icon(Icons.download_done, size: 32.sp,)
+      : (currentDownloadId != null && currentDownloadId == episodes[index].id)
+          ? CircularPercentIndicator(
+              radius: 16.0,
+              lineWidth: 2.0,
+              percent: fileDownloaderProvider.downloadPercentage / 100,
+              center: Text(
+                '${fileDownloaderProvider.downloadPercentage}%',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 11,
+                ),
+              ),
+              progressColor: blueColor,
+            )
+          : Icon(Icons.download_for_offline, size: 32.sp,),
+
+  color: Colors.white,
+  onPressed: () async {
+    if (currentDownloadId != null ) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Another download is already in progress.'),
+        ),
+      );
+      return;
+    }
+
+    if (isDownloaded) {
+      showDeleteConfirmationDialog(context, episodes[index].title);
+    } else {
+      currentDownloadId = episodes[index].id; // Set current download ID
+
+      NotificationService.showNotification(
+        title: 'Downloading..',
+        body: episodes[index].title,
+        locked: true,
+        bigPicture: episodes[index].posterUrl.isNotEmpty
+            ? episodes[index].posterUrl
+            : widget.image,
+        notificationLayout: NotificationLayout.ProgressBar,
+        payload: {'navigate': 'true', 'to': 'downloads'},
+      );
+
+      await fileDownloaderProvider
+          .downloadFileWithPoster(
+              episodes[index].audioUrl,
+              episodes[index].posterUrl.isNotEmpty
+                  ? episodes[index].posterUrl
+                  : widget.image,
+              '${widget.title}~e${episodes[index].title}')
+          .then((onValue) {
+        localDownloadProvider.loadLocalDownloads();
+        NotificationService.dismissAllNotifications();
+        currentDownloadId = null; // Clear current download ID after download completes
+      });
+    }
+  },
+), IconButton(
                                           icon: Icon(
                                             Icons.play_circle,
                                             size: 32.sp,
@@ -757,9 +816,11 @@ class _DetailedPodcastState extends State<DetailedPodcast> {
                                                 audioUrl:
                                                     episodes[index].audioUrl,
                                                 episode: episodes[index].title,
-                                                poster:
-                                                    episodes[index].posterUrl ??
-                                                        widget.image,
+                                                poster: episodes[index]
+                                                        .posterUrl
+                                                        .isEmpty
+                                                    ? widget.image
+                                                    : episodes[index].posterUrl,
                                                 title: widget.title,
                                                 startingIndex: index,
                                                 podcastId: widget.podcastId,
@@ -841,28 +902,35 @@ class _DetailedPodcastState extends State<DetailedPodcast> {
                     fontWeight: FontWeight.w600),
               ),
               onTap: () async {
-                final podcastTitle = widget.title;
-                final podcastDescription = widget.description;
-                final podcastUrl = 'https://example.com';
-                // final limitedDescription =
-                //     LineSplitter.split(podcastDescription).take(2).join('');
-                final text =
-                    '🎧 Check out this amazing podcast: "$podcastTitle" 🎙️\n\n🔗 $podcastUrl';
+                Get.back();
+                loading.value = true;
+                DynamicLinkProvider()
+                    .createLink(widget.title)
+                    .then((value) async {
+                  final podcastTitle = widget.title;
+                  final podcastDescription = widget.description;
+                  final podcastUrl = value;
+                  final limitedDescription = podcastDescription.length > 100
+                      ? '${podcastDescription.substring(0, 120)}...'
+                      : podcastDescription;
 
-                final imageUrl =
-                    widget.image == '' ? podcastPlaceHolder : widget.image;
-                final bytes = await NetworkAssetBundle(Uri.parse(imageUrl))
-                    .load(imageUrl);
+                  final text =
+                      '🎧 Check out this amazing podcast: "$podcastTitle" 🎙️\n $limitedDescription\n🔗 $podcastUrl';
 
-                final tempDir = await getTemporaryDirectory();
-                final tempFile = File('${tempDir.path}/temp_image.jpg');
-                await tempFile.writeAsBytes(bytes.buffer.asUint8List());
+                  final imageUrl = widget.image;
+                  final bytes = await NetworkAssetBundle(Uri.parse(imageUrl))
+                      .load(imageUrl);
 
-                await Share.shareFiles(
-                  [tempFile.path],
-                  text: text,
-                  subject: 'Share Podcast',
-                );
+                  final tempDir = await getTemporaryDirectory();
+                  final tempFile = File('${tempDir.path}/temp_image.jpg');
+                  await tempFile.writeAsBytes(bytes.buffer.asUint8List());
+                  loading.value = false;
+                  await Share.shareFiles(
+                    [tempFile.path],
+                    text: text,
+                    subject: 'Share Podcast',
+                  );
+                });
               },
             ),
             ListTile(
@@ -1143,4 +1211,56 @@ class _DetailedPodcastState extends State<DetailedPodcast> {
       ),
     );
   }
+}
+
+Future<void> showDeleteConfirmationDialog(
+    BuildContext context, String episodeTitle) async {
+  return showDialog<void>(
+    context: context,
+    barrierDismissible: true,
+    barrierColor: const Color.fromARGB(170, 0, 0, 0),
+    builder: (BuildContext context) {
+      return AlertDialog(
+        backgroundColor: const Color.fromARGB(255, 34, 33, 33),
+        title: const Text(
+          'Delete From Downloads?',
+          style: TextStyle(color: Colors.white),
+        ),
+        content: SingleChildScrollView(
+          child: ListBody(
+            children: <Widget>[
+              Text(
+                'Do you want to delete the episode from downloads: $episodeTitle?',
+                style:
+                    const TextStyle(color: Color.fromARGB(217, 246, 240, 240)),
+              ),
+            ],
+          ),
+        ),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop(); // Close the dialog
+            },
+            child: const Text(
+              'Cancel',
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(context).pop(); // Close the dialog after deleting
+            },
+            style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red // Set the button color
+                ),
+            child: const Text(
+              'Delete',
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+        ],
+      );
+    },
+  );
 }

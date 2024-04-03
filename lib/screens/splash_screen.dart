@@ -1,3 +1,4 @@
+import 'package:onpods/providers/local_downloads_provider.dart';
 import 'package:onpods/utils/exports.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -17,14 +18,17 @@ class _SplashScreenState extends State<SplashScreen> {
       if (userId != null) {
         Get.offAll(() => const Layout(), transition: Transition.fadeIn);
       } else {
-        Get.offAll(() => const LoginScreen(),
-            transition: Transition.fadeIn);
+        Get.offAll(() => const LoginScreen(), transition: Transition.fadeIn);
       }
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    final localDownloadProvider = Provider.of<LocalDownloadProvider>(context);
+    if (localDownloadProvider.audioFiles.isEmpty) {
+      localDownloadProvider.loadLocalDownloads();
+    }
     return Scaffold(
       backgroundColor: Colors.black,
       body: Center(

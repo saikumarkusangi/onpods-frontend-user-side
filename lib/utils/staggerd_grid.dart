@@ -111,13 +111,17 @@ class _StaggeredGridTemplateState extends State<StaggeredGridTemplate> {
                                   .any((e) => e.category == widget.categoryId));
                           final quote =
                               provider.quotes[quoteCategoryIndex].datas[index];
+
+                         
+                        
+
                           return GestureDetector(
                             onTap: () => Get.to(
                                 SingleQuote(
-                                  postId: quote.id,
-                                  image: quote.imageUrl,
-                                  userId: quote.userId,
-                                ),
+                                    postId: quote.id,
+                                    image: quote.imageUrl,
+                                    userId: quote.userId,
+                                  ),
                                 transition: Transition.cupertino),
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(10),
