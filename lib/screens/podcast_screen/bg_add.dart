@@ -122,7 +122,7 @@ class BgAddState extends State<BgAdd> with AutomaticKeepAliveClientMixin {
               child: Image.asset(
                 liveGif,
                 color: blueColor,
-                scale: 2,
+                scale: 3,
               ),
             )
           : provider.bgCategories.isEmpty

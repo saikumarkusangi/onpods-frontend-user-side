@@ -13,6 +13,7 @@ class SinglePodcastCategory extends StatefulWidget {
 class _SinglePodcastCategoryState extends State<SinglePodcastCategory> {
   final ScrollController _scrollController = ScrollController();
   bool _isLoadingMore = false;
+  String _sortBy = 'listenCount';
   @override
   void initState() {
     super.initState();
@@ -23,7 +24,7 @@ class _SinglePodcastCategoryState extends State<SinglePodcastCategory> {
   Future<void> _fetchPodcasts() async {
     final podcastProvider =
         Provider.of<PodcastProvider>(context, listen: false);
-    podcastProvider.fetchPodcastsByCategory(widget.categoryId, 1);
+    podcastProvider.fetchPodcastsByCategory(widget.categoryId, 1,_sortBy);
   }
 
   void _initializeScrollController() {
@@ -42,7 +43,7 @@ class _SinglePodcastCategoryState extends State<SinglePodcastCategory> {
             print(
                 '@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ total page :${provider.podcasts[0].totalPages}');
             await provider.fetchPodcastsByCategory(
-                widget.categoryId, provider.podcasts[0].page! + 1);
+                widget.categoryId, provider.podcasts[0].page! + 1,_sortBy);
           }
         } catch (e) {
           throw Exception(e);
@@ -74,12 +75,54 @@ class _SinglePodcastCategoryState extends State<SinglePodcastCategory> {
           widget.title,
           style: TextStyle(color: Colors.white, fontSize: 24.sp),
         ),
+        actions: [
+          PopupMenuButton<String>(
+            color: const Color(0xFF242323),
+            icon: const Icon(
+              Icons.filter_list,
+              color: Colors.white,
+              size: 32,
+            ),
+            
+            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+              const PopupMenuItem<String>(
+                value: 'rating',
+                child: Text(
+                  'Most Rated',
+                  style: TextStyle(color: Colors.white, fontSize: 20),
+                ),
+              ),
+              const PopupMenuItem<String>(
+                value: 'listenCount',
+                child: Text(
+                  'Most Listen',
+                  style: TextStyle(color: Colors.white, fontSize: 20),
+                ),
+              ),
+              const PopupMenuItem<String>(
+                value: 'recentUpload',
+                child: Text(
+                  'Recent Upload',
+                  style: TextStyle(color: Colors.white, fontSize: 20),
+                ),
+              ),
+            ],
+            onSelected: (String value) {
+              setState(() {
+                _sortBy = value;
+              });
+               podcastProvider.podcasts.clear();
+                podcastProvider.setCategory();
+                 podcastProvider.fetchPodcastsByCategory(widget.categoryId, 1,_sortBy);
+            },
+          )
+        ],
       ),
       body: RefreshIndicator(
         onRefresh: () async {
           podcastProvider.podcasts.clear();
           podcastProvider.setCategory();
-          podcastProvider.fetchPodcastsByCategory(widget.categoryId, 1);
+          podcastProvider.fetchPodcastsByCategory(widget.categoryId, 1,_sortBy);
         },
         child: podcastProvider.isLoading &&
                 podcastProvider.categoryId != widget.categoryId
@@ -103,7 +146,6 @@ class _SinglePodcastCategoryState extends State<SinglePodcastCategory> {
                                   podcastProvider.podcasts[0].data![index];
                               return GestureDetector(
                                 onTap: () {
-
                                   Get.to(
                                       DetailedPodcast(
                                           podcastId: podcast.id!,
@@ -160,17 +202,14 @@ class _SinglePodcastCategoryState extends State<SinglePodcastCategory> {
                                             Row(
                                               children: [
                                                 const Icon(
-                                                        Icons.star,
-                                                        color: Colors.yellow,
-                                                      ),
-
+                                                  Icons.star,
+                                                  color: Colors.yellow,
+                                                ),
                                                 const SizedBox(
                                                   width: 10,
                                                 ),
                                                 Text(
-                                                 podcast.rating
-                                                          .toString(),
-
+                                                  podcast.rating.toString(),
                                                   style: TextStyle(
                                                       color:
                                                           Colors.grey.shade500,

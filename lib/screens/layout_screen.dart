@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+import 'package:onpods/screens/chat_room/create_chatroom.dart';
 import 'package:onpods/utils/exports.dart';
 import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
 
@@ -11,12 +13,30 @@ class Layout extends StatefulWidget {
 class _LayoutState extends State<Layout> {
   final _controller = PersistentTabController(initialIndex: 0);
   DateTime? currentBackPressTime;
+   late StreamController<bool> _internetStatusController;
+  late StreamSubscription<ConnectivityResult> _connectivitySubscription;
 
-  Future<bool> checkInternetConnectivity() async {
-
-    final connectivityResult = await Connectivity().checkConnectivity();
-    return connectivityResult != ConnectivityResult.none;
+@override
+  void initState() {
+    super.initState();
+    _internetStatusController = StreamController<bool>();
+    _checkInternetConnectivity();
   }
+    @override
+  void dispose() {
+    _internetStatusController.close();
+    _connectivitySubscription.cancel();
+    super.dispose();
+  }
+
+   Future<void> _checkInternetConnectivity() async {
+    _connectivitySubscription = Connectivity()
+        .onConnectivityChanged
+        .listen((ConnectivityResult result) {
+      _internetStatusController.add(result != ConnectivityResult.none);
+    });
+  }
+
 
   void _showBottomSheet() {
     showModalBottomSheet<void>(
@@ -53,7 +73,7 @@ class _LayoutState extends State<Layout> {
             _buildListTile(quoteIcon, 'Upload Quote', const CreateQuote()),
             const SizedBox(height: 10),
             _buildListTile(
-                chatRoomIcon, 'Create Chat Room',  EmptyPlaceHolder(message: 'message')),
+                chatRoomIcon, 'Create Chat Room',  const CreateChatRoom()),
           ],
         );
       },
@@ -69,13 +89,13 @@ class _LayoutState extends State<Layout> {
           color: const Color.fromARGB(255, 71, 71, 71),
           borderRadius: BorderRadius.circular(60),
         ),
-        child: Image.asset(leadingIcon, scale: 24, color: Colors.white),
+        child: Image.asset(leadingIcon, scale: 12, color: Colors.white),
       ),
       title: Text(
         title,
-        style: const TextStyle(
+        style:  TextStyle(
           color: Colors.white,
-          fontSize: 16,
+          fontSize: 22.sp,
           fontWeight: FontWeight.w400,
         ),
       ),
@@ -93,10 +113,10 @@ class _LayoutState extends State<Layout> {
     List<PersistentBottomNavBarItem> navBarItems() {
       return [
         PersistentBottomNavBarItem(
-            title: 'Home',
+            title: 'Podcasts',
             activeColorPrimary: Colors.white.withOpacity(0.7),
             activeColorSecondary: blueColor,
-            icon: const ImageIcon(AssetImage(homeIcon))),
+            icon: const ImageIcon(AssetImage(podcastIcon))),
         PersistentBottomNavBarItem(
             title: 'Quotes',
             activeColorPrimary: Colors.white.withOpacity(0.7),
@@ -125,16 +145,17 @@ class _LayoutState extends State<Layout> {
       ];
     }
 
-    return FutureBuilder<bool>(
-      future: checkInternetConnectivity(),
+    return  StreamBuilder<bool>(
+      stream: _internetStatusController.stream,
+      initialData: true, 
       builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
+        if (snapshot.connectionState == ConnectionState.done) {
           return Image.asset(
             liveGif,
             color: blueColor,
             scale: 3,
           );
-        } else if (!snapshot.hasData) {
+        } else if (!snapshot.hasData || !snapshot.data!) {
           return const NoConnection();
         } else {
           return PersistentTabView(

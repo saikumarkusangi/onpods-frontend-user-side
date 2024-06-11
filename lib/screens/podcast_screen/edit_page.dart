@@ -77,11 +77,11 @@ class EditPageState extends State<EditPage> {
                 title, description,widget.podcastId,widget.selectedChipIndex, pickedImage);
 
             if (res) {
-              showSnackbar('Successful', 'Podcast Uploaded Successfully');
+              showSnackbar('Successful', 'Podcast Uploaded Successfully',ContentType.success,context);
               provider.fetchPodcastsById(widget.podcastId);
               Navigator.of(context).pop();
             } else {
-              showSnackbar('Fail', 'Something went wrong');
+              showSnackbar('Fail', 'Something went wrong',ContentType.failure,context);
             }
           } finally {
             setState(() {
@@ -99,11 +99,11 @@ class EditPageState extends State<EditPage> {
           final res = await PodcastService().updateEpisode(title, description,
               widget.podcastId, widget.episodeId, pickedImage);
           if (res) {
-            showSnackbar('Successful', 'Updated Successfully');
+            showSnackbar('Successful', 'Updated Successfully',ContentType.success,context);
             provider.fetchPodcastsById(widget.podcastId);
             Navigator.of(context).pop();
           } else {
-            showSnackbar('Fail', 'Something went wrong');
+            showSnackbar('Fail', 'Something went wrong',ContentType.failure,context);
           }
         } finally {
           setState(() {

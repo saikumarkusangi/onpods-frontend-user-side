@@ -92,7 +92,7 @@ class _ChooseYourInterestScreenState extends State<ChooseYourInterestScreen> {
                     textAlign: TextAlign.center,
                     style: TextStyle(
                         color: Colors.white,
-                        fontSize: 18.sp,
+                        fontSize: 20.sp,
                         fontWeight: FontWeight.bold),
                   ),
                 ),
@@ -131,39 +131,42 @@ class _ChooseYourInterestScreenState extends State<ChooseYourInterestScreen> {
                 'Pick 3 categories that you want to listen',
                 style: TextStyle(
                     color: Colors.white,
-                    fontSize: 12.sp),
+                    fontSize: 18.sp),
               ),
             ]),
           ),
           body: Padding(
             padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                provider.podcastCategories.isEmpty
-                    ? const Center(
-                        child: CircularProgressIndicator(
-                          color: blueColor,
-                        ),
-                      )
-                    : provider.podcastCategories.isEmpty
-                        ? const EmptyPlaceHolder(message: 'Categories')
-                        : Wrap(
-                            spacing: 10,
-                            runSpacing: 20,
-                            children: chipWidgets,
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  provider.podcastCategories.isEmpty
+                      ? const Center(
+                          child: CircularProgressIndicator(
+                            color: blueColor,
                           ),
-                CustomElevatedButton(
-                  height: 50,
-                  text: "Next",
-                  buttonColor: blueColor,
-                  buttonTextStyle: TextStyle(
-                      fontSize:18.sp,
-                      color: Colors.white),
-                  onTap: () => _submit(),
-                ),
-              ],
+                        )
+                      : provider.podcastCategories.isEmpty
+                          ? const EmptyPlaceHolder(message: 'Categories')
+                          : Wrap(
+                              spacing: 10,
+                              runSpacing: 20,
+                              children: chipWidgets,
+                            ),
+                            const SizedBox(height: 20,),
+                  CustomElevatedButton(
+                    height: 50,
+                    text: "Next",
+                    buttonColor: blueColor,
+                    buttonTextStyle: TextStyle(
+                        fontSize:18.sp,
+                        color: Colors.white),
+                    onTap: () => _submit(),
+                  ),
+                ],
+              ),
             ),
           ),
         ),

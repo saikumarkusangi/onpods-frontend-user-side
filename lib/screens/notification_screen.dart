@@ -23,86 +23,16 @@ class NotificationsPage extends StatelessWidget {
         ),
         iconTheme: const IconThemeData(color: Colors.white),
       ),
-      body: Padding(
+      body: const Padding(
         padding: EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            CustomElevatedButton(
-              text: 'Normal Notification',
-              onTap: () async {
-                await NotificationService.showNotification(
-                    title: 'Hello', body: 'Body');
-              },
-            ),
-            CustomElevatedButton(
-              text: ' Notification with summary',
-              onTap: () async {
-                await NotificationService.showNotification(
-                    title: 'Hello',
-                    body: 'Body',
-                    summary: 'samll summary',
-                    notificationLayout: NotificationLayout.Inbox);
-              },
-            ),
-            CustomElevatedButton(
-              text: 'progress bar notifcatoin',
-              onTap: () async {
-                await NotificationService.showNotification(
-                    title: 'Hello',
-                    body: 'Body',
-                    summary: 'samll summary',
-                    notificationLayout: NotificationLayout.ProgressBar);
-              },
-            ),
-            CustomElevatedButton(
-              text: ' Notification with summary',
-              onTap: () async {
-                await NotificationService.showNotification(
-                    title: 'Hello',
-                    body: 'Body',
-                    summary: 'samll summary',
-                    notificationLayout: NotificationLayout.BigPicture,
-                    bigPicture:
-                        'https://images-platform.99static.com/5GhOJOUi6vANL1tD2-7bUEhBKgk=/2x0:2000x1998/500x500/top/smart/99designs-contests-attachments/120/120272/attachment_120272240');
-              },
-            ),
-            CustomElevatedButton(
-              text: 'action button',
-              onTap: () async {
-                await NotificationService.showNotification(
-                  title: 'Hello',
-                  body: 'Body',
-                  summary: 'samll summary',
-                  payload: {'navigate': 'true'},
-                  actionButton: [
-                    NotificationActionButton(
-                        key: 'check',
-                        label: 'check it out',
-                        actionType: ActionType.SilentAction)
-                  ],
-                );
-
-
-              },
-            ),
-             CustomElevatedButton(
-                    text: 'media button',
-                    onTap: () async {
-                      await NotificationService.showNotification(
-                          title: 'Hello',
-                          body: 'Body',
-                          summary: 'samll summary',
-                          payload: {'navigate': 'true'},
-                          actionButton: [
-                            NotificationActionButton(
-                                key: 'check',
-                                label: 'check it out',
-                                actionType: ActionType.SilentAction)
-                          ],
-                          notificationLayout: NotificationLayout.MediaPlayer);
-                    })
-          ],
+        child: Center(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+             EmptyPlaceHolder(message: "No")
+            ],
+          ),
         ),
       ),
     );

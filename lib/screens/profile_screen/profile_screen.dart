@@ -342,13 +342,16 @@ class _ProfileScreenState extends State<ProfileScreen>
                                       var item = quotes['data'][index];
 
                                       return GestureDetector(
-                                        onTap: () => Get.to(
+                                        onTap: () {
+                                        
+                                          Get.to(
                                             SingleQuote(
                                               postId: item['_id'],
                                               image: item['imageUrl'],
                                               userId: id,
                                             ),
-                                            transition: Transition.cupertino),
+                                            transition: Transition.cupertino);
+                                        },
                                         child: ClipRRect(
                                           borderRadius:
                                               BorderRadius.circular(10),

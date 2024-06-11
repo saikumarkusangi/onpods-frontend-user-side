@@ -17,6 +17,18 @@ class MiniPlayerProvider extends ChangeNotifier {
 
   String get title => _title;
 
+  String _mainTitle = '';
+
+  String get mainTitle => _mainTitle;
+
+   String _description = '';
+
+  String get description => _description;
+
+     String _uploaderId = '';
+
+  String get uploaderId => _uploaderId;
+
   String _podcastId = '';
 
   String get podcastId => _podcastId;
@@ -101,10 +113,13 @@ class MiniPlayerProvider extends ChangeNotifier {
     print(_episodes);
   }
 
-  void update(String newTitle, String newPoster, List newEpisodes) {
+  void update(String mainTitle,String newTitle, String newPoster, List newEpisodes,String Id,String newDescription) {
     _title = newTitle;
     _poster = newPoster;
     _episodes = newEpisodes;
+    _uploaderId = Id;
+    _description = newDescription;
+    _mainTitle = mainTitle;
     notifyListeners();
     print(_episodes);
   }

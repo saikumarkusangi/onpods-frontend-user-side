@@ -6,6 +6,7 @@ class AuthProvider with ChangeNotifier {
   bool _isLoading = false;
   AuthService? _authService;
   String userId = '';
+  final context = BuildContext;
   AuthProvider() {
     _authService = AuthService(this);
   }
@@ -23,7 +24,7 @@ class AuthProvider with ChangeNotifier {
       userId = userData['data']['id'];
       notifyListeners();
       UserSession.setUserId(userId);
-      showSnackbar('Successful', 'You are logged in!');
+      showSnackbar('Successful', 'You are logged in!',ContentType.success,context);
       Get.offAll(const Layout(), transition: Transition.fadeIn);
     } catch (error) {
       await _googleOauth.signOut();
@@ -46,7 +47,7 @@ class AuthProvider with ChangeNotifier {
       userId = userData['data']['id'];
       notifyListeners();
       UserSession.setUserId(userId);
-      showSnackbar('Successful', 'You are logged in!');
+      showSnackbar('Successful', 'You are logged in!',ContentType.success,context);
       Get.offAll(const Layout(), transition: Transition.fadeIn);
     } catch (error) {
 
@@ -70,7 +71,7 @@ class AuthProvider with ChangeNotifier {
       userId = userData['userId'];
       notifyListeners();
       UserSession.setUserId(userId);
-      showSnackbar('Successful', 'Account Created Successfully!');
+      showSnackbar('Successful', 'Account Created Successfully!',ContentType.success,context);
       Get.offAll(const ChooseYourInterestScreen(),
           transition: Transition.cupertino);
     } catch (error) {
@@ -94,7 +95,7 @@ class AuthProvider with ChangeNotifier {
       userId = userData['userId'];
       notifyListeners();
       UserSession.setUserId(userId);
-      showSnackbar('Successful', 'Account Created Successfully!');
+      showSnackbar('Successful', 'Account Created Successfully!',ContentType.success,context);
       Get.offAll(const ChooseYourInterestScreen(),
           transition: Transition.cupertino);
     } catch (error) {
@@ -114,6 +115,22 @@ class AuthProvider with ChangeNotifier {
     try {
       final otp = await _authService!.forgotPassword(email);
       return otp;
+    } catch (error) {
+      throw Exception(error);
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+   // ---------------------------- Reset Password -----------------------------------------
+
+  Future<Map<String, dynamic>> resetPassword(String password,String email)async {
+    _isLoading = true;
+    notifyListeners();
+    try {
+      final response = await _authService!.resetPassword(password,email);
+      return response;
     } catch (error) {
       throw Exception(error);
     } finally {

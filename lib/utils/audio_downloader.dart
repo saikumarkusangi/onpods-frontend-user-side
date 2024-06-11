@@ -1,3 +1,4 @@
+import 'dart:ffi';
 import 'dart:io';
 import 'dart:async';
 import 'package:http/http.dart' as http;
@@ -10,6 +11,7 @@ enum DownloadStatus { notStarted, started, downloading, completed }
 class FileDownloaderProvider with ChangeNotifier {
   late StreamSubscription<List<int>> _audioDownloadSubscription;
   late StreamSubscription<List<int>> _posterDownloadSubscription;
+  late StreamSubscription<List<int>> _albumDownloadSubscription;
   DownloadStatus _downloadStatus = DownloadStatus.notStarted;
   int downloadPercentage = 0;
   String _downloadedFile = "";
@@ -20,7 +22,7 @@ class FileDownloaderProvider with ChangeNotifier {
   String get downloadedFile => _downloadedFile;
 
   Future<void> downloadFileWithPoster(
-      String audioUrl, String posterUrl, String filename) async {
+      String audioUrl, String posterUrl, String filename,String albumImage) async {
     bool permissionReady = await _checkPermission();
     final Completer<void> completer = Completer<void>();
 
@@ -33,10 +35,12 @@ class FileDownloaderProvider with ChangeNotifier {
 
     var audioRequest = http.Request('GET', Uri.parse(audioUrl));
     var posterRequest = http.Request('GET', Uri.parse(posterUrl));
+    var albumRequest = http.Request('GET', Uri.parse(albumImage));
 
     try {
       var audioResponse = await http.Client().send(audioRequest);
       var posterResponse = await http.Client().send(posterRequest);
+      var albumResponse = await http.Client().send(albumRequest);
 
       final dir = (await getApplicationDocumentsDirectory()).path;
 
@@ -44,9 +48,11 @@ class FileDownloaderProvider with ChangeNotifier {
 
       List<List<int>> audioChunks = <List<int>>[];
       List<List<int>> posterChunks = <List<int>>[];
+      List<List<int>> albumChunks = <List<int>>[];
       int audioDownloaded = 0;
       int posterDownloaded = 0;
-
+      int albumDownloaded = 0;
+    
       updateDownloadStatus(DownloadStatus.started);
 
       _audioDownloadSubscription = audioResponse.stream.listen(
@@ -71,9 +77,21 @@ class FileDownloaderProvider with ChangeNotifier {
         },
       );
 
+ _albumDownloadSubscription = albumResponse.stream.listen(
+        (List<int> chunk) {
+          albumChunks.add(chunk);
+          albumDownloaded += chunk.length;
+          downloadPercentage =
+              ((albumDownloaded / albumResponse.contentLength!) * 100).round();
+
+          notifyListeners();
+        },
+      );
+
       await Future.wait([
         _audioDownloadSubscription.asFuture(),
         _posterDownloadSubscription.asFuture(),
+        _albumDownloadSubscription.asFuture()
       ]);
       updateDownloadStatus(DownloadStatus.completed);
 
@@ -82,7 +100,8 @@ class FileDownloaderProvider with ChangeNotifier {
       notifyListeners();
 
       File audioFile = File('$dir/$filename.mp3');
-      File posterFile = File('$dir/$filename.jpg');
+      File posterFile = File('$dir/$filename.jpg');                
+      File albumFile = File('$dir/$filename.png');                
 
       _downloadedFile = '$dir/$filename.mp3';
 
@@ -101,12 +120,20 @@ class FileDownloaderProvider with ChangeNotifier {
         posterBytes.setRange(posterOffset, posterOffset + chunk.length, chunk);
         posterOffset += chunk.length;
       }
+ final Uint8List albumBytes = Uint8List(albumResponse.contentLength!);
+       int albumOffset = 0;
+      for (List<int> chunk in albumChunks) {
+        albumBytes.setRange(albumOffset, albumOffset + chunk.length, chunk);
+        albumOffset += chunk.length;
+      }
 
       await posterFile.writeAsBytes(posterBytes);
+      await albumFile.writeAsBytes(albumBytes);
 
       updateDownloadStatus(DownloadStatus.completed);
       _audioDownloadSubscription.cancel();
       _posterDownloadSubscription.cancel();
+      _albumDownloadSubscription.cancel();
       downloadPercentage = 0;
 
       notifyListeners();

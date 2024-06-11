@@ -28,6 +28,7 @@ xmlns:tools="http://schemas.android.com/tools"
     android:requestLegacyExternalStorage="true"
     android:usesCleartextTraffic="true"
     android:label="Onpods"
+    android:hardwareAccelerated="true"
     android:name="${applicationName}"
     android:icon="@mipmap/ic_launcher"
     tools:replace="android:label">

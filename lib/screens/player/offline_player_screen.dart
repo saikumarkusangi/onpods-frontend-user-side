@@ -1,18 +1,17 @@
 import 'dart:io';
-import 'dart:math';
 
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/route_manager.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import 'package:onpods/resources/podcast_service.dart';
 import 'package:onpods/utils/colors.dart';
 import 'package:onpods/utils/images.dart';
+import 'package:onpods/utils/snack_bar.dart';
 import 'package:palette_generator/palette_generator.dart';
-import '../../models/audio_model.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:marquee/marquee.dart';
 
@@ -82,7 +81,7 @@ class _OfflinePlayerScreenState extends State<OfflinePlayerScreen> {
 
     _player = AudioPlayer();
     _init();
-    callApi();
+  
   }
 
   Future<void> generatePalette() async {
@@ -93,9 +92,7 @@ class _OfflinePlayerScreenState extends State<OfflinePlayerScreen> {
     });
   }
 
-  callApi() {
-    PodcastService().listenEpisode(widget.podcastId, widget.episodeId);
-  }
+
 
   @override
   void dispose() {
@@ -103,35 +100,10 @@ class _OfflinePlayerScreenState extends State<OfflinePlayerScreen> {
     _player.dispose();
   }
 
-  List rearrangePlaylist(List playlist, int startingIndex) {
-    return [
-      ...playlist.sublist(startingIndex),
-      ...playlist.sublist(0, startingIndex),
-    ];
-  }
+ 
 
   Future<void> _init() async {
-    final rearrangedPlaylist =
-        rearrangePlaylist(widget.playlist, widget.startingIndex);
-    
-    final playList = ConcatenatingAudioSource(
-      children: rearrangedPlaylist.map((e) {
-        return AudioSource.uri(
-          Uri.parse(e.audioUrl),
-          tag: MediaItem(
-            id: e.title,
-            album: widget.title,
-            title: e.title,
-            artist: '',
-            artUri: Uri.parse(e.posterUrl ?? widget.albumImage),
-          ),
-        );
-      }).toList(),
-    );
-
-    // Use the provider to set the current audio
-
-    await _player.setAudioSource(playList);
+    await _player.setAudioSource(AudioSource.file(widget.audioUrl));
     _player.play();
   }
 
@@ -212,23 +184,24 @@ class _OfflinePlayerScreenState extends State<OfflinePlayerScreen> {
               ),
             ),
           ).animate().fadeIn(delay: const Duration(milliseconds: 500)),
-          Positioned(
-            top: 50,
-            right: 15,
-            child: CircleAvatar(
-              backgroundColor: Colors.black45,
-              radius: 25,
-              child: IconButton(
-                onPressed: () {
-                  _showBottomSheet();
-                },
-                icon: const Icon(
-                  Icons.more_vert,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-          ).animate().fadeIn(delay: const Duration(milliseconds: 500)),
+          // Positioned(
+          //   top: 50,
+          //   right: 15,
+          //   child: CircleAvatar(
+          //     backgroundColor: Colors.black45,
+          //     radius: 25,
+          //     child: IconButton(
+          //       onPressed: () {
+          //         _showBottomSheet();
+          //       },
+          //       icon: const Icon(
+          //         Icons.more_vert,
+          //         color: Colors.white,
+          //       ),
+          //     ),
+          //   ),
+          // ).animate().fadeIn(delay: const Duration(milliseconds: 500)),
+        
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 70),
             child: Align(
@@ -262,13 +235,12 @@ class _OfflinePlayerScreenState extends State<OfflinePlayerScreen> {
                           if (state?.sequence.isEmpty ?? true) {
                             return const SizedBox();
                           }
-                          final metadata =
-                              state!.currentSource!.tag as MediaItem;
+                          
                           return SizedBox(
                             height: 40,
                             width: MediaQuery.of(context).size.width,
                             child: Marquee(
-                              text: metadata.title,
+                              text: widget.episode,
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.w800,
@@ -342,29 +314,7 @@ class _OfflinePlayerScreenState extends State<OfflinePlayerScreen> {
                             size: 32,
                           ),
                         ),
-                        IconButton(
-                          onPressed: () {
-                            if (!_player.hasPrevious) {
-                              _player.seek(Duration.zero,
-                                  index: widget.playlist.length - 1);
-                              //  ScaffoldMessenger.of(context).showSnackBar(
-                              //   const SnackBar(
-                              //     duration: Duration(milliseconds: 1000),
-                              //     content: Text(
-                              //         'You are listening to the first episode.'),
-                              //   ),
-                              // );
-                            }
-
-                            _player.seekToPrevious();
-                          },
-                          icon: const Icon(
-                            Icons.skip_previous,
-                            color: Colors.white,
-                            size: 52,
-                          ),
-                        ),
-                        StreamBuilder<PlayerState>(
+                     StreamBuilder<PlayerState>(
                           stream: _player.playerStateStream,
                           builder: (context, snapshot) {
                             final playerState = snapshot.data;
@@ -401,27 +351,7 @@ class _OfflinePlayerScreenState extends State<OfflinePlayerScreen> {
                             );
                           },
                         ),
-                        IconButton(
-                          onPressed: () {
-                            if (!_player.hasNext) {
-                              _player.seek(Duration.zero, index: 0);
-                              // ScaffoldMessenger.of(context).showSnackBar(
-                              //   const SnackBar(
-                              //     duration: Duration(milliseconds: 1000),
-                              //     content: Text(
-                              //         'You are listening to the last episode.'),
-                              //   ),
-                              // );
-                            }
-                            _player.seekToNext();
-                          },
-                          icon: const Icon(
-                            Icons.skip_next_sharp,
-                            color: Colors.white,
-                            size: 52,
-                          ),
-                        ),
-                        IconButton(
+                          IconButton(
                           onPressed: () {
                             _player.seek(
                                 _player.position + const Duration(seconds: 10));
@@ -446,20 +376,36 @@ class _OfflinePlayerScreenState extends State<OfflinePlayerScreen> {
 
   void _showBottomSheet() {
     showModalBottomSheet(
-      backgroundColor: Colors.black,
+      constraints: const BoxConstraints(
+        maxHeight: 100
+      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      backgroundColor: const Color.fromARGB(255, 44, 44, 44),
       context: context,
-      builder: (context) => DraggableScrollableSheet(
-        initialChildSize: 0.5,
-        minChildSize: 0.2,
-        maxChildSize: 1.0,
-        builder: (context, controller) {
-          return const Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Text('Your Bottom Sheet Content'),
-            ],
-          );
-        },
+      builder: (context) => SizedBox(
+        width: double.maxFinite,
+        height: 100,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+         ListTile(
+                  leading: Icon(
+                    Icons.delete,
+                    size: 32.sp,
+                    color: const Color.fromARGB(255, 158, 156, 156),
+                  ),
+                  title: Text(
+                    'Delete',
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 24.sp,
+                        fontWeight: FontWeight.w600),
+                  ),
+                  onTap: () async {
+                
+                  }),
+          ],
+        ),
       ),
     );
   }

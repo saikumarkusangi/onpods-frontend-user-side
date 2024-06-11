@@ -1,8 +1,8 @@
-
 import 'package:onpods/utils/exports.dart';
 
 class ResetPassword extends StatefulWidget {
-  const ResetPassword({super.key});
+  final String email;
+  const ResetPassword({super.key, required this.email});
 
   @override
   State<ResetPassword> createState() => _ResetPasswordState();
@@ -23,15 +23,26 @@ class _ResetPasswordState extends State<ResetPassword> {
     super.dispose();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    void submit() {
-      if (_formKey.currentState!.validate()) {
-        _formKey.currentState!.save();
-        // authProvider.forgotPassword(_passwordController1.text.trim());
+  Future<void> submit() async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    if (_formKey.currentState!.validate()) {
+      _formKey.currentState!.save();
+      if (_passwordController1.text.trim() ==
+          _passwordController2.text.trim()) {
+        final response = await authProvider.resetPassword(
+            _passwordController1.text.trim(), widget.email);
+       if(response['success']){
+         showSnackbar("Success", 'Password reset successful',ContentType.success,context);
+        Get.offAll(const LoginScreen());
+       }
+      } else {
+        showSnackbar("Not Matching", "Please recheck password again.",ContentType.warning,context);
       }
     }
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Reset Password'),
@@ -66,7 +77,8 @@ class _ResetPasswordState extends State<ResetPassword> {
                   return 'Password must atleast length of 6';
                 }
                 return null;
-              }, onSubmit: (String data) {  },
+              },
+              onSubmit: (String data) {},
             ),
           ),
           const SizedBox(
@@ -93,7 +105,8 @@ class _ResetPasswordState extends State<ResetPassword> {
                   return 'Password must be match';
                 }
                 return null;
-              }, onSubmit: (String data) {  },
+              },
+              onSubmit: (String data) {},
             ),
           ),
           const SizedBox(
@@ -107,7 +120,7 @@ class _ResetPasswordState extends State<ResetPassword> {
               text: 'Reset Password',
               buttonTextStyle:
                   const TextStyle(color: Colors.white, fontSize: 18),
-           buttonColor: blueColor,
+              buttonColor: blueColor,
             ),
           ),
         ]),

@@ -23,24 +23,9 @@ class _ChatRoomListState extends State<ChatRoomList> {
         child: Scaffold(
           appBar: AppBar(
             backgroundColor: Colors.black,
-            flexibleSpace:  Padding(
-                padding: const EdgeInsets.only(top: 50, left: 10, right: 10),
-                child: CustomTextFormField(
-                  autofocus: false,
-                  radius: 10,
-                  prefix: const Icon(
-                    Icons.search_rounded,
-                    color: Colors.grey,
-                    size: 26,
-                  ),
-                  hintText: "Search author,category & more...",
-                  vertical: 16,
-                  fillColor: darktextFieldColor,
-                  hintStyle: const TextStyle(color: Colors.grey, fontSize: 14),
-                  textStyle: const TextStyle(color: Colors.white), onSubmit: (String data) {  },
-                )),
+          
             bottom: const PreferredSize(
-                preferredSize: Size(0, 80),
+                preferredSize: Size(0, 6),
                 child: Padding(
                   padding: EdgeInsets.only(bottom: 10),
                   child: Column(
@@ -63,22 +48,32 @@ class _ChatRoomListState extends State<ChatRoomList> {
                   ),
                 )),
           ),
-          body: Padding(
-            padding: const EdgeInsets.only(left: 15, right: 15, top: 10),
-            child: TabBarView(children: [
-              ListView.builder(
-                  itemCount: data.length,
-                  itemBuilder: (context, index) {
-                    return GestureDetector(
-                      onTap: () {
-                        showRoomDetails(context, data[index]['title']!);
-                      },
-                      child: ChartRoomCard(title: data[index]['title']!),
-                    );
-                  }),
-              const ChatRoomListkeleton()
-            ]),
-          ),
+          body:const Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text("Coming Soon...",style: TextStyle(fontSize: 24,color: Colors.white),)
+              ],
+            ),
+          )
+          
+          //  Padding(
+          //   padding: const EdgeInsets.only(left: 15, right: 15, top: 10),
+          //   child: TabBarView(children: [
+          //     ListView.builder(
+          //         itemCount: data.length,
+          //         itemBuilder: (context, index) {
+          //           return GestureDetector(
+          //             onTap: () {
+          //               showRoomDetails(context, data[index]['title']!);
+          //             },
+          //             child: ChartRoomCard(title: data[index]['title']!),
+          //           );
+          //         }),
+          //     const ChatRoomListkeleton()
+          //   ]),
+          // ),
       
         ));
   }

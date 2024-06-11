@@ -31,7 +31,7 @@ class _SingleQuoteState extends State<SingleQuote> {
 
   @override
   Widget build(BuildContext context) {
-     final quoteProvider = Provider.of<QuoteProvider>(context, listen: false);
+    final quoteProvider = Provider.of<QuoteProvider>(context, listen: false);
     return Scaffold(
       bottomNavigationBar: const MiniPlayer(),
       body: SafeArea(
@@ -197,37 +197,37 @@ class _SingleQuoteState extends State<SingleQuote> {
                 ],
               ),
             ),
-            const Padding(
-              padding: EdgeInsets.only(right: 10, left: 10, top: 20),
-              child: Text(
-                'Similar Quotes',
-                style: TextStyle(color: Colors.white, fontSize: 23),
-              ),
-            ),
-            const SizedBox(height: 20,),
-            SizedBox(
-              width: double.maxFinite,
-             
-              child: GridView.builder(
-                itemCount: 2,
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2),
-                  itemBuilder: (context, index) {
-                    return Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: ClipRRect(
-                        borderRadius: const BorderRadius.all(Radius.circular(6)),
-                        child: CachedNetworkImage(imageUrl:quoteProvider.quotes[0].datas[0].imageUrl,
-                        fit: BoxFit.cover,
-                        errorWidget: (context, url, error) => Image.asset(imagePlaceHolder),
-                        placeholder: (context, imageProvider) => Shimmer.fromColors(baseColor: Colors.grey.shade200, highlightColor: Colors.grey.shade400, child: const SizedBox(width: 200,height: 300,)),
-                        ),
-                      ),
-                    );
-                  }),
-            )
+            // const Padding(
+            //   padding: EdgeInsets.only(right: 10, left: 10, top: 20),
+            //   child: Text(
+            //     'Similar Quotes',
+            //     style: TextStyle(color: Colors.white, fontSize: 23),
+            //   ),
+            // ),
+            // const SizedBox(height: 20,),
+            // SizedBox(
+            //   width: double.maxFinite,
+
+            //   child: GridView.builder(
+            //     itemCount: 2,
+            //     shrinkWrap: true,
+            //     physics: const NeverScrollableScrollPhysics(),
+            //       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            //           crossAxisCount: 2),
+            //       itemBuilder: (context, index) {
+            //         return Padding(
+            //           padding: const EdgeInsets.all(8.0),
+            //           child: ClipRRect(
+            //             borderRadius: const BorderRadius.all(Radius.circular(6)),
+            //             child: CachedNetworkImage(imageUrl:quoteProvider.quotes[0].datas[0].imageUrl,
+            //             fit: BoxFit.cover,
+            //             errorWidget: (context, url, error) => Image.asset(imagePlaceHolder),
+            //             placeholder: (context, imageProvider) => Shimmer.fromColors(baseColor: Colors.grey.shade200, highlightColor: Colors.grey.shade400, child: const SizedBox(width: 200,height: 300,)),
+            //             ),
+            //           ),
+            //         );
+            //       }),
+            // )
           ],
         ),
       )),
@@ -257,7 +257,7 @@ class _SingleQuoteState extends State<SingleQuote> {
                   await Share.shareFiles(
                     [tempFile.path],
                     text:
-                        'https://chat.openai.com/c/592c71e8-43aa-48fe-acf3-0f6d3f0b6d19',
+                        'This quote is shared from the OnPods app. Experience the power of podcasts and inspirational quotes by downloading OnPods today.',
                     subject: 'Share Quote',
                   );
                 },
@@ -284,13 +284,17 @@ class _SingleQuoteState extends State<SingleQuote> {
                   style: TextStyle(color: Colors.white, fontSize: 24),
                 ),
               ),
-              const ListTile(
-                leading: Icon(
+              ListTile(
+                onTap: () async {
+                  Navigator.pop(context);
+                  await _showReportBottomSheet(context, widget.postId);
+                },
+                leading: const Icon(
                   Icons.report,
                   color: Colors.white,
                   size: 28,
                 ),
-                title: Text(
+                title: const Text(
                   'Report',
                   style: TextStyle(color: Colors.white, fontSize: 24),
                 ),
@@ -343,9 +347,9 @@ class _SingleQuoteState extends State<SingleQuote> {
                           final res =
                               await QuoteService().deleteQuotes(widget.postId);
                           if (res) {
-                            showSnackbar('Success', 'Post Deleted Sucessfully');
+                            showSnackbar('Success', 'Post Deleted Sucessfully',ContentType.success,context);
                           } else {
-                            showSnackbar('Failed', 'Something went wrong');
+                            showSnackbar('Failed', 'Something went wrong',ContentType.failure,context);
                           }
                         }
                       },
@@ -367,5 +371,60 @@ class _SingleQuoteState extends State<SingleQuote> {
             ],
           );
         });
+  }
+}
+
+Future<void> _showReportBottomSheet(
+    BuildContext context, String podcastId) async {
+  await showModalBottomSheet(
+    context: context,
+    showDragHandle: true,
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+    backgroundColor: const Color.fromARGB(255, 39, 38, 38),
+    builder: (BuildContext context) {
+      return Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          _buildReportOption(context, podcastId, 'Sexual content'),
+          _buildReportOption(
+              context, podcastId, 'Violent or repulsive content'),
+          _buildReportOption(context, podcastId, 'Hateful or abusive content'),
+          _buildReportOption(context, podcastId, 'Harmful or dangerous acts'),
+          _buildReportOption(context, podcastId, 'misleading'),
+         
+          // Add more report options as needed
+        ],
+      );
+    },
+  );
+}
+
+Widget _buildReportOption(
+    BuildContext context, String quoteId, String reportReason) {
+  return ListTile(
+    title: Text(
+      reportReason,
+      style: const TextStyle(color: Colors.white),
+    ),
+    onTap: () async {
+      await _reportQuote(context, quoteId, reportReason);
+      Navigator.pop(context); // Close the bottom sheet after reporting
+    },
+  );
+}
+
+
+Future<void> _reportQuote(
+    BuildContext context, String quoteId, String reportReason) async {
+  try {
+    final res = await PodcastService().reportPodcast(quoteId, reportReason,'quote');
+    if (res) {
+      showSnackbar('Success', 'Report Sent Successfully',ContentType.success,context);
+    } else {
+      showSnackbar('Failed', 'Something went wrong',ContentType.failure,context);
+    }
+  } catch (e) {
+    print('Error reporting quote: $e');
+    showSnackbar('Error', 'Failed to report quote',ContentType.failure,context);
   }
 }

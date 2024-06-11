@@ -449,7 +449,7 @@ class _UserProfileScreenState extends State<UserProfileScreen>
                                       return GestureDetector(
                                         onTap: () => Get.to(
                                             SingleQuote(
-                                              postId: item['id'],
+                                              postId: item['_id'],
                                               image: item['imageUrl'],
                                               userId: widget.userId,
                                             ),

@@ -7,13 +7,15 @@ class AppRoutes {
   static const String signup = '/signup';
   static const String chooseintrest = '/chooseintrest';
   static const String home = '/home';
+  static const String podcast = '/podcast';
 
   static Map<String, WidgetBuilder> routes = {
     splash: (context) => const SplashScreen(),
     login: (context) => const LoginScreen(),
     signup: (context) => const SignUpScreen(),
     chooseintrest: (context) => const ChooseYourInterestScreen(),
-    home: (context) => const HomeScreen()
+    home: (context) => const HomeScreen(),
+    podcast: (context) => SinglePodcastCategory(title: 'horror',categoryId: '',),
   };
 }
 

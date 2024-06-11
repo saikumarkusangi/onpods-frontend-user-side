@@ -100,13 +100,13 @@ class PodcastService {
 
   // ------------------------------ Podcasts by category Id ------------------------------------
 
-  Future<List<PodcastModel>> podcastByCategory(id, page) async {
+  Future<List<PodcastModel>> podcastByCategory(id, page,sortBy) async {
     final userId = await UserSession.getUserId();
     print(
         'calling api podcasts by category : @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@');
     try {
       final response = await http.get(
-          Uri.parse('$baseUrl/podcast/category/$id/?page=$page'),
+          Uri.parse('$baseUrl/podcast/category/$id/?page=$page&sortBy=$sortBy'),
           headers: {"Authorization": userId!});
       if (response.statusCode == 200) {
         final jsonData = [jsonDecode(response.body)];
@@ -262,7 +262,7 @@ class PodcastService {
   Future<List<CurrentPodcastModel>> podcastById(id) async {
     final userId = await UserSession.getUserId();
     print(
-        'calling api podcasts by id : @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@');
+        'calling api podcasts by id : $id');
     try {
       final response = await http.get(Uri.parse('$baseUrl/podcast/id/$id'),
           headers: {"Authorization": userId!});
@@ -271,6 +271,7 @@ class PodcastService {
         final List<CurrentPodcastModel> podcasts = jsonData.map((item) {
           return CurrentPodcastModel.fromJson(item);
         }).toList();
+        
         return podcasts;
       } else {
         throw Exception('Failed to load data');
@@ -497,13 +498,14 @@ class PodcastService {
         throw error['message'];
       }
     } catch (e) {
+      const context = BuildContext;
       if (e is TimeoutException) {
-        showSnackbar('Timeout', 'Server is too busy.Please come back again');
+        showSnackbar('Timeout', 'Server is too busy.Please come back again',ContentType.failure,context);
       } else if (e
           .toString()
           .contains('ClientException with SocketException')) {
         showSnackbar(
-            'Network Connection Error', 'Check your Internet Connection!!!');
+            'Network Connection Error', 'Check your Internet Connection!!!',ContentType.failure,context);
       }
       throw Exception('Error: $e');
     }
@@ -523,6 +525,28 @@ class PodcastService {
       if (response.statusCode == 200) {
         final jsonData = [jsonDecode(response.body)];
         return jsonData[0]['status'];
+      } else {
+        throw Exception('Failed to load data');
+      }
+    } catch (e) {
+      throw Exception(e);
+    }
+  }
+
+  // Report Podcast
+  
+  Future reportPodcast(id, reason,type) async {
+    final userId = await UserSession.getUserId();
+    print(
+        'calling api report podcasts  : $id');
+    try {
+      final response = await http.post(Uri.parse('$baseUrl/report'),
+          headers: {"Authorization": userId!},
+          body: {'reason': reason,'id':id,'type':type});
+
+      if (response.statusCode == 200) { final jsonData = [jsonDecode(response.body)];
+       
+        return jsonData[0]['status'] == 'success';
       } else {
         throw Exception('Failed to load data');
       }

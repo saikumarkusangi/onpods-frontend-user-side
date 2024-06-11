@@ -6,7 +6,7 @@ import 'package:onpods/utils/exports.dart';
 class AuthService {
   final AuthProvider authProvider;
   AuthService(this.authProvider);
-
+ final context = BuildContext;
   // --------------------------------- Login--------------------------------------------------
 
   Future<Map<String, dynamic>> login(String email, String password) async {
@@ -28,16 +28,17 @@ class AuthService {
         throw error['message'];
       }
     } catch (e) {
+      
       if (e is TimeoutException) {
-        showSnackbar('Timeout', 'Server is too busy.Please come back again');
+        showSnackbar('Timeout', 'Server is too busy.Please come back again',ContentType.failure,context);
       } else if (e
           .toString()
           .contains('ClientException with SocketException')) {
         showSnackbar(
-            'Network Connection Error', 'Check your Internet Connection!!!');
+            'Network Connection Error', 'Check your Internet Connection!!!',ContentType.failure,context);
       } else {
         // Handle other exceptions
-        showSnackbar('Something Went Wrong', e);
+        showSnackbar('Something Went Wrong', e,ContentType.failure,context);
       }
       throw Exception('Error: $e');
     }
@@ -67,15 +68,15 @@ class AuthService {
       }
     } catch (e) {
       if (e is TimeoutException) {
-        showSnackbar('Timeout', 'Server is too busy.Please come back again');
+        showSnackbar('Timeout', 'Server is too busy.Please come back again',ContentType.failure,context);
       } else if (e
           .toString()
           .contains('ClientException with SocketException')) {
         showSnackbar(
-            'Network Connection Error', 'Check your Internet Connection!!!');
+            'Network Connection Error', 'Check your Internet Connection!!!',ContentType.failure,context);
       } else {
         // Handle other exceptions
-        showSnackbar('Something Went Wrong', e);
+        showSnackbar('Something Went Wrong', e,ContentType.failure,context);
       }
       throw Exception('Error: $e');
     }
@@ -85,7 +86,7 @@ class AuthService {
 
   Future<Map<String, dynamic>> signup(
       String name, String email, String password) async {
-          final fcmToken = await FirebaseMessaging.instance.getToken();
+    final fcmToken = await FirebaseMessaging.instance.getToken();
     try {
       final response = await http.post(
         Uri.parse('$baseUrl/auth/register'),
@@ -93,7 +94,7 @@ class AuthService {
           'username': name,
           'email': email,
           'password': password,
-          'fcmToken':fcmToken
+          'fcmToken': fcmToken
         },
       ).timeout(const Duration(seconds: 30));
 
@@ -107,15 +108,15 @@ class AuthService {
       }
     } catch (e) {
       if (e is TimeoutException) {
-        showSnackbar('Timeout', 'Server is too busy.Please come back again');
+        showSnackbar('Timeout', 'Server is too busy.Please come back again',ContentType.failure,context);
       } else if (e
           .toString()
           .contains('ClientException with SocketException')) {
         showSnackbar(
-            'Network Connection Error', 'Check your Internet Connection!!!');
+            'Network Connection Error', 'Check your Internet Connection!!!',ContentType.failure,context);
       } else {
         // Handle other exceptions
-        showSnackbar('Something Went Wrong', e);
+        showSnackbar('Something Went Wrong', e,ContentType.failure,context);
       }
       throw Exception('Error: $e');
     }
@@ -124,8 +125,8 @@ class AuthService {
   // ---------------------------------- Signup----------------------------------------
 
   Future<Map<String, dynamic>> oAuthsignup(
-      String name, String email, String id,String photoUrl) async {
-          final fcmToken = await FirebaseMessaging.instance.getToken();
+      String name, String email, String id, String photoUrl) async {
+    final fcmToken = await FirebaseMessaging.instance.getToken();
     try {
       print(
           'calling oauth signup @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@');
@@ -135,8 +136,8 @@ class AuthService {
           'username': name,
           'email': email,
           'oauth': id,
-          'profilePic':photoUrl,
-          'fcmToken':fcmToken
+          'profilePic': photoUrl,
+          'fcmToken': fcmToken
         },
       ).timeout(const Duration(seconds: 30));
 
@@ -150,15 +151,15 @@ class AuthService {
       }
     } catch (e) {
       if (e is TimeoutException) {
-        showSnackbar('Timeout', 'Server is too busy.Please come back again');
+        showSnackbar('Timeout', 'Server is too busy.Please come back again',ContentType.failure,context);
       } else if (e
           .toString()
           .contains('ClientException with SocketException')) {
         showSnackbar(
-            'Network Connection Error', 'Check your Internet Connection!!!');
+            'Network Connection Error', 'Check your Internet Connection!!!',ContentType.failure,context);
       } else {
         // Handle other exceptions
-        showSnackbar('Something Went Wrong', e);
+        showSnackbar('Something Went Wrong', e,ContentType.failure,context);
       }
       throw Exception('Error: $e');
     }
@@ -178,12 +179,13 @@ class AuthService {
         final Map<String, dynamic> data = json.decode(response.body);
         if (data['status'] == 'fail') {
           showSnackbar(
-              'Something went wrong', '${data['message']} with this mail id.');
+              'Something went wrong', '${data['message']} with this mail id.',ContentType.failure,context);
         } else {
-          showSnackbar('OTP Sent', 'Check your email for otp!');
+          showSnackbar('OTP Sent', 'Check your email for otp!',ContentType.failure,context);
           Get.to(
               OtpVerifyScreen(
                 otp: data['otp'].toString(),
+                email: email,
               ),
               transition: Transition.rightToLeft);
         }
@@ -195,15 +197,15 @@ class AuthService {
       }
     } catch (e) {
       if (e is TimeoutException) {
-        showSnackbar('Timeout', 'Server is too busy.Please come back again');
+        showSnackbar('Timeout', 'Server is too busy.Please come back again',ContentType.failure,context);
       } else if (e
           .toString()
           .contains('ClientException with SocketException')) {
         showSnackbar(
-            'Network Connection Error', 'Check your Internet Connection!!!');
+            'Network Connection Error', 'Check your Internet Connection!!!',ContentType.failure,context);
       } else {
         // Handle other exceptions
-        showSnackbar('Something Went Wrong', e);
+        showSnackbar('Something Went Wrong', e,ContentType.failure,context);
       }
       throw Exception('Error: $e');
     }
@@ -211,20 +213,18 @@ class AuthService {
 
   // --------------------------------- resetPassword--------------------------------------------------
 
-  Future<Map<String, dynamic>> resetPassword(
-      String email, String password) async {
+  Future<Map<String, dynamic>> resetPassword(String password,String email) async {
     try {
       final response = await http.post(
         Uri.parse('$baseUrl/auth/reset-password'),
         body: {
-          'email': email,
           'password': password,
+          'email':email
+        
         },
       ).timeout(const Duration(seconds: 30));
       if (response.statusCode == 200) {
-        final Map<String, dynamic> userData = json.decode(response.body);
-        Get.offAll(const Layout(), transition: Transition.leftToRight);
-        return userData;
+        return json.decode(response.body);
       } else {
         final Map<String, dynamic> error = json.decode(response.body);
 
@@ -232,15 +232,15 @@ class AuthService {
       }
     } catch (e) {
       if (e is TimeoutException) {
-        showSnackbar('Timeout', 'Server is too busy.Please come back again');
+        showSnackbar('Timeout', 'Server is too busy.Please come back again',ContentType.failure,context);
       } else if (e
           .toString()
           .contains('ClientException with SocketException')) {
         showSnackbar(
-            'Network Connection Error', 'Check your Internet Connection!!!');
+            'Network Connection Error', 'Check your Internet Connection!!!',ContentType.failure,context);
       } else {
         // Handle other exceptions
-        showSnackbar('Something Went Wrong', e);
+        showSnackbar('Something Went Wrong', e,ContentType.failure,context);
       }
       throw Exception('Error: $e');
     }

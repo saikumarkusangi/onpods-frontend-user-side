@@ -272,7 +272,7 @@ class _BrowseCategoriesState extends State<BrowseCategories> {
               startingIndex: 0,
               albumImage: episodeItem['posterUrl'],
               podcastId: episodeItem['_id'],
-              episodeId: e['_id']));
+              episodeId: e['_id'], description: episodeItem['description'] ?? '', uploaderId: '',));
         },
         child: Padding(
           padding: const EdgeInsets.only(bottom: 20),

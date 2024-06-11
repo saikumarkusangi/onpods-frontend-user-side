@@ -32,6 +32,11 @@ class PodcastProvider with ChangeNotifier {
   String get categoryId => _categoryId;
   bool get isLoading => _isLoading;
 
+  void updateLoading(value){
+    _isLoading  = value;
+    notifyListeners();
+  }
+
   Future<void> fetchCategories() async {
     try {
       notifyListeners();
@@ -61,12 +66,12 @@ class PodcastProvider with ChangeNotifier {
     }
   }
 
-  Future<void> fetchPodcastsByCategory(String categoryId, int page) async {
+  Future<void> fetchPodcastsByCategory(String categoryId, int page,String sortBy) async {
     try {
 _isLoading = true;
       notifyListeners();
       final podcastsData =
-          await PodcastService().podcastByCategory(categoryId, page);
+          await PodcastService().podcastByCategory(categoryId, page,sortBy);
 
       if (_podcasts.isNotEmpty && _categoryId == categoryId) {
         if (_podcasts[0].data!.isNotEmpty &&

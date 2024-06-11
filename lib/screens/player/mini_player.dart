@@ -23,15 +23,18 @@ class _MiniPlayerState extends State<MiniPlayer> {
                 onTap: () {
                   Get.to(
                       PlayerScreen(
+                        animate: false,
                           poster: provider.poster,
-                          title: 'title',
+                          title: provider.mainTitle,
                           episode: 'episode',
                           playlist: provider.episodes,
                           audioUrl: 'audioUrl',
                           startingIndex: 0,
                           albumImage: provider.poster,
-                          podcastId: 'podcastId',
-                          episodeId: provider.podcastId),
+                          podcastId: provider.podcastId,
+                          episodeId: provider.podcastId, 
+                          uploaderId: provider.uploaderId,
+                          description: provider.description,),
                       transition: Transition.downToUp);
                 },
                 child: Container(

@@ -231,7 +231,7 @@ class FinalUploadPageState extends State<FinalUploadPage> {
                 selectedChipIndex, pickedImage, selectedMaturityRating);
 
             if (res['status'] == 'success') {
-              showSnackbar('Successful', 'Podcast Uploaded Successfully');
+              showSnackbar('Successful', 'Podcast Created Successfully',ContentType.success,context);
               Navigator.pop(context);
               await Get.to(FinalUploadPage(
                   index: 0,
@@ -240,7 +240,7 @@ class FinalUploadPageState extends State<FinalUploadPage> {
                   audio: widget.audio,
                   podcastId: res['podcastId']));
             } else {
-              showSnackbar('Fail', 'Something went wrong');
+              showSnackbar('Fail', 'Something went wrong',ContentType.failure,context);
             }
           } finally {
             setState(() {
@@ -258,11 +258,11 @@ class FinalUploadPageState extends State<FinalUploadPage> {
           final res = await PodcastService().uploadEpisode(
               title, description, widget.audio, widget.podcastId, pickedImage);
           if (res) {
-            showSnackbar('Successful', 'Episode Uploaded Successfully');
+            showSnackbar('Successful', 'Episode Uploaded Successfully',ContentType.success,context);
             Get.off(const Layout());
             PodcastService().newEpisodeNotification(widget.title,title, widget.podcastId);
           } else {
-            showSnackbar('Fail', 'Something went wrong');
+            showSnackbar('Fail', 'Something went wrong',ContentType.failure,context);
           }
         } finally {
           setState(() {

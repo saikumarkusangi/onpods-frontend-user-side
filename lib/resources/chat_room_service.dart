@@ -16,21 +16,23 @@ import 'package:onpods/utils/exports.dart';
       ).timeout(const Duration(seconds: 30));
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = json.decode(response.body);
-
-        showSnackbar('Successful', 'Room Created Successfully!');
+        const context = BuildContext;
+        showSnackbar('Successful', 'Room Created Successfully!',ContentType.success,context);
         // All(const Layout(), transition: Transition.leftToRight);
         return data;
       } else {
+         const context = BuildContext;
         final Map<String, dynamic> error = json.decode(response.body);
-        showSnackbar('Something Went Wrong', error['message']);
+        showSnackbar('Something Went Wrong', error['message'],ContentType.failure,context);
         throw Exception('Request failed with status code: ${error['message']}');
       }
     } catch (e) {
+       const context = BuildContext;
       if (e is TimeoutException) {
-        showSnackbar('Timeout', 'Server is too busy.Please come back again');
+        showSnackbar('Timeout', 'Server is too busy.Please come back again',ContentType.failure,context);
       } else {
         // Handle other exceptions
-        showSnackbar('Error', 'An error occurred: $e');
+        showSnackbar('Error', 'An error occurred: $e',ContentType.failure,context);
       }
       throw Exception('Error: $e');
     }

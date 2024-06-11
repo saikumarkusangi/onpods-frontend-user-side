@@ -128,3 +128,6 @@ export 'package:onpods/models/background_images.dart';
 export 'package:onpods/models/new_chat_room.dart';
 export 'package:onpods/models/quotesCategoryModel.dart';
 export 'package:onpods/models/user.dart';
+
+
+export 'package:awesome_snackbar_content/awesome_snackbar_content.dart';

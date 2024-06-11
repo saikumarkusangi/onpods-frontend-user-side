@@ -4,7 +4,8 @@ import 'package:pinput/pinput.dart';
 
 class OtpVerifyScreen extends StatefulWidget {
   final String otp;
-  const OtpVerifyScreen({super.key, required this.otp});
+  final String email;
+  const OtpVerifyScreen({super.key, required this.otp, required this.email});
 
   @override
   State<OtpVerifyScreen> createState() => _OtpVerifyScreenState();
@@ -101,7 +102,7 @@ class _OtpVerifyScreenState extends State<OtpVerifyScreen> {
                   },
                   onCompleted: (value) {
                     if (value == widget.otp) {
-                      Get.to(const ResetPassword(),transition: Transition.rightToLeft);
+                      Get.to( ResetPassword(email:widget.email),transition: Transition.rightToLeft);
                     }
                   },
                   showCursor: true,

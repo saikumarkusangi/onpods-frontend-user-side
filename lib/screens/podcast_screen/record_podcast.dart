@@ -1,5 +1,7 @@
 import 'dart:io';
+import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:onpods/providers/sound_effect_provider.dart';
 import 'package:onpods/utils/exports.dart';
 import 'package:flutter_sound_lite/flutter_sound.dart';
 
@@ -64,6 +66,80 @@ class _RecordPodcastState extends State<RecordPodcast> {
     } catch (e) {
       throw ('Error starting recording: $e');
     }
+  }
+
+  Future<void> saveAudio(String filePath) async {
+    TextEditingController fileNameController = TextEditingController();
+    String? fileName;
+
+    // Show dialog box for entering file name
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          surfaceTintColor: Colors.black,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+          title: const Text('Save Audio'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: fileNameController,
+                decoration: const InputDecoration(labelText: 'Enter file name'),
+                onChanged: (value) {
+                  fileName = value;
+                },
+              ),
+              const SizedBox(
+                height: 20,
+              ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                    backgroundColor: blueColor,
+                    minimumSize: const Size(double.maxFinite, 50),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(6))),
+                child: const Text(
+                  'Save',
+                  style: TextStyle(color: Colors.white, fontSize: 18),
+                ),
+                onPressed: () {
+                  Navigator.of(context).pop(fileNameController.text);
+                },
+              )
+            ],
+          ),
+        );
+      },
+    ).then((fileName) async {
+      if (fileName != null && fileName.isNotEmpty) {
+        try {
+          // Directory? downloadsDirectory = await getDownloadsDirectory();
+
+         
+        String  directory = "/storage/emulated/0/Download";
+
+       bool dirDownloadExists = await Directory(directory).exists();
+          if (dirDownloadExists) {
+            directory = "/storage/emulated/0/Download";
+          } else {
+            directory = "/storage/emulated/0/Downloads";
+          }
+           String fullPath = '$directory/$fileName.mp3';
+
+          // Copy the recorded audio file to the downloads directory
+          await File(filePath).copy(fullPath);
+          ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Audio file saved to: $fullPath')));
+          // Show a message indicating that the audio file has been saved successfully
+          print('Audio file saved to: $fullPath');
+        } catch (e) {
+          // Handle any errors that occur during the saving process
+          ScaffoldMessenger.of(context)
+              .showSnackBar(SnackBar(content: Text('Error:$e')));
+        }
+      }
+    });
   }
 
   Future<void> _stopRecording() async {
@@ -276,8 +352,9 @@ class _RecordPodcastState extends State<RecordPodcast> {
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<BgAudioProvider>(context);
+    final soundEffectProvider = Provider.of<SoundEffectProvider>(context);
     return Scaffold(
-       bottomNavigationBar: const MiniPlayer(),
+      bottomNavigationBar: const MiniPlayer(),
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -652,7 +729,6 @@ class _RecordPodcastState extends State<RecordPodcast> {
                                                           Icons.volume_off),
                                                   color: Colors.white,
                                                   onPressed: () {
-
                                                     if (_player1.volume !=
                                                         0.0) {
                                                       _player1.setVolume(0.0);
@@ -660,9 +736,7 @@ class _RecordPodcastState extends State<RecordPodcast> {
                                                       musicVolume.value = value;
                                                       _player1.setVolume(value);
                                                     }
-                                                    setState(() {
-
-                                                    });
+                                                    setState(() {});
                                                   },
                                                 ),
                                               ),
@@ -716,21 +790,22 @@ class _RecordPodcastState extends State<RecordPodcast> {
                                                     childAspectRatio: 0.8,
                                                     mainAxisSpacing: 0.0),
                                             shrinkWrap: true,
-                                            itemCount: provider
+                                            itemCount: soundEffectProvider
                                                     .selectedSoundEffects
                                                     .length +
                                                 1,
                                             itemBuilder: (context, index) {
                                               final data = index <
-                                                      provider
+                                                      soundEffectProvider
                                                           .selectedSoundEffects
                                                           .length
-                                                  ? provider
+                                                  ? soundEffectProvider
                                                           .selectedSoundEffects[
                                                       index]
                                                   : null;
                                               if (index >=
-                                                  provider.selectedSoundEffects
+                                                  soundEffectProvider
+                                                      .selectedSoundEffects
                                                       .length) {
                                                 return Column(
                                                   children: [
@@ -767,9 +842,12 @@ class _RecordPodcastState extends State<RecordPodcast> {
                                                       MainAxisAlignment.start,
                                                   children: [
                                                     GestureDetector(
+                                                        onLongPress: () =>
+                                                            _showBottomSheetSoundEffects(
+                                                                index),
                                                         onTap: () async {
                                                           final audioUrl =
-                                                              data!['sound'];
+                                                              data['sound'];
 
                                                           if (audioUrl !=
                                                               null) {
@@ -1071,8 +1149,7 @@ class _RecordPodcastState extends State<RecordPodcast> {
                     ? IconButton(
                         onPressed: () {
                           _stopPlayback();
-                          // Get.to(() => BgAdd(filePath: _audioFilePath),
-                          //     transition: Transition.cupertino);
+                          saveAudio(_audioFilePath);
                         },
                         icon: const CircleAvatar(
                           backgroundColor: Colors.lightBlue,
@@ -1120,12 +1197,95 @@ class _RecordPodcastState extends State<RecordPodcast> {
     );
   }
 
+  void _showBottomSheetSoundEffects(index) {
+    final soundEffectProvider =
+        Provider.of<SoundEffectProvider>(context, listen: false);
+    showModalBottomSheet(
+      showDragHandle: true,
+      barrierColor: const Color.fromARGB(170, 0, 0, 0),
+      constraints: const BoxConstraints(maxHeight: 200),
+      backgroundColor: const Color.fromARGB(255, 34, 33, 33),
+      context: context,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      builder: (context) => Padding(
+        padding: const EdgeInsets.symmetric(vertical: 10),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            ListTile(
+              leading: const Icon(
+                Icons.loop,
+                size: 32,
+                color: Color.fromARGB(255, 158, 156, 156),
+              ),
+              title: Text(
+                _player2.loopMode == LoopMode.off ? 'Loop on' : 'Loop off',
+                style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w600),
+              ),
+              onTap: () {
+                if (_player2.loopMode != LoopMode.one) {
+                  _player2.setLoopMode(LoopMode.one);
+                } else {
+                  _player2.setLoopMode(LoopMode.off);
+                }
+                setState(() {});
+                Navigator.pop(context);
+              },
+            ),
+            // ListTile(
+            //   leading: const Icon(
+            //     Icons.favorite,
+            //     size: 32,
+            //     color: Color.fromARGB(255, 158, 156, 156),
+            //   ),
+            //   title: const Text(
+            //     'Favourite',
+            //     style: TextStyle(
+            //         color: Colors.white,
+            //         fontSize: 20,
+            //         fontWeight: FontWeight.w600),
+            //   ),
+            //   onTap: () {},
+            // ),
+            ListTile(
+              leading: const Icon(
+                Icons.delete,
+                size: 32,
+                color: Color.fromARGB(255, 158, 156, 156),
+              ),
+              title: const Text(
+                'Delete',
+                style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w600),
+              ),
+              onTap: () async {
+                _player2.stop();
+
+                soundEffectProvider.selectedSoundEffects.removeAt(index);
+                currentBg.value = 100;
+                Navigator.pop(context);
+                setState(() {});
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                    content: Text('Sound Effect Removed from List')));
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   void _showBottomSheet(index) {
     final provider = Provider.of<BgAudioProvider>(context, listen: false);
     showModalBottomSheet(
       showDragHandle: true,
       barrierColor: const Color.fromARGB(170, 0, 0, 0),
-      constraints: const BoxConstraints(maxHeight: 300),
+      constraints: const BoxConstraints(maxHeight: 200),
       backgroundColor: const Color.fromARGB(255, 34, 33, 33),
       context: context,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -1157,21 +1317,21 @@ class _RecordPodcastState extends State<RecordPodcast> {
                 Navigator.pop(context);
               },
             ),
-            ListTile(
-              leading: const Icon(
-                Icons.favorite,
-                size: 32,
-                color: Color.fromARGB(255, 158, 156, 156),
-              ),
-              title: const Text(
-                'Favourite',
-                style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w600),
-              ),
-              onTap: () {},
-            ),
+            // ListTile(
+            //   leading: const Icon(
+            //     Icons.favorite,
+            //     size: 32,
+            //     color: Color.fromARGB(255, 158, 156, 156),
+            //   ),
+            //   title: const Text(
+            //     'Favourite',
+            //     style: TextStyle(
+            //         color: Colors.white,
+            //         fontSize: 20,
+            //         fontWeight: FontWeight.w600),
+            //   ),
+            //   onTap: () {},
+            // ),
             ListTile(
               leading: const Icon(
                 Icons.delete,
@@ -1192,6 +1352,8 @@ class _RecordPodcastState extends State<RecordPodcast> {
                 currentBg.value = 100;
                 Navigator.pop(context);
                 setState(() {});
+                ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Audio Removed from List')));
               },
             ),
           ],

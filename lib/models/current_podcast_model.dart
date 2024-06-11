@@ -73,6 +73,7 @@ class Episode {
   String audioUrl;
   String posterUrl;
   String id;
+  String createdAt;
   int listens;
 
   Episode({
@@ -82,6 +83,7 @@ class Episode {
     required this.posterUrl,
     required this.id,
     required this.listens,
+     this.createdAt = ''
   });
 
   factory Episode.fromJson(Map<String, dynamic> json) => Episode(
@@ -91,6 +93,7 @@ class Episode {
         posterUrl: json["posterUrl"] ?? '',
         id: json["_id"],
         listens: json["listens"] ?? 0,
+        createdAt: json['createdAt'] ?? ''
       );
 
   Map<String, dynamic> toJson() => {
@@ -100,6 +103,7 @@ class Episode {
         "posterUrl": posterUrl,
         "_id": id,
         "listens": listens,
+        "createdAt":createdAt
       };
 }
 
