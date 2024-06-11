@@ -39,7 +39,7 @@ class _LoginScreenState extends State<LoginScreen> {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
       Provider.of<AuthProvider>(context, listen: false)
-          .login(_emailController.text.trim(), _passwordController.text.trim());
+          .login(_emailController.text.trim(), _passwordController.text.trim(),context);
     }
   }
 
@@ -155,7 +155,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 final response = await _googleOauth.signIn();
                 
 
-                                  authProvider.oauthLogin(response!.id);
+                                  authProvider.oauthLogin(response!.id,context);
 
                               }),
                               const SizedBox(

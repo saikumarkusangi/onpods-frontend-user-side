@@ -25,7 +25,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     void submit() {
       if (_formKey.currentState!.validate()) {
         _formKey.currentState!.save();
-        authProvider.forgotPassword(_emailController.text.trim());
+        authProvider.forgotPassword(_emailController.text.trim(),context);
       }
     }
 

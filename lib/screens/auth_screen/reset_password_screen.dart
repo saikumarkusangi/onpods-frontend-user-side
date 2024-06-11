@@ -30,7 +30,7 @@ class _ResetPasswordState extends State<ResetPassword> {
       if (_passwordController1.text.trim() ==
           _passwordController2.text.trim()) {
         final response = await authProvider.resetPassword(
-            _passwordController1.text.trim(), widget.email);
+            _passwordController1.text.trim(), widget.email,context);
        if(response['success']){
          showSnackbar("Success", 'Password reset successful',ContentType.success,context);
         Get.offAll(const LoginScreen());

@@ -6,7 +6,7 @@ class AuthProvider with ChangeNotifier {
   bool _isLoading = false;
   AuthService? _authService;
   String userId = '';
-  final context = BuildContext;
+  
   AuthProvider() {
     _authService = AuthService(this);
   }
@@ -15,11 +15,11 @@ class AuthProvider with ChangeNotifier {
 
   // ---------------------------- Login -----------------------------------------
 
-  Future<void> login(String email, String password) async {
+  Future<void> login(String email, String password,BuildContext context) async {
     _isLoading = true;
     notifyListeners();
     try {
-      final userData = await _authService!.login(email, password);
+      final userData = await _authService!.login(email, password,context);
 
       userId = userData['data']['id'];
       notifyListeners();
@@ -37,12 +37,12 @@ class AuthProvider with ChangeNotifier {
 
 // ---------------------------- Login -----------------------------------------
 
-  Future<void> oauthLogin(String id) async {
+  Future<void> oauthLogin(String id,BuildContext context) async {
 
     _isLoading = true;
     notifyListeners();
     try {
-      final userData = await _authService!.oAuthlogin(id);
+      final userData = await _authService!.oAuthlogin(id,context);
 
       userId = userData['data']['id'];
       notifyListeners();
@@ -61,12 +61,12 @@ class AuthProvider with ChangeNotifier {
 
   // ---------------------------- Sign UP -----------------------------------------
 
-  Future<void> signUp(String name, String email, String password) async {
+  Future<void> signUp(String name, String email, String password,BuildContext context) async {
 
     _isLoading = true;
     notifyListeners();
     try {
-      final userData = await _authService!.signup(name, email, password);
+      final userData = await _authService!.signup(name, email, password,context);
 
       userId = userData['userId'];
       notifyListeners();
@@ -85,12 +85,12 @@ class AuthProvider with ChangeNotifier {
 
   // ---------------------------- Sign UP -----------------------------------------
 
-  Future<void> oAuthsignUp(String name, String email, String id,String photoUrl) async {
+  Future<void> oAuthsignUp(String name, String email, String id,String photoUrl,BuildContext context) async {
 
     _isLoading = true;
     notifyListeners();
     try {
-      final userData = await _authService!.oAuthsignup(name, email, id,photoUrl);
+      final userData = await _authService!.oAuthsignup(name, email, id,photoUrl,context);
 
       userId = userData['userId'];
       notifyListeners();
@@ -109,11 +109,11 @@ class AuthProvider with ChangeNotifier {
 
   // ---------------------------- Forgot Password -----------------------------------------
 
-  Future<Map<String, dynamic>> forgotPassword(String email) async {
+  Future<Map<String, dynamic>> forgotPassword(String email,BuildContext context) async {
     _isLoading = true;
     notifyListeners();
     try {
-      final otp = await _authService!.forgotPassword(email);
+      final otp = await _authService!.forgotPassword(email,context);
       return otp;
     } catch (error) {
       throw Exception(error);
@@ -125,11 +125,11 @@ class AuthProvider with ChangeNotifier {
 
    // ---------------------------- Reset Password -----------------------------------------
 
-  Future<Map<String, dynamic>> resetPassword(String password,String email)async {
+  Future<Map<String, dynamic>> resetPassword(String password,String email,BuildContext context)async {
     _isLoading = true;
     notifyListeners();
     try {
-      final response = await _authService!.resetPassword(password,email);
+      final response = await _authService!.resetPassword(password,email,context);
       return response;
     } catch (error) {
       throw Exception(error);

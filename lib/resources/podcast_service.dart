@@ -480,6 +480,7 @@ class PodcastService {
            int podcasts_page,
 
            int episodes_page ,
+           BuildContext context
           ) async {
     print(
         'calling search api $query @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@');
@@ -498,7 +499,6 @@ class PodcastService {
         throw error['message'];
       }
     } catch (e) {
-      const context = BuildContext;
       if (e is TimeoutException) {
         showSnackbar('Timeout', 'Server is too busy.Please come back again',ContentType.failure,context);
       } else if (e

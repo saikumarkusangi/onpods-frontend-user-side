@@ -55,12 +55,12 @@ class _SearchScreenState extends State<SearchScreen> {
                     textStyle: const TextStyle(color: Colors.white),
                     onChanged: (String data) {
                       if (data.length > 2) {
-                        provider.search(data, 1, 1, 1);
+                        provider.search(data, 1, 1, 1,context);
                       }
                     },
                     onSubmit: (String data) {
                       if (data.length > 2) {
-                        provider.search(data, 1, 1, 1);
+                        provider.search(data, 1, 1, 1,context);
                       } else {
                         setState(() {
                           searched = true;

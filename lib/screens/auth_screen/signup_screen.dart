@@ -41,7 +41,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       if (_formKey.currentState!.validate()) {
         _formKey.currentState!.save();
         authProvider.signUp(_nameController.text.trim(),
-            _emailController.text.trim(), _passwordController.text.trim());
+            _emailController.text.trim(), _passwordController.text.trim(),context);
       }
     }
 
@@ -243,7 +243,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                     () async {
                                   final response = await _googleOauth.signIn();
                                   authProvider.oAuthsignUp(
-                                      response!.displayName.toString(),response.email, response.id,response.photoUrl ?? '');
+                                      response!.displayName.toString(),response.email, response.id,response.photoUrl ?? '',context);
                                 }),
                                 const SizedBox(
                                   height: 20,

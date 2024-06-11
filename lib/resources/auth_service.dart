@@ -6,10 +6,10 @@ import 'package:onpods/utils/exports.dart';
 class AuthService {
   final AuthProvider authProvider;
   AuthService(this.authProvider);
- final context = BuildContext;
+
   // --------------------------------- Login--------------------------------------------------
 
-  Future<Map<String, dynamic>> login(String email, String password) async {
+  Future<Map<String, dynamic>> login(String email, String password,BuildContext context) async {
     try {
       final response = await http.post(
         Uri.parse('$baseUrl/auth/login'),
@@ -29,24 +29,14 @@ class AuthService {
       }
     } catch (e) {
       
-      if (e is TimeoutException) {
-        showSnackbar('Timeout', 'Server is too busy.Please come back again',ContentType.failure,context);
-      } else if (e
-          .toString()
-          .contains('ClientException with SocketException')) {
-        showSnackbar(
-            'Network Connection Error', 'Check your Internet Connection!!!',ContentType.failure,context);
-      } else {
-        // Handle other exceptions
-        showSnackbar('Something Went Wrong', e,ContentType.failure,context);
-      }
+     showSnackbar('Something Went Wrong', e,ContentType.failure,context);
       throw Exception('Error: $e');
     }
   }
 
 // --------------------------------- Login--------------------------------------------------
 
-  Future<Map<String, dynamic>> oAuthlogin(String id) async {
+  Future<Map<String, dynamic>> oAuthlogin(String id,BuildContext context) async {
     try {
       print(
           'calling oauth login @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ id');
@@ -85,7 +75,7 @@ class AuthService {
 // ---------------------------------- Signup----------------------------------------
 
   Future<Map<String, dynamic>> signup(
-      String name, String email, String password) async {
+      String name, String email, String password,BuildContext context) async {
     final fcmToken = await FirebaseMessaging.instance.getToken();
     try {
       final response = await http.post(
@@ -125,7 +115,7 @@ class AuthService {
   // ---------------------------------- Signup----------------------------------------
 
   Future<Map<String, dynamic>> oAuthsignup(
-      String name, String email, String id, String photoUrl) async {
+      String name, String email, String id, String photoUrl,BuildContext context) async {
     final fcmToken = await FirebaseMessaging.instance.getToken();
     try {
       print(
@@ -167,7 +157,7 @@ class AuthService {
 
   // --------------------------------- Forgot Password --------------------------------------------------
 
-  Future<Map<String, dynamic>> forgotPassword(String email) async {
+  Future<Map<String, dynamic>> forgotPassword(String email,BuildContext context) async {
     try {
       final response = await http.post(
         Uri.parse('$baseUrl/auth/forgot-password'),
@@ -213,7 +203,7 @@ class AuthService {
 
   // --------------------------------- resetPassword--------------------------------------------------
 
-  Future<Map<String, dynamic>> resetPassword(String password,String email) async {
+  Future<Map<String, dynamic>> resetPassword(String password,String email,BuildContext context) async {
     try {
       final response = await http.post(
         Uri.parse('$baseUrl/auth/reset-password'),

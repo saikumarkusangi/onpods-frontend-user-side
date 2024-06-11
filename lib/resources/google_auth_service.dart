@@ -7,7 +7,7 @@ Future<void> googleSignUp(context) async {
   final provider = Provider.of<AuthProvider>(context);
   final response = await _googleOauth.signIn();
   provider.signUp(
-      response!.displayName.toString(), response.email, response.id);
+      response!.displayName.toString(), response.email, response.id,context);
 }
 
 Future<void> googleSignIn(context) async {

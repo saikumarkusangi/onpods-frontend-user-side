@@ -123,10 +123,10 @@ _isLoading = true;
   }
 
 
-  Future<void> search(query,userpage,podcastpage,episodepage) async {
+  Future<void> search(query,userpage,podcastpage,episodepage,context) async {
     try {
 
-      _searchData = await PodcastService().search(query,1,1,1);
+      _searchData = await PodcastService().search(query,1,1,1,context);
       notifyListeners();
     } catch (e) {
       throw Exception(e);
